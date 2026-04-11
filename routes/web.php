@@ -81,3 +81,16 @@ Route::post('/recruiter/logout', [App\Http\Controllers\Auth\RecruiterLoginContro
 
 require __DIR__.'/auth.php';
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+
+// Emergency Production Fix for Hostinger
+Route::get('/multiverse-init', function() {
+    try {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+        return "🌌 Multiverse Synchronized! All caches cleared. You can now visit the <a href='/'>Home Page</a>.";
+    } catch (\Exception $e) {
+        return "Initialization Error: " . $e->getMessage();
+    }
+});
