@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+Allow: /colleges
+Allow: /notes
+Allow: /jobs
+Allow: /sitemap.xml
+
+# Restricted Zones
+Disallow: /admin
+Disallow: /chat
+Disallow: /profile
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+
+Sitemap: https://mycollegeverse.com/sitemap.xml

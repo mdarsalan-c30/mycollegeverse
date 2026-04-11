@@ -1,0 +1,83 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
+
+Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
+
+// Public Reading Routes (SEO Friendly)
+Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
+Route::get('/notes/{id}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
+
+Route::get('/community', [App\Http\Controllers\CommunityController::class, 'index'])->name('community.index');
+
+Route::get('/jobs', [App\Http\Controllers\JobBoardController::class, 'index'])->name('jobs.index');
+Route::get('/jobs/{job}', [App\Http\Controllers\JobBoardController::class, 'show'])->name('jobs.show');
+
+Route::get('/colleges', [App\Http\Controllers\CollegeController::class, 'index'])->name('colleges.index');
+Route::get('/colleges/{college:slug}', [App\Http\Controllers\CollegeController::class, 'show'])->name('colleges.show');
+
+Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
+Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+
+// Interaction Routes (Auth Required)
+Route::middleware(['auth'])->group(function () {
+    // Shared Routes (Dynamic Layouts)
+    Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
+    Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
+    Route::delete('/chat/message/{id}', [App\Http\Controllers\ChatController::class, 'deleteMessage'])->name('chat.delete');
+    Route::get('/chat/{user?}', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile/update-photo', [App\Http\Controllers\ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
+
+    // Student Only Routes
+    Route::middleware(['role:student'])->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/notes', [App\Http\Controllers\NoteController::class, 'store'])->name('notes.store');
+        Route::get('/notes/{id}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
+        Route::post('/community/store', [App\Http\Controllers\CommunityController::class, 'store'])->name('community.store');
+        Route::post('/community/comment', [App\Http\Controllers\CommunityController::class, 'comment'])->name('community.comment');
+        Route::post('/community/vote/{postId}', [App\Http\Controllers\CommunityController::class, 'vote'])->name('community.vote');
+        Route::get('/professors', [App\Http\Controllers\ProfessorController::class, 'index'])->name('professors.index');
+        Route::get('/professors/{id}', [App\Http\Controllers\ProfessorController::class, 'show'])->name('professors.show');
+        Route::post('/professors/request', [App\Http\Controllers\ProfessorController::class, 'requestProfessor'])->name('professors.request');
+        Route::post('/professors/{id}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
+        Route::post('/colleges/{college:slug}/rate', [App\Http\Controllers\CollegeController::class, 'rate'])->name('colleges.rate');
+        Route::post('/colleges/request', [App\Http\Controllers\CollegeController::class, 'requestCollege'])->name('colleges.request');
+
+        // Recruitment Pipeline routes
+        Route::get('/pipeline', [App\Http\Controllers\PipelineController::class, 'index'])->name('pipeline.index');
+        Route::post('/jobs/{job}/apply', [App\Http\Controllers\JobApplicationController::class, 'store'])->name('jobs.apply');
+    });
+
+    // Recruiter Only Routes
+    Route::middleware(['role:recruiter'])->group(function () {
+        Route::get('/recruiter', [App\Http\Controllers\RecruiterController::class, 'index'])->name('recruiter.dashboard');
+        Route::post('/recruiter/jobs', [App\Http\Controllers\RecruiterController::class, 'storeJob'])->name('recruiter.jobs.store');
+        Route::get('/recruiter/jobs/{job}/applicants', [App\Http\Controllers\RecruiterController::class, 'viewApplicants'])->name('recruiter.jobs.applicants');
+        Route::post('/recruiter/applications/{application}/status', [App\Http\Controllers\RecruiterController::class, 'updateApplicationStatus'])->name('recruiter.applications.status');
+        Route::post('/recruiter/integration/initialize', [App\Http\Controllers\RecruiterController::class, 'initializeIntegration'])->name('recruiter.integration.initialize');
+    });
+});
+
+// Separate Recruiter Auth
+Route::get('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'create'])->name('recruiter.register');
+Route::post('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'store'])->name('recruiter.register.store');
+Route::get('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'create'])->name('recruiter.login');
+Route::post('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'store'])->name('recruiter.login.store');
+Route::post('/recruiter/logout', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'destroy'])->name('recruiter.logout');
+
+require __DIR__.'/auth.php';
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
