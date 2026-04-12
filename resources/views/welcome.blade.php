@@ -108,7 +108,7 @@
         <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
             <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 md:h-14 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-12 md:h-20 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
@@ -186,7 +186,7 @@
                         Academic Identity Platform
                     </div>
                     
-                    <h1 class="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900 tracking-tight">
                         The ultimate <span class="gradient-text">College OS</span> for every student.
                     </h1>
                     
@@ -222,7 +222,7 @@
 
                 <div class="relative">
                     <!-- Glass Card Mockups -->
-                    <div class="glass p-6 rounded-3xl shadow-2xl relative z-10 border-white/50">
+                    <div class="glass p-5 md:p-8 rounded-3xl shadow-2xl relative z-10 border-white/50 w-full max-w-full">
                         <div class="flex justify-between items-center mb-6">
                             <h3 class="font-bold text-xl text-secondary">Recent Uploads</h3>
                             <a href="{{ route('notes.index') }}" class="text-primary font-semibold text-sm">View All</a>
@@ -360,7 +360,7 @@
         <footer class="max-w-7xl mx-auto px-6 py-10 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-12 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 <p class="text-slate-500 text-xs md:text-sm font-medium">© 2026 MyCollegeVerse. Built for Students, by Students.</p>

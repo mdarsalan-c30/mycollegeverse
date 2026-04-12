@@ -111,7 +111,7 @@
             <aside class="hidden lg:flex flex-col w-72 h-full bg-white border-r border-slate-100 relative z-40 transition-all duration-300">
                 <div class="px-10 py-12">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-14 w-auto" alt="Recruiter MCV">
+                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="Recruiter MCV">
                         <span class="font-black text-lg tracking-tight text-slate-900 sr-only">Pipeline OS Hub</span>
                     </div>
                 </div>

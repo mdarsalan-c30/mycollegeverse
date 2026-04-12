@@ -85,7 +85,7 @@
             <aside class="hidden lg:flex flex-col w-72 h-full bg-white border-r border-admin-border relative z-40">
                 <div class="px-8 py-8 shrink-0">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-14 w-auto" alt="Admin MCV">
+                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="Admin MCV">
                         <span class="sr-only">AdminVerse Control Tower</span>
                     </div>
                 </div>
