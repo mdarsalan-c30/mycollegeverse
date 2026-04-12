@@ -91,6 +91,11 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 | Admin Multiverse Security Guard 🛡️
 |--------------------------------------------------------------------------
 */
+// Admin Login Redirect (Resolves 404 Node)
+Route::get('/admin/login', function() {
+    return redirect()->route('login');
+});
+
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     // The Command Center Hub
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
