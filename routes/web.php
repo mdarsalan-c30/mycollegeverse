@@ -32,6 +32,9 @@ Route::get('/colleges/{college:slug}', [App\Http\Controllers\CollegeController::
 Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
 Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
 
+// Multiverse SEO Pages (Privacy, Terms, About, etc.)
+Route::get('/p/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
+
 // Interaction Routes (Auth Required)
 Route::middleware(['auth'])->group(function () {
     // Shared Routes (Dynamic Layouts)
@@ -139,6 +142,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // Deep Analytics Cluster
     Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics');
+
+    // SEO Nucleus (Page Management)
+    Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
 });
 
 Route::get('/multiverse-init', function() {

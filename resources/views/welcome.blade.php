@@ -390,9 +390,10 @@
                 </div>
                 <p class="text-slate-500 text-xs md:text-sm font-medium">© 2026 MyCollegeVerse. Built for Students, by Students.</p>
                 <div class="flex gap-6 text-slate-400">
-                    <a href="#" class="hover:text-primary transition-colors italic">Privacy</a>
-                    <a href="#" class="hover:text-primary transition-colors italic">Terms</a>
-                    <a href="#" class="hover:text-primary transition-colors italic">Contact</a>
+                    <a href="{{ route('pages.show', 'about-us') }}" class="hover:text-primary transition-colors italic">About Us</a>
+                    <a href="{{ route('pages.show', 'privacy-policy') }}" class="hover:text-primary transition-colors italic">Privacy</a>
+                    <a href="{{ route('pages.show', 'terms-of-service') }}" class="hover:text-primary transition-colors italic">Terms</a>
+                    <a href="{{ route('pages.show', 'contact-us') }}" class="hover:text-primary transition-colors italic">Contact</a>
                 </div>
             </div>
         </footer>
