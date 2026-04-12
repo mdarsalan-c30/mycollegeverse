@@ -135,7 +135,7 @@
                     </div>
 
                     <!-- Mobile Toggle -->
-                    <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-slate-600 hover:text-primary transition-colors">
+                    <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-slate-600 hover:text-primary transition-colors focus:outline-none">
                         <svg x-show="!mobileMenu" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
                         </svg>
@@ -146,37 +146,65 @@
                 </div>
             </div>
 
-            <!-- Mobile Menu Overlay -->
+            <!-- Mobile Side Menu Overlay (Backdrop) -->
             <div x-show="mobileMenu" 
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-4"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 -translate-y-4"
-                 class="md:hidden mt-2 glass rounded-2xl p-6 shadow-2xl border border-slate-100 space-y-4 text-left italic"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click="mobileMenu = false"
+                 class="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[60] md:hidden"
+                 x-cloak></div>
+
+            <!-- Mobile Side Menu Drawer -->
+            <div x-show="mobileMenu" 
+                 x-transition:enter="transition ease-out duration-300 transform"
+                 x-transition:enter-start="translate-x-full"
+                 x-transition:enter-end="translate-x-0"
+                 x-transition:leave="transition ease-in duration-200 transform"
+                 x-transition:leave-start="translate-x-0"
+                 x-transition:leave-end="translate-x-full"
+                 class="fixed inset-y-0 right-0 w-[85%] max-w-xs glass bg-white/95 backdrop-blur-2xl z-[70] md:hidden shadow-2xl p-8 flex flex-col h-full overflow-y-auto"
                  x-cloak>
-                <div class="grid grid-cols-1 gap-1">
-                    <a href="{{ route('notes.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Browse Notes</a>
-                    <a href="{{ route('community.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Community Hub</a>
-                    <a href="{{ route('jobs.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Jobs Pipeline</a>
-                    <a href="{{ route('professors.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Professor Reviews</a>
-                    <a href="{{ route('colleges.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Campus Hubs</a>
+                <div class="flex justify-between items-center mb-10">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MCV">
+                    <button @click="mobileMenu = false" class="p-2 text-slate-400 hover:text-primary transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <div class="pt-4 border-t border-slate-100 space-y-4">
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="block w-full text-center py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 italic">Enter Dashboard</a>
-                    @else
-                        <a href="{{ route('login') }}" class="block w-full text-center py-4 text-slate-600 font-bold hover:text-primary transition-colors">Sign In</a>
-                        <a href="{{ route('register') }}" class="block w-full text-center py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 italic">Create Account Node</a>
-                    @endauth
+
+                <div class="space-y-6 text-left">
+                    <div class="space-y-1">
+                        <a href="{{ route('notes.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Browse NotesHub</a>
+                        <a href="{{ route('community.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Community Verse</a>
+                        <a href="{{ route('jobs.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Carrier Pipeline</a>
+                        <a href="{{ route('professors.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Professor Intel</a>
+                        <a href="{{ route('colleges.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Campus Nodes</a>
+                    </div>
+                    
+                    <div class="pt-8 space-y-4">
+                        @auth
+                            <a href="{{ url('/dashboard') }}" class="block w-full text-center py-5 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 italic text-lg">Enter Dashboard</a>
+                        @else
+                            <a href="{{ route('login') }}" class="block w-full text-center py-4 text-slate-600 font-bold hover:text-primary transition-colors">Sign In</a>
+                            <a href="{{ route('register') }}" class="block w-full text-center py-5 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/20 italic text-lg">Create Identity</a>
+                        @endauth
+                    </div>
                 </div>
-            </div>
+
+                <div class="mt-auto pt-10 text-center">
+                    <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">© 2026 MyCollegeVerse</p>
+                </div>
         </nav>
 
         <!-- Hero Section -->
-        <main class="pt-32 pb-20 px-4 md:px-6">
-            <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        <main class="pt-28 pb-20 px-4 md:px-6 overflow-hidden">
+            <div class="max-w-7xl mx-auto w-full overflow-hidden">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
                 <div class="space-y-8 text-center lg:text-left">
                     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold text-sm mx-auto lg:mx-0">
                         <span class="relative flex h-2 w-2">
@@ -186,7 +214,7 @@
                         Academic Identity Platform
                     </div>
                     
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900 tracking-tight">
+                    <h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900 tracking-tight break-words">
                         The ultimate <span class="gradient-text">College OS</span> for every student.
                     </h1>
                     
