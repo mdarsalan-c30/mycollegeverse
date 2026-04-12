@@ -98,7 +98,7 @@
             .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         </style>
     </head>
-    <body class="antialiased bg-slate-50 text-slate-900 hero-pattern min-h-screen" x-data="{ mobileMenu: false }">
+    <body class="antialiased bg-slate-50 text-slate-900 hero-pattern min-h-screen overflow-x-hidden" x-data="{ mobileMenu: false }">
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -107,7 +107,7 @@
         <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
             <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-8 md:h-10 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-7 md:h-10 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
@@ -252,9 +252,11 @@
                     </div>
 
                     <!-- Abstract decorative elements (Blobs) -->
-                    <div class="absolute -top-20 -right-20 w-80 h-80 bg-primary/30 rounded-full blur-3xl -z-10 animate-blob"></div>
-                    <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl -z-10 animate-blob animation-delay-2000"></div>
-                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-violet-400/20 rounded-full blur-3xl -z-10 animate-blob animation-delay-4000"></div>
+                    <div class="absolute inset-0 -z-10 overflow-hidden rounded-3xl pointer-events-none">
+                        <div class="absolute -top-20 -right-20 w-80 h-80 bg-primary/30 rounded-full blur-3xl animate-blob"></div>
+                        <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+                        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-violet-400/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+                    </div>
                 </div>
             </div>
         </main>
