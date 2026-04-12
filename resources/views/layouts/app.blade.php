@@ -123,7 +123,7 @@
             <aside class="hidden lg:flex flex-col w-72 h-full sidebar-bg border-r border-slate-200 shadow-sm relative z-40 transition-all duration-300">
                 <div class="px-8 py-8">
                     <div class="flex items-center gap-3">
-                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="MyCollegeVerse Logo">
+                        <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="MyCollegeVerse — Student OS">
                         <span class="font-bold text-xl tracking-tight text-secondary sr-only">CollegeVerse</span>
                     </div>
                 </div>

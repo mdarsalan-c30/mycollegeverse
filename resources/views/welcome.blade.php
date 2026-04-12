@@ -33,11 +33,11 @@
         </script>
 
         <!-- Multiverse Branding 💎 -->
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('mcv/apple-touch-icon.png') }}">
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('mcv/favicon-32x32.png') }}">
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('mcv/favicon-16x16.png') }}">
-        <link rel="manifest" href="{{ asset('mcv/site.webmanifest') }}">
-        <link rel="shortcut icon" href="{{ asset('mcv/favicon.ico') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/mcv/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/mcv/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/mcv/favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ asset('assets/mcv/site.webmanifest') }}">
+        <link rel="shortcut icon" href="{{ asset('assets/mcv/favicon.ico') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -108,7 +108,7 @@
         <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
             <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-1 md:gap-2">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-16 md:h-28 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-16 md:h-28 w-auto" alt="MyCollegeVerse — Academic Identity Platform">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
@@ -169,7 +169,7 @@
                  class="fixed inset-y-0 right-0 w-[85%] max-w-xs glass bg-white/95 backdrop-blur-2xl z-[70] md:hidden shadow-2xl p-8 flex flex-col h-full overflow-y-auto"
                  x-cloak>
                 <div class="flex justify-between items-center mb-10">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MCV">
+                    <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MyCollegeVerse — Pocket OS">
                     <button @click="mobileMenu = false" class="p-2 text-slate-400 hover:text-primary transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -385,7 +385,7 @@
         <footer class="max-w-7xl mx-auto px-6 py-10 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-12 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-12 w-auto" alt="MyCollegeVerse — Building Academic Identity">
                     <span class="font-bold text-lg text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 <p class="text-slate-500 text-xs md:text-sm font-medium">© 2026 MyCollegeVerse. Built for Students, by Students.</p>
