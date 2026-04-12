@@ -1,0 +1,6 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Bridge Traffic to Public Node 🛰️
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>

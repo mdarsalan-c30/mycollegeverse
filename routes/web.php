@@ -152,14 +152,16 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
 });
 
-Route::get('/multiverse-init', function() {
+Route::get('/multiverse-sync', function() {
     try {
-        Artisan::call('config:clear');
-        Artisan::call('cache:clear');
-        Artisan::call('view:clear');
+        Artisan::call('optimize:clear');
         Artisan::call('route:clear');
-        return "🌌 Multiverse Synchronized! All caches cleared. You can now visit the <a href='/'>Home Page</a>.";
+        Artisan::call('view:clear');
+        Artisan::call('config:clear');
+        return "🌌 Multiverse Synchronized! All production caches have been cleared. You can now visit <a href='/admin/login'>/admin/login</a>.";
     } catch (\Exception $e) {
-        return "Initialization Error: " . $e->getMessage();
+        return "Sync Error: " . $e->getMessage();
     }
 });
+
+Route::get('/multiverse-init', function() {
