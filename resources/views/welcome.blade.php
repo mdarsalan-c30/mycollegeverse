@@ -107,8 +107,8 @@
         <!-- Navigation -->
         <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
             <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
-                <div class="flex items-center gap-2">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-12 md:h-20 w-auto" alt="MyCollegeVerse">
+                <div class="flex items-center gap-1 md:gap-2">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-16 md:h-28 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
@@ -202,9 +202,9 @@
         </nav>
 
         <!-- Hero Section -->
-        <main class="pt-28 pb-20 px-4 md:px-6 overflow-hidden">
+        <main class="pt-24 pb-20 px-2 md:px-6 overflow-hidden">
             <div class="max-w-7xl mx-auto w-full overflow-hidden">
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="flex flex-col lg:grid lg:grid-cols-2 gap-10 items-center">
                 <div class="space-y-8 text-center lg:text-left">
                     <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold text-sm mx-auto lg:mx-0">
                         <span class="relative flex h-2 w-2">
@@ -214,26 +214,26 @@
                         Academic Identity Platform
                     </div>
                     
-                    <h1 class="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900 tracking-tight break-words">
-                        The ultimate <span class="gradient-text">College OS</span> for every student.
+                    <h1 class="text-xl xs:text-2xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900 tracking-tight break-words px-2">
+                        The ultimate <span class="gradient-text">College OS</span><br class="md:hidden"> for every student.
                     </h1>
                     
                     <p class="text-lg md:text-xl text-slate-600 max-w-lg leading-relaxed mx-auto lg:mx-0">
                         Access high-quality structured notes, interact with peers, and review professors. All in one place.
                     </p>
 
-                    <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto lg:mx-0">
+                    <div class="flex flex-col sm:flex-row gap-4 w-full max-w-[280px] md:max-w-md mx-auto lg:mx-0">
                         <form action="{{ route('notes.index') }}" method="GET" class="flex-1 glass p-2 rounded-2xl flex items-center gap-4 shadow-xl shadow-slate-200/50">
-                            <input type="text" name="search" placeholder="Search for your college or subject..." class="bg-transparent border-none focus:ring-0 px-4 w-full text-slate-700 font-medium h-12 text-sm">
-                            <button type="submit" class="bg-primary text-white p-3 rounded-xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <input type="text" name="search" placeholder="Search..." class="bg-transparent border-none focus:ring-0 px-2 w-full text-slate-700 font-medium h-10 text-xs">
+                            <button type="submit" class="bg-primary text-white p-2 rounded-xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform flex-shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </button>
                         </form>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row items-center gap-6 pt-4 justify-center lg:justify-start">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 justify-center lg:justify-start max-w-[280px] md:max-w-none mx-auto lg:mx-0">
                         <div class="flex -space-x-4">
                             @for ($i = 1; $i <= 4; $i++)
                                 <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white overflow-hidden shadow-sm">
@@ -244,34 +244,31 @@
                                 +{{ $stats['users'] > 100 ? round($stats['users']/100)*100 : $stats['users'] }}
                             </div>
                         </div>
-                        <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest">Joined by students in {{ $stats['colleges'] }} Hubs</p>
+                        <p class="text-[9px] md:text-xs text-slate-500 font-bold uppercase tracking-widest leading-tight">Joined by students in<br class="md:hidden"> {{ $stats['colleges'] }} Campus Hubs</p>
                     </div>
                 </div>
 
                 <div class="relative">
                     <!-- Glass Card Mockups -->
-                    <div class="glass p-5 md:p-8 rounded-3xl shadow-2xl relative z-10 border-white/50 w-full max-w-full">
+                    <div class="glass p-4 md:p-8 rounded-[2rem] shadow-2xl relative z-10 border-white/50 w-full max-w-[300px] md:max-w-full mx-auto scale-95 md:scale-100 origin-center">
                         <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-bold text-xl text-secondary">Recent Uploads</h3>
-                            <a href="{{ route('notes.index') }}" class="text-primary font-semibold text-sm">View All</a>
+                            <h3 class="font-bold text-lg md:text-xl text-secondary">Recent Notes</h3>
+                            <a href="{{ route('notes.index') }}" class="text-primary font-semibold text-xs md:text-sm">View All</a>
                         </div>
                         
-                        <div class="space-y-4">
+                        <div class="space-y-3 md:space-y-4">
                             @forelse ($recentNotes as $note)
-                            <a href="{{ route('notes.show', $note->id) }}" class="block p-4 rounded-2xl bg-white/50 border border-white/80 hover:bg-white transition-all group flex items-center justify-between shadow-sm">
-                                <div class="flex items-center gap-4 overflow-hidden">
-                                    <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform flex-shrink-0">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <a href="{{ route('notes.show', $note->id) }}" class="block p-3 md:p-4 rounded-xl md:rounded-2xl bg-white/50 border border-white/80 hover:bg-white transition-all group flex items-center justify-between shadow-sm">
+                                <div class="flex items-center gap-3 md:gap-4 overflow-hidden">
+                                    <div class="w-10 h-10 md:w-12 md:h-12 bg-primary/10 rounded-lg md:rounded-xl flex items-center justify-center text-primary group-hover:scale-110 transition-transform flex-shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 md:h-6 md:w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                         </svg>
                                     </div>
                                     <div class="overflow-hidden">
-                                        <p class="font-bold text-slate-800 truncate">{{ $note->title }}</p>
-                                        <p class="text-xs text-slate-500 truncate">{{ $note->subject->name ?? 'General' }}</p>
+                                        <p class="text-sm md:text-base font-bold text-slate-800 truncate">{{ $note->title }}</p>
+                                        <p class="text-[10px] md:text-xs text-slate-500 truncate">{{ $note->subject->name ?? 'General Info' }}</p>
                                     </div>
-                                </div>
-                                <div class="flex items-center gap-1 bg-yellow-400/10 text-yellow-600 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase">
-                                    Verified
                                 </div>
                             </a>
                             @empty
