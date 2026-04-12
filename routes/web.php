@@ -83,6 +83,64 @@ require __DIR__.'/auth.php';
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
 
 // Emergency Production Fix for Hostinger
+/*
+|--------------------------------------------------------------------------
+| Admin Multiverse Security Guard 🛡️
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    // The Command Center Hub
+    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    
+    // Citizen Registry (User Management)
+    Route::get('/users', [App\Http\Controllers\Admin\UserController::class, 'index'])->name('users');
+    Route::post('/users/{user}/status', [App\Http\Controllers\Admin\UserController::class, 'updateStatus'])->name('users.status');
+    Route::post('/users/{user}/promote', [App\Http\Controllers\Admin\UserController::class, 'promote'])->name('users.promote');
+    
+    // Knowledge Moderation (Note Approval)
+    Route::get('/notes', [App\Http\Controllers\Admin\NoteController::class, 'index'])->name('notes');
+    Route::post('/notes/{note}/verify', [App\Http\Controllers\Admin\NoteController::class, 'verify'])->name('notes.verify');
+    Route::delete('/notes/{note}', [App\Http\Controllers\Admin\NoteController::class, 'destroy'])->name('notes.destroy');
+
+    // Resolution Center (Reports & Flags)
+    Route::get('/reports', [App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports');
+    Route::post('/reports/{report}/resolve', [App\Http\Controllers\Admin\ReportController::class, 'resolve'])->name('reports.resolve');
+
+    // Community Moderation (Verse Feed)
+    Route::get('/community', [App\Http\Controllers\Admin\CommunityController::class, 'index'])->name('community');
+    Route::post('/community/{post}/pin', [App\Http\Controllers\Admin\CommunityController::class, 'togglePin'])->name('community.pin');
+    Route::delete('/community/{post}', [App\Http\Controllers\Admin\CommunityController::class, 'destroy'])->name('community.destroy');
+
+    // Chat Monitoring (Social Safety) 💬
+    Route::get('/chat', [App\Http\Controllers\Admin\ChatController::class, 'index'])->name('chat');
+    
+    // Feedback Governance (Reviews) ⭐
+    Route::get('/reviews', [App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('reviews');
+    Route::delete('/reviews/{type}/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
+
+    // Institutional Registries (Colleges & Professors)
+    Route::get('/colleges', [App\Http\Controllers\Admin\CollegeController::class, 'index'])->name('colleges');
+    Route::post('/colleges', [App\Http\Controllers\Admin\CollegeController::class, 'store'])->name('colleges.store');
+    Route::post('/colleges/import', [App\Http\Controllers\Admin\CollegeController::class, 'import'])->name('colleges.import');
+    Route::patch('/colleges/{college}', [App\Http\Controllers\Admin\CollegeController::class, 'update'])->name('colleges.update');
+    Route::delete('/colleges/{college}', [App\Http\Controllers\Admin\CollegeController::class, 'destroy'])->name('colleges.destroy');
+
+    Route::get('/professors', [App\Http\Controllers\Admin\ProfessorController::class, 'index'])->name('professors');
+    Route::post('/professors', [App\Http\Controllers\Admin\ProfessorController::class, 'store'])->name('professors.store');
+    Route::delete('/professors/{professor}', [App\Http\Controllers\Admin\ProfessorController::class, 'destroy'])->name('professors.destroy');
+
+    // Command Center (Settings & Admins) ⚙️👑
+    Route::get('/settings', [App\Http\Controllers\Admin\SettingController::class, 'index'])->name('settings');
+    Route::post('/settings', [App\Http\Controllers\Admin\SettingController::class, 'update'])->name('settings.update');
+    
+    Route::get('/admins', [App\Http\Controllers\Admin\AdminManagementController::class, 'index'])->name('admins');
+    Route::post('/admins', [App\Http\Controllers\Admin\AdminManagementController::class, 'store'])->name('admins.store');
+    Route::delete('/admins/{admin}', [App\Http\Controllers\Admin\AdminManagementController::class, 'destroy'])->name('admins.destroy');
+
+    // Deep Analytics Cluster
+    Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics');
+});
+
 Route::get('/multiverse-init', function() {
     try {
         Artisan::call('config:clear');

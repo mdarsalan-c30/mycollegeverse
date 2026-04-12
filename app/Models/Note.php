@@ -37,4 +37,21 @@ class Note extends Model
     {
         return $this->morphMany(Comment::class, 'commentable');
     }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
+
+    /**
+     * Resolve the High-Fidelity URL for the Knowledge Asset.
+     */
+    public function getPdfUrlAttribute()
+    {
+        if (filter_var($this->file_path, FILTER_VALIDATE_URL)) {
+            return $this->file_path;
+        }
+
+        return asset('storage/' . $this->file_path);
+    }
 }

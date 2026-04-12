@@ -33,6 +33,8 @@ class User extends Authenticatable
         'company_name',
         'company_website',
         'integration_token',
+        'status',
+        'ban_reason',
     ];
 
     public function getKarmaAttribute()
@@ -159,5 +161,10 @@ class User extends Authenticatable
     public function getUnreadPipelineCountAttribute()
     {
         return $this->applications()->where('is_seen_by_student', false)->count();
+    }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 }

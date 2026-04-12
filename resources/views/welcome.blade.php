@@ -32,6 +32,13 @@
             })(window, document, "clarity", "script", "wa301yp28x");
         </script>
 
+        <!-- Multiverse Branding 💎 -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('mcv/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('mcv/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('mcv/favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ asset('mcv/site.webmanifest') }}">
+        <link rel="shortcut icon" href="{{ asset('mcv/favicon.ico') }}">
+
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,6 +46,8 @@
 
         <!-- Tailwind CDN with Custom Config -->
         <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Alpine.js -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script>
             tailwind.config = {
                 theme: {
@@ -56,6 +65,7 @@
         </script>
 
         <style>
+            [x-cloak] { display: none !important; }
             .glass {
                 background: rgba(255, 255, 255, 0.7);
                 backdrop-filter: blur(12px);
@@ -88,49 +98,86 @@
             .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         </style>
     </head>
-    <body class="antialiased bg-slate-50 text-slate-900 hero-pattern min-h-screen">
+    <body class="antialiased bg-slate-50 text-slate-900 hero-pattern min-h-screen" x-data="{ mobileMenu: false }">
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
         <!-- Navigation -->
-        <nav class="fixed top-0 w-full z-50 px-6 py-4">
-            <div class="max-w-7xl mx-auto glass rounded-2xl px-6 py-3 flex justify-between items-center shadow-sm">
+        <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
+            <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-2">
-                    <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                        <span class="text-white font-bold text-xl">M</span>
-                    </div>
-                    <span class="font-bold text-xl tracking-tight text-secondary">MyCollegeVerse</span>
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-8 md:h-10 w-auto" alt="MyCollegeVerse">
+                    <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
                 <div class="hidden md:flex items-center gap-8 font-medium text-slate-600">
                     <a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Browse Notes</a>
-                    <a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community</a>
+                    <a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community Hub</a>
                     <a href="{{ route('jobs.index') }}" class="hover:text-primary transition-colors">Jobs</a>
                     <a href="{{ route('professors.index') }}" class="hover:text-primary transition-colors">Professors</a>
-                    <a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Colleges</a>
+                    <a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Colleges Hub</a>
                 </div>
 
                 <div class="flex items-center gap-4">
-                    @if (Route::has('login'))
-                        @auth
-                            <a href="{{ url('/dashboard') }}" class="text-slate-600 font-medium">Dashboard</a>
-                        @else
-                            <a href="{{ route('login') }}" class="text-slate-600 font-medium hover:text-primary">Login</a>
-                            @if (Route::has('register'))
-                                <a href="{{ route('register') }}" class="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/25 hover:scale-105 transition-transform">Get Started</a>
-                            @endif
-                        @endauth
-                    @endif
+                    <div class="hidden md:flex items-center gap-4">
+                        @if (Route::has('login'))
+                            @auth
+                                <a href="{{ url('/dashboard') }}" class="text-slate-600 font-medium">Dashboard</a>
+                            @else
+                                <a href="{{ route('login') }}" class="text-slate-600 font-medium hover:text-primary">Login</a>
+                                @if (Route::has('register'))
+                                    <a href="{{ route('register') }}" class="bg-primary text-white px-6 py-2.5 rounded-xl font-semibold shadow-lg shadow-primary/25 hover:scale-105 transition-transform">Get Started</a>
+                                @endif
+                            @endauth
+                        @endif
+                    </div>
+
+                    <!-- Mobile Toggle -->
+                    <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2 text-slate-600 hover:text-primary transition-colors">
+                        <svg x-show="!mobileMenu" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                        </svg>
+                        <svg x-show="mobileMenu" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" x-cloak>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div x-show="mobileMenu" 
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 -translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 -translate-y-4"
+                 class="md:hidden mt-2 glass rounded-2xl p-6 shadow-2xl border border-slate-100 space-y-4 text-left italic"
+                 x-cloak>
+                <div class="grid grid-cols-1 gap-1">
+                    <a href="{{ route('notes.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Browse Notes</a>
+                    <a href="{{ route('community.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Community Hub</a>
+                    <a href="{{ route('jobs.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Jobs Pipeline</a>
+                    <a href="{{ route('professors.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Professor Reviews</a>
+                    <a href="{{ route('colleges.index') }}" class="block px-4 py-3 text-slate-600 font-bold hover:bg-primary/5 hover:text-primary rounded-xl transition-all">Campus Hubs</a>
+                </div>
+                <div class="pt-4 border-t border-slate-100 space-y-4">
+                    @auth
+                        <a href="{{ url('/dashboard') }}" class="block w-full text-center py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 italic">Enter Dashboard</a>
+                    @else
+                        <a href="{{ route('login') }}" class="block w-full text-center py-4 text-slate-600 font-bold hover:text-primary transition-colors">Sign In</a>
+                        <a href="{{ route('register') }}" class="block w-full text-center py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 italic">Create Account Node</a>
+                    @endauth
                 </div>
             </div>
         </nav>
 
         <!-- Hero Section -->
-        <main class="pt-32 pb-20 px-6">
+        <main class="pt-32 pb-20 px-4 md:px-6">
             <div class="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold text-sm">
+                <div class="space-y-8 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 font-semibold text-sm mx-auto lg:mx-0">
                         <span class="relative flex h-2 w-2">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
@@ -138,17 +185,17 @@
                         Academic Identity Platform
                     </div>
                     
-                    <h1 class="text-5xl md:text-7xl font-extrabold leading-tight text-slate-900">
+                    <h1 class="text-4xl md:text-5xl lg:text-7xl font-extrabold leading-tight text-slate-900">
                         The ultimate <span class="gradient-text">College OS</span> for every student.
                     </h1>
                     
-                    <p class="text-xl text-slate-600 max-w-lg leading-relaxed">
+                    <p class="text-lg md:text-xl text-slate-600 max-w-lg leading-relaxed mx-auto lg:mx-0">
                         Access high-quality structured notes, interact with peers, and review professors. All in one place.
                     </p>
 
-                    <div class="flex flex-col sm:flex-row gap-4">
+                    <div class="flex flex-col sm:flex-row gap-4 max-w-md mx-auto lg:mx-0">
                         <form action="{{ route('notes.index') }}" method="GET" class="flex-1 glass p-2 rounded-2xl flex items-center gap-4 shadow-xl shadow-slate-200/50">
-                            <input type="text" name="search" placeholder="Search for your college or subject..." class="bg-transparent border-none focus:ring-0 px-4 w-full text-slate-700 font-medium h-12">
+                            <input type="text" name="search" placeholder="Search for your college or subject..." class="bg-transparent border-none focus:ring-0 px-4 w-full text-slate-700 font-medium h-12 text-sm">
                             <button type="submit" class="bg-primary text-white p-3 rounded-xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -157,18 +204,18 @@
                         </form>
                     </div>
 
-                    <div class="flex items-center gap-6 pt-4">
+                    <div class="flex flex-col sm:flex-row items-center gap-6 pt-4 justify-center lg:justify-start">
                         <div class="flex -space-x-4">
                             @for ($i = 1; $i <= 4; $i++)
-                                <div class="w-12 h-12 rounded-full border-4 border-white overflow-hidden shadow-sm">
+                                <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white overflow-hidden shadow-sm">
                                     <img src="https://ui-avatars.com/api/?name=User+{{$i}}&background=random" alt="User">
                                 </div>
                             @endfor
-                            <div class="w-12 h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-600 font-bold shadow-sm">
+                            <div class="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center text-slate-600 font-bold shadow-sm text-xs md:text-base">
                                 +{{ $stats['users'] > 100 ? round($stats['users']/100)*100 : $stats['users'] }}
                             </div>
                         </div>
-                        <p class="text-xs text-slate-500 font-bold uppercase tracking-widest">Joined by students in {{ $stats['colleges'] }} Hubs</p>
+                        <p class="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-widest">Joined by students in {{ $stats['colleges'] }} Hubs</p>
                     </div>
                 </div>
 
@@ -308,14 +355,12 @@
         </section>
 
         <footer class="max-w-7xl mx-auto px-6 py-10 border-t border-slate-200">
-            <div class="flex flex-col md:row justify-between items-center gap-6">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-sm">M</span>
-                    </div>
-                    <span class="font-bold text-lg text-secondary">MyCollegeVerse</span>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center gap-3">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-8 w-auto" alt="MyCollegeVerse">
+                    <span class="font-bold text-lg text-secondary sr-only">MyCollegeVerse</span>
                 </div>
-                <p class="text-slate-500 text-sm">© 2026 MyCollegeVerse. Built for Students, by Students.</p>
+                <p class="text-slate-500 text-xs md:text-sm font-medium">© 2026 MyCollegeVerse. Built for Students, by Students.</p>
                 <div class="flex gap-6 text-slate-400">
                     <a href="#" class="hover:text-primary transition-colors italic">Privacy</a>
                     <a href="#" class="hover:text-primary transition-colors italic">Terms</a>

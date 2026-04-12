@@ -5,6 +5,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
+        <!-- Multiverse Branding 💎 -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('mcv/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('mcv/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('mcv/favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ asset('mcv/site.webmanifest') }}">
+        <link rel="shortcut icon" href="{{ asset('mcv/favicon.ico') }}">
+
         <!-- SEO Intelligence 🔍 -->
         <title>@yield('title', 'MyCollegeVerse | The Academic Multiverse')</title>
         <meta name="description" content="@yield('meta_description', 'The ultimate academic multiverse for students. Share notes, review professors, and join your campus verse.')">
@@ -116,10 +123,8 @@
             <aside class="hidden lg:flex flex-col w-72 h-full sidebar-bg border-r border-slate-200 shadow-sm relative z-40 transition-all duration-300">
                 <div class="px-8 py-8">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                            <span class="text-white font-bold text-xl uppercase">M</span>
-                        </div>
-                        <span class="font-bold text-xl tracking-tight text-secondary">CollegeVerse</span>
+                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MyCollegeVerse Logo">
+                        <span class="font-bold text-xl tracking-tight text-secondary sr-only">CollegeVerse</span>
                     </div>
                 </div>
 

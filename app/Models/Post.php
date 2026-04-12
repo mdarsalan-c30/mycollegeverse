@@ -41,4 +41,9 @@ class Post extends Model
         if (!$this->image_path) return null;
         return app(\App\Services\ImageKitService::class)->getUrl($this->image_path, ['q' => 80]);
     }
+
+    public function reports()
+    {
+        return $this->morphMany(Report::class, 'reportable');
+    }
 }

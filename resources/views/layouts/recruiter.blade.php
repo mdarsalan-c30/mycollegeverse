@@ -6,6 +6,14 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>@yield('title', 'Recruiter Dashboard | VerseOS Pipeline')</title>
+
+        <!-- Multiverse Branding 💎 -->
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('mcv/apple-touch-icon.png') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('mcv/favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('mcv/favicon-16x16.png') }}">
+        <link rel="manifest" href="{{ asset('mcv/site.webmanifest') }}">
+        <link rel="shortcut icon" href="{{ asset('mcv/favicon.ico') }}">
+
         <meta name="description" content="@yield('meta_description', 'High-fidelity talent scouting and campus integration console for recruitment nodes.')">
         <link rel="canonical" href="{{ url()->current() }}" />
 
@@ -102,14 +110,9 @@
             <!-- Recruiter Sidebar -->
             <aside class="hidden lg:flex flex-col w-72 h-full bg-white border-r border-slate-100 relative z-40 transition-all duration-300">
                 <div class="px-10 py-12">
-                    <div class="flex items-center gap-3 group cursor-pointer">
-                        <div class="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-2xl shadow-slate-900/20 group-hover:scale-110 transition-transform">
-                            <span class="font-black text-xl italic leading-none">P</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-black text-lg tracking-tight text-slate-900">Pipeline <span class="text-primary">OS</span></span>
-                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] -mt-1">Recruiter Hub</span>
-                        </div>
+                    <div class="flex items-center gap-3">
+                        <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="Recruiter MCV">
+                        <span class="font-black text-lg tracking-tight text-slate-900 sr-only">Pipeline OS Hub</span>
                     </div>
                 </div>
 
