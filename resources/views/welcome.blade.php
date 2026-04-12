@@ -96,6 +96,7 @@
 
             .hide-scrollbar::-webkit-scrollbar { display: none; }
             .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+            html, body { overflow-x: hidden; width: 100%; position: relative; }
         </style>
     </head>
     <body class="antialiased bg-slate-50 text-slate-900 hero-pattern min-h-screen overflow-x-hidden" x-data="{ mobileMenu: false }">
@@ -107,7 +108,7 @@
         <nav class="fixed top-0 w-full z-50 px-4 md:px-6 py-4">
             <div class="max-w-7xl mx-auto glass rounded-2xl px-4 md:px-6 py-3 flex justify-between items-center shadow-sm">
                 <div class="flex items-center gap-2">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-7 md:h-10 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 md:h-14 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg md:text-xl tracking-tight text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 
@@ -251,8 +252,8 @@
                         </div>
                     </div>
 
-                    <!-- Abstract decorative elements (Blobs) -->
-                    <div class="absolute inset-0 -z-10 overflow-hidden rounded-3xl pointer-events-none">
+                    <!-- Abstract decorative elements (Blobs) - Disabled on mobile for stability -->
+                    <div class="absolute inset-0 -z-10 overflow-hidden rounded-3xl pointer-events-none hidden lg:block">
                         <div class="absolute -top-20 -right-20 w-80 h-80 bg-primary/30 rounded-full blur-3xl animate-blob"></div>
                         <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-indigo-400/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-violet-400/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
@@ -359,7 +360,7 @@
         <footer class="max-w-7xl mx-auto px-6 py-10 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-center gap-8">
                 <div class="flex items-center gap-3">
-                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-8 w-auto" alt="MyCollegeVerse">
+                    <img src="{{ asset('mcv/mycollegeverse.png') }}" class="h-10 w-auto" alt="MyCollegeVerse">
                     <span class="font-bold text-lg text-secondary sr-only">MyCollegeVerse</span>
                 </div>
                 <p class="text-slate-500 text-xs md:text-sm font-medium">© 2026 MyCollegeVerse. Built for Students, by Students.</p>
