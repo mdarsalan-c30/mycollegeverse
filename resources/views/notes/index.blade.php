@@ -78,7 +78,7 @@
                x-show="matches({ 
                    title: '{{ addslashes($note->title) }}', 
                    subject: '{{ addslashes($note->subject->name ?? '') }}', 
-                   college: '{{ addslashes($note->college->name ?? '') }}',
+                   college: '{{ addslashes(optional($note->college)->name ?? '') }}',
                    semester: '{{ $note->subject->semester ?? 0 }}',
                    course: '{{ addslashes($note->subject->course ?? '') }}',
                    is_verified: {{ $note->is_verified ? 'true' : 'false' }} 
@@ -109,14 +109,14 @@
                 </div>
 
                 <h4 class="text-xl font-extrabold text-slate-800 mb-2 truncate group-hover:text-primary transition-colors">{{ $note->title }}</h4>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{{ $note->subject->name ?? 'Subject' }} • {{ $note->college->name ?? 'Global' }}</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{{ optional($note->subject)->name ?? 'Subject' }} • {{ optional($note->college)->name ?? 'Global' }}</p>
 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-slate-200 overflow-hidden">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($note->user->name) }}&background=random" alt="{{ $note->user->name }}" />
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(optional($note->user)->name ?? 'Unknown') }}&background=random" alt="{{ optional($note->user)->name ?? 'Unknown' }}" />
                         </div>
-                        <span class="text-xs font-bold text-slate-600">{{ $note->user->name }}</span>
+                        <span class="text-xs font-bold text-slate-600">{{ optional($note->user)->name ?? 'Unknown User' }}</span>
                     </div>
                     <div class="flex items-center gap-1 text-slate-400 font-bold text-xs uppercase group-hover:text-primary">
                         Access Hub

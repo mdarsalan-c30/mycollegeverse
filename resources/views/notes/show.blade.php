@@ -50,7 +50,7 @@
                  <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
                      <div>
                         <h2 class="text-3xl font-black text-secondary mb-2">{{ $note->title }}</h2>
-                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Uploaded by {{ $note->user->name }} • {{ $note->created_at->diffForHumans() }}</p>
+                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Uploaded by {{ optional($note->user)->name ?? 'Unknown' }} • {{ $note->created_at->diffForHumans() }}</p>
                      </div>
                      
                      @auth
@@ -72,9 +72,9 @@
                     <div id="comment-list-{{ $note->id }}" class="space-y-6 mb-8">
                         @foreach($note->comments as $comment)
                         <div class="flex gap-4">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($comment->user->name) }}&background=random" class="w-10 h-10 rounded-xl" />
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode(optional($comment->user)->name ?? 'Unknown') }}&background=random" class="w-10 h-10 rounded-xl" />
                             <div>
-                                <p class="font-bold text-slate-800">{{ $comment->user->name }}</p>
+                                <p class="font-bold text-slate-800">{{ optional($comment->user)->name ?? 'Unknown User' }}</p>
                                 <p class="text-sm text-slate-600 font-medium">{{ $comment->content }}</p>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                         <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-xl">📄</div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-slate-800 truncate group-hover:text-primary transition-colors">{{ $rel->title }}</p>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ $note->subject->name ?? 'General' }} • {{ $rel->user->name }}</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{{ optional($note->subject)->name ?? 'General' }} • {{ optional($rel->user)->name ?? 'Unknown' }}</p>
                         </div>
                     </a>
                     @empty

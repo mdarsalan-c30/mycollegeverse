@@ -106,11 +106,11 @@
                                         </div>
                                         <div>
                                             <p class="text-xs font-black text-admin-dark truncate">{{ $note->title }}</p>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">By {{ $note->user->name ?? 'Unknown Identity' }}</p>
+                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">By {{ optional($note->user)->name ?? 'Unknown Identity' }}</p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-8 py-5 text-[10px] font-bold text-slate-500 uppercase">{{ $note->college->name ?? 'Global Verse' }}</td>
+                                <td class="px-8 py-5 text-[10px] font-bold text-slate-500 uppercase">{{ optional($note->college)->name ?? 'Global Verse' }}</td>
                                 <td class="px-8 py-5">
                                     <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $note->is_verified ? 'bg-green-500/10 text-green-600' : 'bg-yellow-500/10 text-yellow-600' }}">
                                         {{ $note->is_verified ? 'Verified' : 'Pending' }}
