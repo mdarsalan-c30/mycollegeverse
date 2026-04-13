@@ -12,6 +12,12 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        '/mcv-admin/login',
+        '/mcv-admin/register',
+        '/recruiter/login',
+        '/recruiter/register',
+        '/login',
+        '/register',
+        '/multiverse-reset.php',
     ];
 }
