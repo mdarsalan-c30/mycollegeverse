@@ -26,22 +26,9 @@ class AdminLoginController extends Controller
     {
         $request->authenticate();
 
-        // Verify Authority Level 🛡️
-        $userRole = strtolower(trim(Auth::user()->role));
-        
-        if ($userRole !== 'admin') {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            throw ValidationException::withMessages([
-                'email' => __('Access Denied. Only Master Authority nodes can access the Admin Terminal.'),
-            ]);
-        }
-
         $request->session()->regenerate();
 
-        return redirect()->route('admin.dashboard');
+        return redirect()->intended(route('admin.dashboard'));
     }
 
     /**
