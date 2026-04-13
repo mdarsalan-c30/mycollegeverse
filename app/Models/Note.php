@@ -38,7 +38,7 @@ class Note extends Model
 
     public function reviews()
     {
-        return $this->hasMany(NoteReview::class);
+        return $this->hasMany(\App\Models\NoteReview::class);
     }
 
     public function getAvgRatingAttribute()

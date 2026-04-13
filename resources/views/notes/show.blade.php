@@ -149,6 +149,11 @@
                         </select>
                     </div>
 
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Feedback (Optional)</label>
+                        <textarea name="feedback" placeholder="Help other students by explaining your rating..." class="w-full h-24 bg-slate-50 border-slate-100 rounded-xl text-sm font-medium p-4 focus:ring-primary/20"></textarea>
+                    </div>
+
                     <button type="submit" class="w-full bg-slate-900 text-white h-14 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
                         Submit & Earn +5 Karma
                     </button>

@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\DB;
 use App\Models\JobPosting;
+use App\Models\NoteReview;
 
 class User extends Authenticatable
 {
@@ -65,7 +66,7 @@ class User extends Authenticatable
 
     public function noteReviews()
     {
-        return $this->hasMany(NoteReview::class);
+        return $this->hasMany(\App\Models\NoteReview::class);
     }
 
     public function getArsScoreAttribute()

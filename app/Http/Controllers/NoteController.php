@@ -92,12 +92,12 @@ class NoteController extends Controller
             'feedback' => 'nullable|string|max:1000',
         ]);
 
-        $review = $note->reviews()->updateOrCreate(
+        $note->reviews()->updateOrCreate(
             ['user_id' => Auth::id()],
             [
                 'rating' => $validated['rating'],
                 'helped_in_exam' => $validated['helped_in_exam'],
-                'feedback' => $validated['feedback'],
+                'feedback' => $validated['feedback'] ?? null,
             ]
         );
 
