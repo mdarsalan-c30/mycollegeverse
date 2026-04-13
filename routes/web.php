@@ -75,11 +75,13 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-// Separate Recruiter Auth
-Route::get('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'create'])->name('recruiter.register');
-Route::post('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'store'])->name('recruiter.register.store');
-Route::get('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'create'])->name('recruiter.login');
-Route::post('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'store'])->name('recruiter.login.store');
+// Separate Recruiter Auth (Isolated Node) 🛰️
+Route::middleware('guest')->group(function () {
+    Route::get('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'create'])->name('recruiter.register');
+    Route::post('/recruiter/register', [App\Http\Controllers\Auth\RecruiterRegisterController::class, 'store'])->name('recruiter.register.store');
+    Route::get('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'create'])->name('recruiter.login');
+    Route::post('/recruiter/login', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'store'])->name('recruiter.login.store');
+});
 Route::post('/recruiter/logout', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'destroy'])->name('recruiter.logout');
 
 require __DIR__.'/auth.php';
@@ -91,9 +93,11 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 | Admin Multiverse Security Guard 🛡️
 |--------------------------------------------------------------------------
 */
-// Master Authority Auth Terminal (Replicates Recruiter Protocol) 🛡️
-Route::get('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
-Route::post('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
+// Master Authority Auth Terminal (Isolated Node) 🛡️
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
+    Route::post('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
+});
 Route::post('/admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'destroy'])->name('admin.logout');
 
 // Admin Base Redirect
