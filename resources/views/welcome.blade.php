@@ -413,30 +413,80 @@
             </div>
         </section>
 
-        <!-- SEO Content Block: The Student OS Advantage -->
-        <section class="max-w-7xl mx-auto px-6 py-20 bg-white/30 rounded-[3rem] border border-white my-10 shadow-sm relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
-            <div class="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6">
-                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">Beyond just notes. This is your <span class="gradient-text">Academic Command Center.</span></h2>
-                    <p class="text-slate-600 leading-relaxed font-medium">
-                        MyCollegeVerse is engineered to solve the most critical friction points in a student's life. Why hunt through disorganized Telegram groups or pay for low-quality materials when you can access the ultimate **Academic Multiverse**? 
+        <!-- SEO Content Block: The Student OS Advantage 🚀 -->
+        <section class="max-w-7xl mx-auto px-6 py-24 bg-white/40 rounded-[4rem] border border-white/60 my-16 shadow-glass relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
+            
+            <div class="relative z-10 space-y-20">
+                <!-- Top Header -->
+                <div class="max-w-3xl">
+                    <h2 class="text-4xl md:text-6xl font-black text-slate-900 leading-tight mb-8">
+                        Beyond just notes. This is your <span class="gradient-text">Academic Command Center.</span>
+                    </h2>
+                    <p class="text-xl text-slate-600 leading-relaxed font-medium">
+                        MyCollegeVerse is engineered to solve the most critical friction points in a student's life. Why hunt through disorganized Telegram groups or pay for low-quality materials when you can access the ultimate **Academic Multiverse**?
                     </p>
-                    <div class="grid sm:grid-cols-2 gap-6 pt-4">
-                        <div class="space-y-2">
-                             <div class="text-primary font-black text-xl">🚀 Programmatic SEO</div>
-                             <p class="text-xs text-slate-500 leading-relaxed font-medium">Get precise study material mapped to your specific syllabus (AKTU, BTech, DU) with one-click access.</p>
+                </div>
+
+                <!-- Feature Grid -->
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Feature: SEO -->
+                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group">
+                        <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-blue-500/20 mb-6 group-hover:rotate-12 transition-transform">
+                            🚀
                         </div>
-                        <div class="space-y-2">
-                             <div class="text-secondary font-black text-xl">🧠 Professor Intel</div>
-                             <p class="text-xs text-slate-500 leading-relaxed font-medium">Read honest reviews about your faculty and understand their teaching style before you even enter the classroom.</p>
+                        <h3 class="text-2xl font-black text-slate-800 mb-4">Programmatic SEO</h3>
+                        <p class="text-sm text-slate-500 leading-loose font-medium">
+                            Get precise study material mapped to your specific syllabus (**AKTU, BTech, DU**) with one-click access. No more dead links.
+                        </p>
+                    </div>
+
+                    <!-- Feature: Intel -->
+                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group lg:translate-y-8">
+                        <div class="w-14 h-14 bg-indigo-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/20 mb-6 group-hover:rotate-12 transition-transform">
+                            🧠
                         </div>
+                        <h3 class="text-2xl font-black text-slate-800 mb-4">Professor Intel</h3>
+                        <p class="text-sm text-slate-500 leading-loose font-medium">
+                            Read honest reviews about your faculty and understand their teaching style before you even enter the classroom. Knowledge is power.
+                        </p>
+                    </div>
+
+                    <!-- Feature: Karma -->
+                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group">
+                        <div class="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20 mb-6 group-hover:rotate-12 transition-transform">
+                            ✨
+                        </div>
+                        <h3 class="text-2xl font-black text-slate-800 mb-4">Karma Economy</h3>
+                        <p class="text-sm text-slate-500 leading-loose font-medium">
+                            Share resources, help peers, and earn Karma points. High-authority students get exclusive access to **Carrier Pipelines** and top recruiters.
+                        </p>
                     </div>
                 </div>
-                <div class="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10">
-                    <p class="text-sm text-slate-700 leading-loose">
-                        Whether you are looking for **DBMS important questions**, **Operating System revision notes**, or detailed **College placement reviews**, MyCollegeVerse provides a peer-verified identity platform. Our "Multiverse" approach ensures that every campus has its own dedicated community hub, allowing for hyper-local collaboration. By sharing high-quality resources, you don't just help others—you build your own **Academic Identity** and earn Karma points that unlock premium career pipelines and recruiter visibility. Join thousands of students who are turning their college journey into a data-driven success story.
-                    </p>
+
+                <!-- Detailed Advantage -->
+                <div class="bg-primary/5 p-10 md:p-16 rounded-[4rem] border border-primary/10 relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                    
+                    <div class="relative z-10 grid lg:grid-cols-5 gap-12 items-center">
+                        <div class="lg:col-span-3 space-y-6">
+                            <h4 class="text-2xl font-black text-secondary uppercase tracking-tighter">The Multiverse Advantage</h4>
+                            <p class="text-lg md:text-xl text-slate-700 leading-relaxed font-medium">
+                                Whether you are looking for **DBMS important questions**, **Operating System revision notes**, or detailed **College placement reviews**, MyCollegeVerse provides a peer-verified identity platform.
+                            </p>
+                            <p class="text-lg text-slate-500 leading-relaxed">
+                                Our "Multiverse" approach ensures that every campus has its own dedicated community hub, allowing for hyper-local collaboration. By sharing high-quality resources, you don't just help others—you build your own **Academic Identity**.
+                            </p>
+                        </div>
+                        <div class="lg:col-span-2">
+                            <div class="glass p-8 rounded-[3rem] border-white text-center space-y-4 shadow-xl">
+                                <p class="text-5xl font-black text-primary italic">Join </p>
+                                <p class="text-slate-600 font-bold">thousands of students who are turning their college journey into a data-driven success story.</p>
+                                <a href="{{ route('register') }}" class="block w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg shadow-primary/20 hover:scale-105 transition-all">Create My Identity</a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
