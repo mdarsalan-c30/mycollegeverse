@@ -15,23 +15,32 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Report::query();
+        try {
+            $query = \DB::table('reports')->join('users', 'users.id', '=', 'reports.reporter_id')
+                ->select('reports.*', 'users.name as reporter_name');
 
-        // High-Fidelity Filtering 🔍
-        if ($request->has('status') && $request->status != 'all') {
-            $query->where('status', $request->status);
-        } else {
-            // Default to Pending for administrative efficiency
-            $query->where('status', 'pending');
+            if ($request->has('status') && $request->status != 'all') {
+                $query->where('reports.status', $request->status);
+            } else {
+                $query->where('reports.status', 'pending');
+            }
+
+            if ($request->has('type') && $request->type != 'all') {
+                $query->where('reports.reportable_type', $request->type);
+            }
+
+            $rawReports = $query->latest('reports.created_at')->paginate(15);
+
+            // Map to objects the view expects
+            $reports = $rawReports->through(function($r) {
+                $r->reporter = (object)['name' => $r->reporter_name];
+                $r->created_at = \Carbon\Carbon::parse($r->created_at);
+                return $r;
+            });
+        } catch (\Throwable $e) {
+            \Log::warning('Reports table issue: ' . $e->getMessage());
+            $reports = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
         }
-
-        if ($request->has('type') && $request->type != 'all') {
-            $query->where('reportable_type', $request->type);
-        }
-
-        $reports = $query->with(['reporter'])
-            ->latest()
-            ->paginate(15);
 
         return view('admin.reports.index', compact('reports'));
     }

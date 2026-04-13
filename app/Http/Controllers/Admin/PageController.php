@@ -14,7 +14,12 @@ class PageController extends Controller
      */
     public function index()
     {
-        $pages = Page::latest()->get();
+        try {
+            $pages = Page::latest()->get();
+        } catch (\Throwable $e) {
+            \Log::warning('Pages table missing — run migrations: ' . $e->getMessage());
+            $pages = collect([]);
+        }
         return view('admin.pages.index', compact('pages'));
     }
 

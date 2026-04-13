@@ -41,16 +41,16 @@
 
                 <div class="flex-1 space-y-2">
                     <h3 class="text-lg font-black text-admin-secondary leading-tight line-clamp-2">{{ $note->title }}</h3>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $note->college->name ?? 'Global Hub' }}</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ optional($note->college)->name ?? 'Global Hub' }}</p>
                 </div>
 
                 <div class="w-full mt-8 pt-8 border-t border-slate-100 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-lg bg-admin-surface text-[10px] font-black text-slate-400 flex items-center justify-center border border-slate-100">
-                            {{ substr($note->user->name, 0, 1) }}
+                            {{ substr(optional($note->user)->name ?? '?', 0, 1) }}
                         </div>
                         <div>
-                            <p class="text-[10px] font-black text-admin-dark truncate w-24">{{ $note->user->name }}</p>
+                            <p class="text-[10px] font-black text-admin-dark truncate w-24">{{ optional($note->user)->name ?? 'Unknown' }}</p>
                             <p class="text-[8px] font-bold text-slate-400 uppercase">{{ $note->created_at->format('M d, Y') }}</p>
                         </div>
                     </div>

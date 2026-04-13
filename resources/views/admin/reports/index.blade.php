@@ -39,10 +39,10 @@
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-4">
                                 <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center font-bold text-slate-400">
-                                    {{ substr($report->reporter->name, 0, 1) }}
+                                    {{ substr(optional($report->reporter)->name ?? '?', 0, 1) }}
                                 </div>
                                 <div>
-                                    <p class="text-xs font-black text-admin-dark">{{ $report->reporter->name }}</p>
+                                    <p class="text-xs font-black text-admin-dark">{{ optional($report->reporter)->name ?? 'Unknown Citizen' }}</p>
                                     <p class="text-[9px] font-bold text-slate-300 uppercase italic tracking-tighter">{{ $report->created_at->diffForHumans() }}</p>
                                 </div>
                             </div>
