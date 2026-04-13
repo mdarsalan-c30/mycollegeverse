@@ -170,3 +170,13 @@ Route::get('/multiverse-sync', function() {
 });
 
 Route::get('/multiverse-init', function() {
+    try {
+        Artisan::call('config:clear');
+        Artisan::call('cache:clear');
+        Artisan::call('view:clear');
+        Artisan::call('route:clear');
+        return "🌌 Multiverse Synchronized! All caches cleared. You can now visit the <a href='/'>Home Page</a>.";
+    } catch (\Exception $e) {
+        return "Initialization Error: " . $e->getMessage();
+    }
+});
