@@ -434,7 +434,7 @@
                         </div>
                         <h3 class="text-3xl font-black text-slate-800 mb-6 italic">Precision Knowledge Hub</h3>
                         <p class="text-slate-500 font-medium leading-relaxed max-w-md">
-                            Get precise study material mapped to your specific syllabus (**AKTU**, **BTech**, **DU**) with one-click access. No more dead links.
+                            Get precise study material mapped to your specific syllabus (<b>AKTU</b>, <b>BTech</b>, <b>DU</b>) with one-click access. No more dead links.
                         </p>
                     </div>
 
@@ -477,7 +477,7 @@
                     <div class="flex-1">
                         <h3 class="text-2xl md:text-3xl font-black text-secondary leading-tight mb-4 italic">The Multiverse Advantage</h3>
                         <p class="text-sm text-slate-600 leading-relaxed font-medium mb-6">
-                            Whether you're looking for **DBMS questions**, **Revision notes**, or **Placement reviews**, we provide a peer-verified identity platform.
+                            Whether you're looking for <b>DBMS questions</b>, <b>Revision notes</b>, or <b>Placement reviews</b>, we provide a peer-verified identity platform.
                         </p>
                         <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-black text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">
                             Create Identity
