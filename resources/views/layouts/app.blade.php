@@ -15,6 +15,9 @@
         <!-- SEO Intelligence 🔍 -->
         <title>@yield('title', 'MyCollegeVerse | The Academic Multiverse')</title>
         <meta name="description" content="@yield('meta_description', 'The ultimate academic multiverse for students. Share notes, review professors, and join your campus verse.')">
+        <meta name="keywords" content="@yield('meta_keywords', 'college notes, professor reviews, campus community, academic identity, BTech notes, AKTU notes, student OS, MyCollegeVerse')">
+        <meta name="author" content="MyCollegeVerse Team">
+        <meta name="robots" content="index, follow, max-image-preview:large">
         <link rel="canonical" href="{{ url()->current() }}" />
         
         <!-- Open Graph / Facebook -->

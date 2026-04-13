@@ -35,7 +35,25 @@ class ProfessorController extends Controller
     public function show(Professor $professor)
     {
         $professor->load(['reviews.user', 'college']);
-        return view('professors.show', compact('professor'));
+
+        // SEO Expert Injection 🔍
+        $seoTitle = "{$professor->name} Reviews - {$professor->department} Faculty at {$professor->college->name}";
+        $seoDescription = "Read student reviews and academic insights for Prof. {$professor->name} of {$professor->college->name}. Shared by the MyCollegeVerse community.";
+        
+        // JSON-LD Person/Faculty Schema
+        $schema = [
+            "@context" => "https://schema.org",
+            "@type" => "Person",
+            "name" => $professor->name,
+            "jobTitle" => "Professor",
+            "worksFor" => [
+                "@type" => "EducationalOrganization",
+                "name" => $professor->college->name
+            ],
+            "description" => $seoDescription
+        ];
+
+        return view('professors.show', compact('professor', 'seoTitle', 'seoDescription', 'schema'));
     }
 
     public function rate(Request $request, Professor $professor, \App\Services\ImageKitService $imageKit)

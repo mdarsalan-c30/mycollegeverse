@@ -1,6 +1,12 @@
 <x-app-layout>
-    @section('title', $post->title . ' | MyCollegeVerse')
-    @section('meta_description', Str::limit($post->content, 150))
+    @section('title', $seoTitle ?? $post->title . ' | MyCollegeVerse')
+    @section('meta_description', $seoDescription ?? Str::limit($post->content, 150))
+
+    @push('structured-data')
+    <script type="application/ld+json">
+        {!! json_encode($schema ?? []) !!}
+    </script>
+    @endpush
 
     <div class="min-h-screen bg-[#F8FAFC] -mx-4 sm:-mx-8 lg:-mx-12 px-4 sm:px-8 lg:px-12 py-8">
         <div class="grid lg:grid-cols-12 gap-8 max-w-[1600px] mx-auto">

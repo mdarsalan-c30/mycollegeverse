@@ -1,6 +1,12 @@
 <x-app-layout>
-    @section('title', $professor->name . ' - Faculty Review | MyCollegeVerse')
-    @section('meta_description', 'Read reviews and ratings for professor ' . $professor->name . ' (' . $professor->department . ') at ' . (optional($professor->college)->name ?? 'Campus') . '. Get insights into teaching style and academic results.')
+    @section('title', $seoTitle ?? $professor->name . ' - Faculty Review | MyCollegeVerse')
+    @section('meta_description', $seoDescription ?? 'Read reviews and ratings for professor ' . $professor->name . ' (' . $professor->department . ') at ' . (optional($professor->college)->name ?? 'Campus') . '. Get insights into teaching style and academic results.')
+
+    @push('structured-data')
+    <script type="application/ld+json">
+        {!! json_encode($schema ?? []) !!}
+    </script>
+    @endpush
 <div class="space-y-8 pb-24">
 
     {{-- ═══════════════════════════════════════════════════

@@ -3,8 +3,41 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>MyCollegeVerse — Building Academic Identity</title>
+        <title>MyCollegeVerse — Building Academic Identity | The Student OS</title>
+        <meta name="description" content="The ultimate academic multiverse for students. Access high-quality BTech notes, AKTU study material, professor reviews, and campus community hubs. Build your academic identity with MyCollegeVerse.">
+        <meta name="keywords" content="college notes, BTech notes pdf, AKTU notes, professor reviews, student community, exam preparation, academic identity, MyCollegeVerse, engineering notes">
+        <meta name="author" content="MyCollegeVerse">
+        <meta name="robots" content="index, follow, max-image-preview:large">
+        <link rel="canonical" href="{{ url('/') }}" />
 
+        <!-- Open Graph / SEO Social -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url('/') }}">
+        <meta property="og:title" content="MyCollegeVerse — Building Academic Identity | The Student OS">
+        <meta property="og:description" content="Access high-quality BTech notes, official AKTU material, and professor reviews in the ultimate student multiverse.">
+        <meta property="og:image" content="{{ asset('assets/mcv/og-landing.jpg') }}">
+
+        <!-- Twitter Card -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url('/') }}">
+        <meta property="twitter:title" content="MyCollegeVerse — Building Academic Identity">
+        <meta property="twitter:description" content="The absolute College OS for every student. Share notes, review faculty, and dominate your academics.">
+        <meta property="twitter:image" content="{{ asset('assets/mcv/og-landing.jpg') }}">
+
+        <!-- Structured Data (JSON-LD) -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "MyCollegeVerse",
+          "url": "https://mycollegeverse.in",
+          "logo": "https://mycollegeverse.in/assets/mcv/mycollegeverse.png",
+          "sameAs": [
+            "https://twitter.com/mycollegeverse"
+          ],
+          "description": "An academic identity platform and student OS for sharing notes, reviewing professors, and campus collaboration."
+        }
+        </script>
         <!-- Analytics Infrastructure 📡 -->
         <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -370,6 +403,34 @@
                         <h3 class="text-xl font-bold mb-4 text-secondary">Community First</h3>
                         <p class="text-slate-500 text-sm leading-relaxed">Ask questions, share insights, and collaborate with students from your college.</p>
                     </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEO Content Block: The Student OS Advantage -->
+        <section class="max-w-7xl mx-auto px-6 py-20 bg-white/30 rounded-[3rem] border border-white my-10 shadow-sm relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+            <div class="relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">Beyond just notes. This is your <span class="gradient-text">Academic Command Center.</span></h2>
+                    <p class="text-slate-600 leading-relaxed font-medium">
+                        MyCollegeVerse is engineered to solve the most critical friction points in a student's life. Why hunt through disorganized Telegram groups or pay for low-quality materials when you can access the ultimate **Academic Multiverse**? 
+                    </p>
+                    <div class="grid sm:grid-cols-2 gap-6 pt-4">
+                        <div class="space-y-2">
+                             <div class="text-primary font-black text-xl">🚀 Programmatic SEO</div>
+                             <p class="text-xs text-slate-500 leading-relaxed font-medium">Get precise study material mapped to your specific syllabus (AKTU, BTech, DU) with one-click access.</p>
+                        </div>
+                        <div class="space-y-2">
+                             <div class="text-secondary font-black text-xl">🧠 Professor Intel</div>
+                             <p class="text-xs text-slate-500 leading-relaxed font-medium">Read honest reviews about your faculty and understand their teaching style before you even enter the classroom.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10">
+                    <p class="text-sm text-slate-700 leading-loose">
+                        Whether you are looking for **DBMS important questions**, **Operating System revision notes**, or detailed **College placement reviews**, MyCollegeVerse provides a peer-verified identity platform. Our "Multiverse" approach ensures that every campus has its own dedicated community hub, allowing for hyper-local collaboration. By sharing high-quality resources, you don't just help others—you build your own **Academic Identity** and earn Karma points that unlock premium career pipelines and recruiter visibility. Join thousands of students who are turning their college journey into a data-driven success story.
+                    </p>
                 </div>
             </div>
         </section>

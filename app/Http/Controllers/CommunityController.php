@@ -47,11 +47,29 @@ class CommunityController extends Controller
             ->loadCount('comments')
             ->loadSum('likes as score', 'value');
 
-        // Data for Sidebars (Keep consistency with Index)
-        $trendingHubs = \App\Models\College::withCount('posts')->orderBy('posts_count', 'desc')->take(5)->get();
-        $topContributors = \App\Models\User::withCount('posts')->orderBy('posts_count', 'desc')->take(6)->get();
+        // SEO Expert Injection 🔍
+        $seoTitle = "{$post->title} - Community Discussion | MyCollegeVerse";
+        $seoDescription = \Illuminate\Support\Str::limit($post->content, 160);
+        
+        // JSON-LD DiscussionForumPosting Schema
+        $schema = [
+            "@context" => "https://schema.org",
+            "@type" => "DiscussionForumPosting",
+            "headline" => $post->title,
+            "articleBody" => $post->content,
+            "author" => [
+                "@type" => "Person",
+                "name" => $post->user->name
+            ],
+            "datePublished" => $post->created_at->toIso8601String(),
+            "interactionStatistic" => [
+                "@type" => "InteractionCounter",
+                "interactionType" => "https://schema.org/CommentAction",
+                "userInteractionCount" => $post->comments_count
+            ]
+        ];
 
-        return view('community.show', compact('post', 'trendingHubs', 'topContributors'));
+        return view('community.show', compact('post', 'trendingHubs', 'topContributors', 'seoTitle', 'seoDescription', 'schema'));
     }
 
     public function store(Request $request)
