@@ -146,8 +146,8 @@ class User extends Authenticatable
 
     public function getIdCardUrlAttribute($value)
     {
-        if (!$this->id_card_url) return null;
-        return app(\App\Services\ImageKitService::class)->getUrl($this->id_card_url, ['w' => 800, 'q' => 70]);
+        if (!$value) return null;
+        return app(\App\Services\ImageKitService::class)->getUrl($value, ['w' => 800, 'q' => 70]);
     }
 
     public function receivedMessages()
