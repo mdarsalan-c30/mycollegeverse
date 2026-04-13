@@ -95,17 +95,17 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 */
 // Master Authority Auth Terminal (Isolated Node) 🛡️
 Route::middleware('guest')->group(function () {
-    Route::get('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
-    Route::post('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
+    Route::get('/mcv-admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
+    Route::post('/mcv-admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
 });
-Route::post('/admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'destroy'])->name('admin.logout');
+Route::post('/mcv-admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'destroy'])->name('admin.logout');
 
 // Admin Base Redirect
-Route::get('/admin', function() {
+Route::get('/mcv-admin', function() {
     return redirect()->route('admin.dashboard');
 });
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('mcv-admin')->name('admin.')->group(function () {
     // The Command Center Hub
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
