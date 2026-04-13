@@ -91,9 +91,14 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 | Admin Multiverse Security Guard 🛡️
 |--------------------------------------------------------------------------
 */
-// Admin Login Redirect (Resolves 404 Node)
-Route::get('/admin/login', function() {
-    return redirect()->route('login');
+// Master Authority Auth Terminal (Replicates Recruiter Protocol) 🛡️
+Route::get('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
+Route::post('/admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
+Route::post('/admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'destroy'])->name('admin.logout');
+
+// Admin Base Redirect
+Route::get('/admin', function() {
+    return redirect()->route('admin.dashboard');
 });
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
