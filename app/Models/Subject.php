@@ -11,7 +11,12 @@ class Subject extends Model
 
     protected $fillable = [
         'name',
-        'course',
+        'course_id',
         'semester',
     ];
+
+    public function course()
+    {
+        return $this->belongsTo(Course::class);
+    }
 }

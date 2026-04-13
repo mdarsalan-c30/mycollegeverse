@@ -28,8 +28,10 @@ class NoteController extends Controller
         
         $notes = $query->latest()->get();
         $subjects = Subject::all();
+        $courses = \App\Models\Course::orderBy('name')->get();
+        $availableSemesters = Subject::pluck('semester')->unique()->sort()->values();
         
-        return view('notes.index', compact('notes', 'subjects'));
+        return view('notes.index', compact('notes', 'subjects', 'courses', 'availableSemesters'));
     }
 
     public function show($identifier)

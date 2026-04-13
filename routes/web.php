@@ -143,7 +143,7 @@ Route::get('/mcv-admin', function() {
     return redirect()->route('admin.dashboard');
 });
 
-Route::middleware(['auth', 'role:admin'])->prefix('mcv-admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     // The Command Center Hub
     Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     

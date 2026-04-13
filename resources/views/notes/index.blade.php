@@ -5,23 +5,28 @@
     <div class="space-y-10 pb-20" x-data="{ 
         showUploadModal: false,
         search: '',
-        activeFilter: 'All Courses',
+        activeCourse: 'All',
+        activeSemester: 'All',
+        activeFilter: 'Verified Only',
+        showVerifiedOnly: false,
+
+        // For Upload Modal
+        uploadStep: 1,
+        selectedCourse: '',
+        selectedSemester: '',
+        selectedSubject: '',
+
         matches(note) {
             const searchMatch = !this.search || 
                 note.title.toLowerCase().includes(this.search.toLowerCase()) || 
-                note.subject.toLowerCase().includes(this.search.toLowerCase()) ||
+                note.subject_name.toLowerCase().includes(this.search.toLowerCase()) ||
                 note.college.toLowerCase().includes(this.search.toLowerCase());
             
-            let filterMatch = true;
-            if (this.activeFilter === 'Semester 1') {
-                filterMatch = note.semester == 1;
-            } else if (this.activeFilter === 'Engineering') {
-                filterMatch = note.course.toLowerCase().includes('engineering');
-            } else if (this.activeFilter === 'Verified Only') {
-                filterMatch = note.is_verified;
-            }
+            let courseMatch = this.activeCourse === 'All' || note.course_id == this.activeCourse;
+            let semesterMatch = this.activeSemester === 'All' || note.semester == this.activeSemester;
+            let verifiedMatch = !this.showVerifiedOnly || note.is_verified;
             
-            return searchMatch && filterMatch;
+            return searchMatch && courseMatch && semesterMatch && verifiedMatch;
         }
     }">
         <!-- Page Header -->
@@ -32,7 +37,7 @@
             </div>
             
             @auth
-            <button @click="showUploadModal = true" class="bg-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+            <button @click="showUploadModal = true; uploadStep = 1" class="bg-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
@@ -49,26 +54,46 @@
         </div>
 
         <!-- Filters & Search -->
-        <div class="glass p-4 rounded-[2rem] shadow-sm border-white/40 flex flex-wrap items-center gap-4">
-            <div class="flex-1 min-w-[200px] relative">
-                <input type="text" x-model="search" @keydown.enter="$el.blur()" placeholder="Search by title or subject..." class="w-full h-12 bg-white/50 border border-slate-100 rounded-2xl px-12 focus:ring-primary/20 focus:border-primary text-sm font-medium">
-                <svg class="absolute left-4 top-3.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="glass p-5 rounded-[2.5rem] shadow-sm border-white/40 flex flex-wrap items-center gap-6">
+            <!-- Search -->
+            <div class="flex-1 min-w-[250px] relative">
+                <input type="text" x-model="search" @keydown.enter="$el.blur()" placeholder="Search by title, subject or college..." class="w-full h-14 bg-white/50 border border-slate-100 rounded-2xl px-12 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all">
+                <svg class="absolute left-4 top-4.5 h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
             </div>
             
-            @php
-                $filters = ['All Courses', 'Semester 1', 'Engineering', 'Verified Only'];
-            @endphp
+            <!-- Course Filter -->
+            <div class="min-w-[150px]">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Academic Path</label>
+                <select x-model="activeCourse" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
+                    <option value="All">All Courses</option>
+                    @foreach($courses as $course)
+                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
-            @foreach($filters as $filter)
-                <button 
-                    @click="activeFilter = '{{ $filter }}'"
-                    :class="activeFilter === '{{ $filter }}' ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-slate-600 hover:text-primary hover:border-primary/50'"
-                    class="px-5 py-2.5 glass rounded-xl text-sm font-bold transition-all">
-                    {{ $filter }}
+            <!-- Semester Filter -->
+            <div class="min-w-[150px]">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Semester</label>
+                <select x-model="activeSemester" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
+                    <option value="All">All Semesters</option>
+                    @foreach($availableSemesters as $sem)
+                        <option value="{{ $sem }}">Semester {{ $sem }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <!-- Verified Toggle -->
+            <div class="flex flex-col items-center">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Verified</label>
+                <button @click="showVerifiedOnly = !showVerifiedOnly" 
+                        :class="showVerifiedOnly ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"
+                        class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    🛡️ <span class="ml-1" x-text="showVerifiedOnly ? 'ON' : 'OFF'"></span>
                 </button>
-            @endforeach
+            </div>
         </div>
 
         <!-- Notes Grid -->
@@ -77,10 +102,10 @@
             <a href="{{ route('notes.show', $note->slug ?? $note->id) }}" 
                x-show="matches({ 
                    title: '{{ addslashes($note->title) }}', 
-                   subject: '{{ addslashes($note->subject->name ?? '') }}', 
+                   subject_name: '{{ addslashes($note->subject->name ?? '') }}', 
                    college: '{{ addslashes(optional($note->college)->name ?? '') }}',
                    semester: '{{ $note->subject->semester ?? 0 }}',
-                   course: '{{ addslashes($note->subject->course ?? '') }}',
+                   course_id: '{{ $note->subject->course_id ?? 0 }}',
                    is_verified: {{ $note->is_verified ? 'true' : 'false' }} 
                })"
                x-transition:enter="transition ease-out duration-300"
@@ -123,7 +148,7 @@
                 </div>
 
                 <h4 class="text-xl font-extrabold text-slate-800 mb-2 truncate group-hover:text-primary transition-colors">{{ $note->title }}</h4>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{{ optional($note->subject)->name ?? 'Subject' }} • {{ optional($note->college)->name ?? 'Global' }}</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{{ optional($note->subject)->name ?? 'Subject' }} • {{ optional($note->subject->course)->name ?? 'Global' }}</p>
 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-3">
@@ -146,7 +171,7 @@
             @endforelse
         </div>
 
-        <!-- Upload Modal -->
+        <!-- Upload Modal (Refined Step Flow) -->
         <div x-show="showUploadModal" 
              class="fixed inset-0 z-50 overflow-y-auto" 
              style="display: none;"
@@ -161,9 +186,12 @@
                 <div @click="showUploadModal = false" class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-sm" aria-hidden="true"></div>
 
                 <div class="inline-block overflow-hidden text-left align-bottom transition-all transform glass rounded-[2.5rem] shadow-2xl sm:my-8 sm:align-middle sm:max-w-xl sm:w-full border-white">
-                    <div class="px-8 pt-8 pb-10 bg-white/40">
-                        <div class="flex justify-between items-center mb-8">
-                            <h3 class="text-2xl font-black text-secondary">Upload New Resource</h3>
+                    <div class="px-8 md:px-12 pt-10 pb-12 bg-white/40">
+                        <div class="flex justify-between items-center mb-10">
+                            <div>
+                                <h3 class="text-2xl font-black text-secondary">Share Your Knowledge</h3>
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1 italic">Step <span x-text="uploadStep"></span> of 2: Meta Configuration</p>
+                            </div>
                             <button @click="showUploadModal = false" class="text-slate-400 hover:text-primary transition-colors">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </button>
@@ -171,44 +199,80 @@
 
                         <form action="{{ route('notes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                             @csrf
-                            <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Note Title</label>
-                                <input type="text" name="title" required placeholder="e.g. Quantum Mechanics Lecture Notes" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 focus:ring-primary/20 focus:border-primary text-sm font-medium">
-                            </div>
+                            
+                            <!-- Step 1: Core Selection -->
+                            <div x-show="uploadStep === 1" class="space-y-6" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Note Title</label>
+                                    <input type="text" name="title" required placeholder="e.g. Operating System Unit 1 Notes" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 focus:ring-primary/20 focus:border-primary text-sm font-bold">
+                                </div>
 
-                            <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Subject Category</label>
-                                <select name="subject_id" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 focus:ring-primary/20 focus:border-primary text-sm font-bold text-slate-700">
-                                    <option value="">Select a subject...</option>
-                                    @foreach($subjects as $subject)
-                                        <option value="{{ $subject->id }}">{{ $subject->name }} ({{ $subject->course }})</option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <div>
-                                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Upload File (PDF/DOC/ZIP)</label>
-                                <div class="relative group mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-2xl hover:border-primary/50 transition-all bg-white/30">
-                                    <div class="space-y-1 text-center">
-                                        <svg class="mx-auto h-12 w-12 text-slate-400 group-hover:text-primary transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <div class="flex text-sm text-slate-600">
-                                            <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-bold text-primary hover:underline">
-                                                <span>Select a file</span>
-                                                <input id="file-upload" name="file" type="file" class="sr-only" required>
-                                            </label>
-                                            <p class="pl-1">or drag and drop</p>
-                                        </div>
-                                        <p class="text-xs text-slate-500 font-medium">PDF, DOC up to 10MB</p>
+                                <div class="grid grid-cols-2 gap-5">
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Academic Path</label>
+                                        <select x-model="selectedCourse" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
+                                            <option value="">Select Course</option>
+                                            @foreach($courses as $course)
+                                                <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Semester</label>
+                                        <select x-model="selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
+                                            <option value="">Select Sem</option>
+                                            @for($i=1; $i<=8; $i++)
+                                                <option value="{{ $i }}">Semester {{ $i }}</option>
+                                            @endfor
+                                        </select>
                                     </div>
                                 </div>
+
+                                <div>
+                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Subject Node</label>
+                                    <select name="subject_id" x-model="selectedSubject" :disabled="!selectedCourse || !selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 disabled:opacity-50 transition-opacity">
+                                        <option value="">Select Subject</option>
+                                        @foreach($subjects as $subject)
+                                            <template x-if="selectedCourse == '{{ $subject->course_id }}' && selectedSemester == '{{ $subject->semester }}'">
+                                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
+                                            </template>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <button type="button" 
+                                        @click="if(selectedSubject) uploadStep = 2" 
+                                        :disabled="!selectedSubject"
+                                        class="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:bg-black disabled:opacity-30 transition-all">
+                                    Next: File Upload
+                                </button>
                             </div>
 
-                            <div class="pt-4">
-                                <button type="submit" class="w-full bg-primary text-white h-14 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm">
-                                    Share with the Verse
-                                </button>
+                            <!-- Step 2: File Upload -->
+                            <div x-show="uploadStep === 2" class="space-y-8" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
+                                <div class="relative group flex justify-center px-10 pt-10 pb-12 border-2 border-slate-200 border-dashed rounded-3xl hover:border-primary/50 transition-all bg-white/30">
+                                    <div class="space-y-4 text-center">
+                                        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+                                            <svg class="h-10 w-10 text-primary" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                                                <path d="M24 14v20M14 24h20" stroke-width="4" stroke-linecap="round" />
+                                            </svg>
+                                        </div>
+                                        <div class="flex flex-col text-sm text-slate-600">
+                                            <label for="file-upload" class="relative cursor-pointer font-black text-primary text-lg hover:underline">
+                                                <span>Click to Select Node File</span>
+                                                <input id="file-upload" name="file" type="file" class="sr-only" required @change="fileName = $el.files[0].name">
+                                            </label>
+                                            <p class="mt-2 text-xs text-slate-400 font-bold uppercase italic tracking-tighter">Academic Documents (PDF/Doc) up to 10MB</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <button type="button" @click="uploadStep = 1" class="flex-1 h-16 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Back</button>
+                                    <button type="submit" class="flex-[2] h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all outline-none">
+                                        Share with the Verse
+                                    </button>
+                                </div>
                             </div>
                         </form>
                     </div>
