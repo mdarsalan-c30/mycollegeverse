@@ -50,6 +50,7 @@ class User extends Authenticatable
             ->count();
         $commentCount = DB::table('comments')->where('user_id', $this->id)->count();
         $reviewCount = DB::table('reviews')->where('user_id', $this->id)->count();
+        $noteReviewCount = $this->noteReviews()->count();
 
         return (
             ($noteCount * 50) + 
@@ -57,8 +58,14 @@ class User extends Authenticatable
             ($postCount * 20) + 
             ($likesReceived * 5) + 
             ($commentCount * 10) + 
-            ($reviewCount * 15)
+            ($reviewCount * 15) +
+            ($noteReviewCount * 5)
         );
+    }
+
+    public function noteReviews()
+    {
+        return $this->hasMany(NoteReview::class);
     }
 
     public function getArsScoreAttribute()
@@ -168,6 +175,59 @@ class User extends Authenticatable
     public function getUnreadPipelineCountAttribute()
     {
         return $this->applications()->where('is_seen_by_student', false)->count();
+    }
+
+    public function getBadgesAttribute()
+    {
+        $badges = [];
+        
+        // Verse Pioneer (Early Adopters)
+        if ($this->id < 100) {
+            $badges[] = ['icon' => '👑', 'name' => 'Verse Pioneer', 'color' => 'bg-amber-100 ring-amber-500'];
+        }
+
+        // Knowledge Titan (High Note Contribution)
+        if ($this->notes()->count() >= 5) {
+            $badges[] = ['icon' => '📚', 'name' => 'Knowledge Titan', 'color' => 'bg-blue-100 ring-blue-500'];
+        }
+
+        // Community Oracle (High Engagement)
+        if ($this->posts()->count() >= 5) {
+            $badges[] = ['icon' => '🏛️', 'name' => 'Community Oracle', 'color' => 'bg-purple-100 ring-purple-500'];
+        }
+
+        // Rising Star (Karma based)
+        if ($this->karma >= 1000) {
+            $badges[] = ['icon' => '🌟', 'name' => 'Rising Star', 'color' => 'bg-emerald-100 ring-emerald-500'];
+        }
+
+        // Helpful Citizen (Review based)
+        $reviewCount = \DB::table('reviews')->where('user_id', $this->id)->count();
+        if ($reviewCount >= 3) {
+            $badges[] = ['icon' => '🤝', 'name' => 'Verified Helper', 'color' => 'bg-rose-100 ring-rose-500'];
+        }
+
+        return $badges;
+    }
+
+    public function followers()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'following_id', 'follower_id')->withTimestamps();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'following_id')->withTimestamps();
+    }
+
+    public function savedNotes()
+    {
+        return $this->belongsToMany(Note::class, 'saved_notes')->withTimestamps();
+    }
+
+    public function isFollowing(User $user)
+    {
+        return $this->following()->where('following_id', $user->id)->exists();
     }
 
     public function reports()

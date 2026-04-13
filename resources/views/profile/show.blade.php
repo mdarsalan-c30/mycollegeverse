@@ -59,9 +59,18 @@
                     </div>
                     <p class="text-slate-500 font-bold max-w-lg">{{ $user->college->name ?? 'Campus Node curator' }} • Passionate about Academic Excellence.</p>
                     <div class="flex items-center justify-center md:justify-start gap-6 pt-4">
-                        <div><p class="text-xl font-black text-slate-800">128</p><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Followers</p></div>
-                        <div><p class="text-xl font-black text-slate-800">450</p><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Downloads</p></div>
-                        <div><p class="text-xl font-black text-slate-800">14k</p><p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Points</p></div>
+                        <div>
+                            <p class="text-xl font-black text-slate-800">{{ $user->followers_count ?? 0 }}</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Followers</p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-black text-slate-800">{{ number_format($user->notes()->sum('downloads')) }}</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Downloads</p>
+                        </div>
+                        <div>
+                            <p class="text-xl font-black text-slate-800">{{ number_format($user->karma) }}</p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Points</p>
+                        </div>
                     </div>
                 </div>
 
@@ -80,7 +89,7 @@
             </div>
         </div>
 
-        <div class="grid lg:grid-cols-3 gap-10">
+        <div class="grid lg:grid-cols-3 gap-10" x-data="{ activeTab: 'uploads' }">
             <!-- Left Info -->
             <div class="space-y-8">
                 <div class="glass p-8 rounded-[2.5rem] shadow-sm border-white/50">
@@ -104,43 +113,74 @@
                 <div class="glass p-8 rounded-[2.5rem] shadow-sm border-white/50">
                     <h4 class="text-lg font-black text-secondary mb-6">Achievements</h4>
                     <div class="grid grid-cols-3 gap-4">
-                         @for($i=1; $i<=3; $i++)
-                            <div class="aspect-square glass rounded-2xl flex items-center justify-center text-3xl shadow-inner border-white/40 bg-white/10" title="Badge {{$i}}">
-                                🏆
+                         @forelse($user->badges as $badge)
+                            <div class="aspect-square {{ $badge['color'] }} rounded-2xl flex items-center justify-center text-3xl shadow-lg ring-1 ring-inset border-white/40" title="{{ $badge['name'] }}">
+                                {{ $badge['icon'] }}
                             </div>
-                         @endfor
-                         <div class="aspect-square glass rounded-2xl flex items-center justify-center text-slate-300 font-black text-xs border-dashed border-2 border-slate-200">
-                             +12
-                         </div>
+                         @empty
+                            <div class="col-span-3 py-6 text-center bg-slate-50/50 rounded-2xl border border-dashed border-slate-100">
+                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Novice Explorer</p>
+                            </div>
+                         @endforelse
                     </div>
                 </div>
             </div>
 
             <!-- Right Activity Feed -->
             <div class="lg:col-span-2 space-y-8">
-                 <div class="flex gap-8 border-b border-slate-100 pb-2">
-                    <button class="text-primary font-black border-b-2 border-primary pb-4">My Uploads</button>
-                    <button class="text-slate-400 font-bold pb-4 hover:text-secondary transition-colors">Saved Notes</button>
-                    <button class="text-slate-400 font-bold pb-4 hover:text-secondary transition-colors">Contributions</button>
+                 <div class="flex gap-8 border-b border-slate-100 pb-2 overflow-x-auto no-scrollbar whitespace-nowrap">
+                    <button @click="activeTab = 'uploads'" :class="activeTab === 'uploads' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">My Uploads</button>
+                    <button @click="activeTab = 'saved'" :class="activeTab === 'saved' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">Saved Notes</button>
+                    <button @click="activeTab = 'contributions'" :class="activeTab === 'contributions' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">Contributions</button>
                 </div>
 
-                <div class="grid md:grid-cols-2 gap-6">
-                    @for($i=0; $i<4; $i++)
+                <!-- Tab content: My Uploads -->
+                <div x-show="activeTab === 'uploads'" x-transition class="grid md:grid-cols-2 gap-6">
+                    @forelse($user->notes()->with('subject')->latest()->get() as $pNote)
                     <div class="glass p-6 rounded-[2.5rem] shadow-glass border-white hover:shadow-xl transition-all group">
                          <div class="flex justify-between items-start mb-6">
                             <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
                                 📄
                             </div>
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Uploaded 2d ago</span>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Uploaded {{ $pNote->created_at->diffForHumans() }}</span>
                         </div>
-                        <h4 class="text-lg font-extrabold text-slate-800 mb-1 truncate">Algorithmic Logic v1</h4>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Computer Science</p>
+                        <h4 class="text-lg font-extrabold text-slate-800 mb-1 truncate">{{ $pNote->title }}</h4>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">{{ $pNote->subject->name ?? 'General' }}</p>
                         <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
-                            <span class="flex items-center gap-1">📥 120</span>
-                            <span class="flex items-center gap-1">⭐ 4.9</span>
+                            <span class="flex items-center gap-1">📥 {{ $pNote->downloads }}</span>
+                            <span class="flex items-center gap-1">⭐ 5.0</span>
                         </div>
                     </div>
-                    @endfor
+                    @empty
+                    <div class="md:col-span-2 text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-100">
+                        <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">No knowledge assets shared yet.</p>
+                    </div>
+                    @endforelse
+                </div>
+
+                <!-- Tab content: Saved Notes -->
+                <div x-show="activeTab === 'saved'" x-transition class="py-20 text-center glass rounded-[3rem] border-white/60">
+                    <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔖</div>
+                    <h5 class="text-lg font-black text-slate-800">Archive Empty</h5>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Personal library coming in the next update.</p>
+                </div>
+
+                <!-- Tab content: Contributions -->
+                <div x-show="activeTab === 'contributions'" x-transition class="space-y-6">
+                    @forelse($user->posts()->latest()->get() as $pPost)
+                    <div class="glass p-8 rounded-[2.5rem] shadow-sm border-white">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-sm">💬</div>
+                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Campus Broadcast • {{ $pPost->created_at->diffForHumans() }}</span>
+                        </div>
+                        <h4 class="text-xl font-black text-slate-800 mb-3">{{ $pPost->title }}</h4>
+                        <p class="text-sm text-slate-500 font-medium leading-relaxed">{{ Str::limit($pPost->content, 150) }}</p>
+                    </div>
+                    @empty
+                    <div class="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-100">
+                        <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">Silence in the verse... no posts recorded.</p>
+                    </div>
+                    @endforelse
                 </div>
             </div>
         </div>

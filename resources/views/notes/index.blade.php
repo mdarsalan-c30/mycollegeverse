@@ -74,7 +74,7 @@
         <!-- Notes Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($notes as $note)
-            <a href="{{ route('notes.show', $note->id) }}" 
+            <a href="{{ route('notes.show', $note->slug ?? $note->id) }}" 
                x-show="matches({ 
                    title: '{{ addslashes($note->title) }}', 
                    subject: '{{ addslashes($note->subject->name ?? '') }}', 
@@ -89,9 +89,17 @@
                class="glass p-6 rounded-[2.5rem] shadow-glass border-white hover:shadow-xl transition-all group relative overflow-hidden block">
                 <!-- Priority Badge -->
                 @if(Auth::check() && $note->college_id == Auth::user()->college_id)
-                <div class="absolute top-0 right-0">
+                <div class="absolute top-0 right-0 z-10">
                     <div class="bg-primary text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-bl-2xl shadow-sm tracking-widest">
                         Your College
+                    </div>
+                </div>
+                @endif
+                
+                @if($note->exam_help_rate >= 80 && $note->reviews()->count() > 0)
+                <div class="absolute top-0 left-0 z-10">
+                    <div class="bg-emerald-500 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-br-2xl shadow-sm tracking-widest flex items-center gap-1">
+                        <span class="animate-pulse">🛡️</span> {{ $note->exam_help_rate }}% Exam Trusted
                     </div>
                 </div>
                 @endif
@@ -102,9 +110,9 @@
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    @php $rating = 4.5 + (rand(0, 5) / 10); @endphp
+                    @php $rating = $note->avg_rating; @endphp
                     <div class="flex items-center gap-1 bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-black">
-                        ⭐ {{ $rating }}
+                        ⭐ {{ number_format($rating, 1) }}
                     </div>
                 </div>
 

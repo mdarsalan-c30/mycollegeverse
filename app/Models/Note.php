@@ -11,12 +11,49 @@ class Note extends Model
 
     protected $fillable = [
         'title',
+        'slug',
         'file_path',
         'user_id',
         'college_id',
         'subject_id',
         'is_verified',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($note) {
+            if (!$note->slug) {
+                $base = \Illuminate\Support\Str::slug($note->title);
+                $slug = $base;
+                $i = 1;
+                while (static::where('slug', $slug)->exists()) {
+                    $slug = $base . '-' . $i++;
+                }
+                $note->slug = $slug;
+            }
+        });
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(NoteReview::class);
+    }
+
+    public function getAvgRatingAttribute()
+    {
+        return round($this->reviews()->avg('rating') ?: 5.0, 1);
+    }
+
+    public function getExamHelpRateAttribute()
+    {
+        $total = $this->reviews()->count();
+        if ($total === 0) return 100; // Legacy default
+        
+        $helped = $this->reviews()->where('helped_in_exam', true)->count();
+        return round(($helped / $total) * 100);
+    }
 
     public function college()
     {

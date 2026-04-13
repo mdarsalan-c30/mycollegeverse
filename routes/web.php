@@ -19,7 +19,25 @@ Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'inde
 
 // Public Reading Routes (SEO Friendly)
 Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
-Route::get('/notes/{id}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
+Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
+
+// Master Browser Nexus (For Hostinger/Terminal-less Sync)
+Route::get('/force-sync-multiverse', [App\Http\Controllers\MultiverseSyncController::class, 'sync']);
+Route::get('/multiverse-note-slug-sync', function() {
+    try {
+        $notes = \App\Models\Note::whereNull('slug')->get();
+        $count = 0;
+        foreach($notes as $n) {
+            $n->update([
+                'slug' => \Illuminate\Support\Str::slug($n->title) . '-' . \Illuminate\Support\Str::random(6)
+            ]);
+            $count++;
+        }
+        return "🌌 Note identity mapped! Generated $count note slugs. Visit <a href='/notes'>Notes</a>.";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
 
 Route::get('/community', [App\Http\Controllers\CommunityController::class, 'index'])->name('community.index');
 Route::get('/community/{user:username}/{post:slug}', [App\Http\Controllers\CommunityController::class, 'show'])->name('community.show');
@@ -66,7 +84,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:student'])->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
         Route::post('/notes', [App\Http\Controllers\NoteController::class, 'store'])->name('notes.store');
-        Route::get('/notes/{id}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
+        Route::post('/notes/{note}/review', [App\Http\Controllers\NoteController::class, 'addReview'])->name('notes.review');
+        Route::get('/notes/{slug}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
         Route::post('/community/store', [App\Http\Controllers\CommunityController::class, 'store'])->name('community.store');
         Route::post('/community/comment', [App\Http\Controllers\CommunityController::class, 'comment'])->name('community.comment');
         Route::post('/community/vote/{postId}', [App\Http\Controllers\CommunityController::class, 'vote'])->name('community.vote');

@@ -101,19 +101,70 @@
         <div class="space-y-8">
              <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm text-center space-y-6">
                 <div class="inline-flex items-center gap-2 bg-amber-100 text-amber-600 px-4 py-1.5 rounded-full text-sm font-black ring-4 ring-amber-50">
-                    ⭐ 4.9 <span class="text-amber-400/50">/ 5.0</span>
+                    ⭐ {{ number_format($note->avg_rating, 1) }} <span class="text-amber-400/50">/ 5.0</span>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-2xl font-black text-slate-800">Verified Hub</p>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-loose">Institutionally Validated</p>
+                    <p class="text-2xl font-black text-slate-800">{{ $note->reviews()->count() > 0 ? $note->exam_help_rate . '%' : 'Fresh' }} Trust</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-loose">Student Authority Index</p>
                 </div>
+            </div>
+
+            <!-- Note Authority & Validation Poll -->
+            <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm space-y-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    </div>
+                    <h4 class="text-lg font-black text-secondary">Exam Readiness</h4>
+                </div>
+                
+                <p class="text-sm font-medium text-slate-500 leading-relaxed">Is this resource helpful for your exams? Your validation builds the multiverse trust.</p>
+
+                @auth
+                <form action="{{ route('notes.review', $note->id) }}" method="POST" class="space-y-4">
+                    @csrf
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="helped_in_exam" value="1" required class="peer hidden">
+                            <div class="h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-2 font-bold text-slate-400 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 peer-checked:text-emerald-600 group-hover:bg-slate-50 transition-all">
+                                <span>👍</span> Yes
+                            </div>
+                        </label>
+                        <label class="cursor-pointer group">
+                            <input type="radio" name="helped_in_exam" value="0" class="peer hidden">
+                            <div class="h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-2 font-bold text-slate-400 peer-checked:border-rose-500 peer-checked:bg-rose-50 peer-checked:text-rose-600 group-hover:bg-slate-50 transition-all">
+                                <span>👎</span> No
+                            </div>
+                        </label>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Rate Academic Quality</label>
+                        <select name="rating" required class="w-full h-12 bg-slate-50 border-slate-100 rounded-xl text-sm font-bold focus:ring-primary/20">
+                            <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
+                            <option value="4">⭐⭐⭐⭐ Great</option>
+                            <option value="3">⭐⭐⭐ Good</option>
+                            <option value="2">⭐⭐ Fair</option>
+                            <option value="1">⭐ Poor</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="w-full bg-slate-900 text-white h-14 rounded-2xl font-bold shadow-xl hover:scale-[1.02] active:scale-95 transition-all text-sm flex items-center justify-center gap-2">
+                        Submit & Earn +5 Karma
+                    </button>
+                </form>
+                @else
+                <a href="{{ route('login') }}" class="block w-full text-center py-4 bg-slate-100 text-slate-500 rounded-2xl font-bold hover:bg-slate-200 transition-all text-sm">
+                    Sign in to Validate
+                </a>
+                @endauth
             </div>
 
             <div class="glass p-8 rounded-[2.5rem] border-white/60">
                 <h4 class="text-lg font-black text-secondary mb-6">Related from {{ $note->subject->name ?? 'General' }}</h4>
                 <div class="space-y-6">
                     @forelse($related as $rel)
-                    <a href="{{ route('notes.show', $rel->id) }}" class="flex gap-4 group cursor-pointer">
+                    <a href="{{ route('notes.show', $rel->slug ?? $rel->id) }}" class="flex gap-4 group cursor-pointer">
                         <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all text-xl">📄</div>
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-bold text-slate-800 truncate group-hover:text-primary transition-colors">{{ $rel->title }}</p>
