@@ -14,13 +14,16 @@ class ProfessorController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $query = Professor::with('reviews');
+        
+        // Defensive Registry Sync: Only show professors with an institutional anchor 🏢
+        // This prevents 500 errors when rendering orphaned nodes.
+        $query = Professor::whereHas('college')->with(['reviews', 'college']);
 
-        if ($user) {
+        if ($user && $user->college_id) {
             $query->orderByRaw('college_id = ? DESC', [$user->college_id]);
         }
         
-        $professors = $query->get();
+        $professors = $query->latest()->get();
             
         $myPendingRequest = Auth::check()
             ? ProfessorRequest::where('user_id', Auth::id())->where('status', 'pending')->first()

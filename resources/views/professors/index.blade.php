@@ -128,7 +128,7 @@
                 <div x-show="matches({ 
                          name: '{{ addslashes($prof->name) }}',
                          department: '{{ addslashes($prof->department) }}',
-                         college: '{{ addslashes($prof->college->name) }}'
+                         college: '{{ addslashes(optional($prof->college)->name ?? "Institutional Node") }}'
                      })"
                      x-transition:enter="transition ease-out duration-300"
                      x-transition:enter-start="opacity-0 scale-95"
@@ -174,7 +174,7 @@
                     </div>
 
                     <div class="flex justify-between items-center pt-6 border-t border-slate-100">
-                        <p class="text-xs font-bold text-slate-400 tracking-wide">{{ $prof->college->name }}</p>
+                        <p class="text-xs font-bold text-slate-400 tracking-wide">{{ optional($prof->college)->name ?? "Institutional Node" }}</p>
                         <a href="{{ route('professors.show', $prof->id) }}" class="text-primary font-bold text-sm hover:underline">Rate & Review</a>
                     </div>
                 </div>

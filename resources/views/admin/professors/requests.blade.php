@@ -53,10 +53,10 @@
                     <tr class="hover:bg-slate-50/40 transition-colors">
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-3">
-                                <img src="{{ $req->user->profile_photo_url }}" class="w-10 h-10 rounded-xl shadow-sm border border-white" alt="">
+                                <img src="{{ optional($req->user)->profile_photo_url ?? 'https://via.placeholder.com/100?text=Citizen' }}" class="w-10 h-10 rounded-xl shadow-sm border border-white" alt="">
                                 <div>
-                                    <p class="text-xs font-black text-admin-dark">{{ $req->user->name }}</p>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase">{{ $req->user->college->name ?? 'External Citizen' }}</p>
+                                    <p class="text-xs font-black text-admin-dark">{{ optional($req->user)->name ?? 'Unknown Identity' }}</p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase">{{ optional($req->user)->college->name ?? 'External Citizen' }}</p>
                                 </div>
                             </div>
                         </td>

@@ -33,30 +33,37 @@ class ProfessorController extends Controller
             'department' => 'required|string',
         ]);
 
-        // Create the actual Professor node
-        $professor = Professor::create([
-            'name' => $request->name,
-            'department' => $request->department,
-            'college_id' => $request->college_id,
-            'profile_pic' => $profRequest->profile_photo_url, // Use the photo from request
-        ]);
+        try {
+            return \DB::transaction(function () use ($request, $profRequest) {
+                // 1. Create the actual Professor node
+                $professor = Professor::create([
+                    'name' => $request->name,
+                    'department' => $request->department,
+                    'college_id' => $request->college_id,
+                    'profile_pic' => $profRequest->profile_photo_url,
+                ]);
 
-        // Update Request Status
-        $profRequest->update(['status' => 'approved']);
+                // 2. Update Request Status
+                $profRequest->update(['status' => 'approved']);
 
-        ApprovalLog::safeCreate([
-            'admin_id' => Auth::id(),
-            'action' => 'professor_request_approved',
-            'target_type' => 'Professor',
-            'target_id' => $professor->id,
-            'metadata' => [
-                'request_id' => $profRequest->id,
-                'professor_name' => $professor->name,
-                'college_id' => $request->college_id
-            ],
-        ]);
+                // 3. Log the administrative action
+                ApprovalLog::safeCreate([
+                    'admin_id' => Auth::id(),
+                    'action' => 'professor_request_approved',
+                    'target_type' => 'Professor',
+                    'target_id' => $professor->id,
+                    'metadata' => [
+                        'request_id' => $profRequest->id,
+                        'professor_name' => $professor->name,
+                        'college_id' => $request->college_id
+                    ],
+                ]);
 
-        return redirect()->route('admin.professors.requests')->with('success', "Faculty Node '{$professor->name}' established from request.");
+                return redirect()->route('admin.professors.requests')->with('success', "Faculty Node '{$professor->name}' established from request.");
+            });
+        } catch (\Exception $e) {
+            return back()->with('error', "Failed to establish faculty node: " . $e->getMessage());
+        }
     }
 
     /**
