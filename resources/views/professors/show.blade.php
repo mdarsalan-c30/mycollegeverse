@@ -1,6 +1,6 @@
 <x-app-layout>
     @section('title', $professor->name . ' - Faculty Review | MyCollegeVerse')
-    @section('meta_description', 'Read reviews and ratings for professor ' . $professor->name . ' (' . $professor->department . ') at ' . ($professor->college->name ?? 'Campus') . '. Get insights into teaching style and academic results.')
+    @section('meta_description', 'Read reviews and ratings for professor ' . $professor->name . ' (' . $professor->department . ') at ' . (optional($professor->college)->name ?? 'Campus') . '. Get insights into teaching style and academic results.')
 <div class="space-y-8 pb-24">
 
     {{-- ═══════════════════════════════════════════════════
@@ -24,7 +24,7 @@
                             <h1 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight">{{ $professor->name }}</h1>
                             <p class="text-slate-500 font-semibold mt-1 flex items-center gap-2">
                                 <svg class="w-4 h-4 text-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                                {{ $professor->department }} &bull; {{ $professor->college->name }}
+                                {{ $professor->department }} &bull; {{ optional($professor->college)->name ?? 'Institutional Hub' }}
                             </p>
                         </div>
 
@@ -51,7 +51,7 @@
                         @if($professor->designation ?? null)
                             <span class="px-3 py-1 bg-primary/10 text-primary text-xs font-black rounded-full">{{ $professor->designation }}</span>
                         @endif
-                        <span class="px-3 py-1 bg-violet-50 text-violet-700 text-xs font-black rounded-full">{{ $professor->college->name }}</span>
+                        <span class="px-3 py-1 bg-violet-50 text-violet-700 text-xs font-black rounded-full">{{ optional($professor->college)->name ?? 'Campus Verse' }}</span>
                         @if($avg >= 4.5)
                             <span class="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-black rounded-full">⭐ Top Rated</span>
                         @endif
@@ -194,14 +194,14 @@
             </div>
 
             {{-- Student Tip Card --}}
-            @if($total > 0)
+            @if($total > 0 && $professor->reviews->sortByDesc('rating')->first())
             <div class="bg-amber-50 border border-amber-100 p-6 rounded-[2rem]">
                 <div class="flex items-center gap-2 mb-3">
                     <span class="text-lg">💡</span>
                     <h3 class="text-xs font-black text-amber-900 uppercase tracking-widest">Student Tip</h3>
                 </div>
                 <p class="text-sm text-amber-800 font-medium leading-relaxed italic">
-                    "{{ Str::limit($professor->reviews->sortByDesc('rating')->first()->comment ?? 'No reviews yet.', 150) }}"
+                    "{{ Str::limit($professor->reviews->sortByDesc('rating')->first()->comment, 150) }}"
                 </p>
                 <p class="text-[10px] text-amber-600 font-black mt-2">— Highest rated review</p>
             </div>

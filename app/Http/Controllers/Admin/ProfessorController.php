@@ -9,6 +9,7 @@ use App\Models\ProfessorRequest;
 use App\Models\College;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ProfessorController extends Controller
 {
@@ -41,6 +42,7 @@ class ProfessorController extends Controller
                     'department' => $request->department,
                     'college_id' => $request->college_id,
                     'profile_pic' => $profRequest->profile_photo_url,
+                    'slug' => Str::slug($request->name . '-' . $request->department . '-' . time()),
                 ]);
 
                 // 2. Update Request Status
@@ -114,7 +116,9 @@ class ProfessorController extends Controller
             'profile_pic' => 'nullable|url',
         ]);
 
-        $professor = Professor::create($request->all());
+        $data = $request->all();
+        $data['slug'] = Str::slug($request->name . '-' . $request->department . '-' . time());
+        $professor = Professor::create($data);
 
         ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),

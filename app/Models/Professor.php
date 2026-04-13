@@ -9,7 +9,15 @@ class Professor extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'department', 'college_id', 'profile_pic'];
+    protected $fillable = ['name', 'department', 'college_id', 'profile_pic', 'slug'];
+
+    /**
+     * Use slugs instead of IDs for public routing.
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     public function college()
     {

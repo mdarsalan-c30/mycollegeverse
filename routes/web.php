@@ -54,9 +54,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/community/comment', [App\Http\Controllers\CommunityController::class, 'comment'])->name('community.comment');
         Route::post('/community/vote/{postId}', [App\Http\Controllers\CommunityController::class, 'vote'])->name('community.vote');
         Route::get('/professors', [App\Http\Controllers\ProfessorController::class, 'index'])->name('professors.index');
-        Route::get('/professors/{id}', [App\Http\Controllers\ProfessorController::class, 'show'])->name('professors.show');
+        Route::get('/professors/{professor:slug}', [App\Http\Controllers\ProfessorController::class, 'show'])->name('professors.show');
         Route::post('/professors/request', [App\Http\Controllers\ProfessorController::class, 'requestProfessor'])->name('professors.request');
-        Route::post('/professors/{id}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
+        Route::post('/professors/{professor:slug}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
         Route::post('/colleges/{college:slug}/rate', [App\Http\Controllers\CollegeController::class, 'rate'])->name('colleges.rate');
         Route::post('/colleges/request', [App\Http\Controllers\CollegeController::class, 'requestCollege'])->name('colleges.request');
 
@@ -166,6 +166,22 @@ Route::middleware(['auth', 'role:admin'])->prefix('mcv-admin')->name('admin.')->
 
     // SEO Nucleus (Page Management)
     Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
+});
+
+Route::get('/multiverse-slug-sync', function() {
+    try {
+        $profs = \App\Models\Professor::whereNull('slug')->get();
+        $count = 0;
+        foreach($profs as $p) {
+            $p->update([
+                'slug' => \Illuminate\Support\Str::slug($p->name . '-' . $p->department . '-' . $p->id)
+            ]);
+            $count++;
+        }
+        return "🌌 Identity Sync Complete! Generated $count slugs for existing faculty nodes.";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
 });
 
 Route::get('/multiverse-sync', function() {

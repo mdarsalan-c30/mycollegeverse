@@ -56,7 +56,7 @@
                                 <img src="{{ optional($req->user)->profile_photo_url ?? 'https://via.placeholder.com/100?text=Citizen' }}" class="w-10 h-10 rounded-xl shadow-sm border border-white" alt="">
                                 <div>
                                     <p class="text-xs font-black text-admin-dark">{{ optional($req->user)->name ?? 'Unknown Identity' }}</p>
-                                    <p class="text-[9px] font-bold text-slate-400 uppercase">{{ optional($req->user)->college->name ?? 'External Citizen' }}</p>
+                                    <p class="text-[9px] font-bold text-slate-400 uppercase">{{ optional(optional($req->user)->college)->name ?? 'External Citizen' }}</p>
                                 </div>
                             </div>
                         </td>

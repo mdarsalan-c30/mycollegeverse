@@ -32,13 +32,13 @@ class ProfessorController extends Controller
         return view('professors.index', compact('professors', 'myPendingRequest'));
     }
 
-    public function show($id)
+    public function show(Professor $professor)
     {
-        $professor = Professor::with(['reviews.user', 'college'])->findOrFail($id);
+        $professor->load(['reviews.user', 'college']);
         return view('professors.show', compact('professor'));
     }
 
-    public function rate(Request $request, $id, \App\Services\ImageKitService $imageKit)
+    public function rate(Request $request, Professor $professor, \App\Services\ImageKitService $imageKit)
     {
         $user = Auth::user();
 
@@ -69,7 +69,7 @@ class ProfessorController extends Controller
 
         Review::create([
             'user_id' => $user->id,
-            'professor_id' => $id,
+            'professor_id' => $professor->id,
             'rating' => $request->rating,
             'comment' => $request->comment,
         ]);
