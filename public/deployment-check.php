@@ -34,4 +34,28 @@ echo "<a href='/reboot.php' class='btn'>Emergency Reboot</a>";
 echo "<h3>Route Test:</h3>";
 echo "<p>The new Admin Terminal is now at: <a href='/mcv-admin/login' style='color:#3b82f6;'>/mcv-admin/login</a></p>";
 
+echo "<hr style='border: 0; border-top: 1px solid #334155; margin: 40px 0;'>";
+
+echo "<h3>Authority Diagnosis Node 🔎</h3>";
+echo "<p>Check the role of any email in the system:</p>";
+echo "<form method='GET' style='display:flex; gap:10px;'>
+        <input type='email' name='check_email' placeholder='shami@gmail.com' required style='padding:10px; border-radius:10px; border:1px solid #334155; background:#0f172a; color:#fff; flex:1;'>
+        <button type='submit' style='padding:10px 20px; background:#10b981; color:#fff; border:none; border-radius:10px; cursor:pointer;'>Check Role</button>
+      </form>";
+
+if (isset($_GET['check_email'])) {
+    $email = $_GET['check_email'];
+    $user = \App\Models\User::where('email', $email)->first();
+    
+    echo "<div style='margin-top:20px; padding:20px; background:#000; border-radius:15px; border:1px solid #10b981;'>";
+    if ($user) {
+        echo "<p><strong>Email:</strong> " . e($user->email) . "</p>";
+        echo "<p><strong>Current Role (Raw):</strong> <span style='color:#10b981;'>'" . e($user->role) . "'</span></p>";
+        echo "<p><strong>Result:</strong> " . (strtolower(trim($user->role)) === 'admin' ? "✅ AUTHORIZED FOR ADMIN ACCESS" : "❌ DENIED (Not an admin)") . "</p>";
+    } else {
+        echo "<p style='color:#ef4444;'>❌ User not found in database.</p>";
+    }
+    echo "</div>";
+}
+
 echo "</div></body></html>";
