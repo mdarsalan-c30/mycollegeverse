@@ -303,6 +303,12 @@
                                         <p class="text-[10px] md:text-xs text-slate-500 truncate">{{ $note->subject->name ?? 'General Info' }}</p>
                                     </div>
                                 </div>
+                                <div class="flex flex-col items-end gap-1">
+                                    <div class="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-0.5 rounded-lg text-[10px] font-black italic">
+                                        ⭐ {{ number_format($note->avg_rating, 1) }}
+                                    </div>
+                                    <span class="text-[8px] font-black text-slate-300 uppercase tracking-widest">{{ $note->reviews()->count() }} Studs</span>
+                                </div>
                             </a>
                             @empty
                             <div class="p-8 text-center text-slate-400 font-bold italic">No notes uploaded yet.</div>

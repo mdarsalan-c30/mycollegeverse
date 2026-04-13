@@ -66,7 +66,52 @@
                      @endauth
                  </div>
 
+                 @if($note->reviews()->count() > 0)
+                 <div class="mb-12 space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-black text-slate-800 flex items-center gap-2">
+                            Verified Student Validation
+                            <span class="bg-emerald-100 text-emerald-600 text-[10px] px-2 py-0.5 rounded-md uppercase tracking-tighter shadow-sm">Peer Reviewed</span>
+                        </h3>
+                        <div class="text-xs font-black text-slate-400 uppercase tracking-widest">{{ $note->reviews()->count() }} Responses</div>
+                    </div>
+
+                    <div class="grid gap-4">
+                        @foreach($note->reviews()->latest()->take(5)->get() as $review)
+                        <div class="glass p-6 rounded-[2rem] border-emerald-100/50 bg-emerald-50/20">
+                            <div class="flex flex-col sm:flex-row justify-between items-start gap-4">
+                                <div class="flex gap-4">
+                                    <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&background=10b981&color=fff" class="w-10 h-10 rounded-xl shadow-sm" />
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            <p class="font-bold text-slate-800 text-sm">{{ $review->user->name }}</p>
+                                            <div class="flex text-[10px]">
+                                                @for($i=1; $i<=5; $i++)
+                                                    <span class="{{ $i <= $review->rating ? 'text-amber-400' : 'text-slate-200' }}">⭐</span>
+                                                @endfor
+                                            </div>
+                                        </div>
+                                        @if($review->helped_in_exam)
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-600 uppercase tracking-tighter mt-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                            Helped in Exam
+                                        </span>
+                                        @endif
+                                    </div>
+                                </div>
+                                <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">{{ $review->created_at->diffForHumans() }}</span>
+                            </div>
+                            @if($review->feedback)
+                            <p class="mt-4 text-sm font-medium text-slate-600 leading-relaxed italic">"{{ $review->feedback }}"</p>
+                            @endif
+                        </div>
+                        @endforeach
+                    </div>
+                 </div>
+                 @endif
+
                  <div class="space-y-6">
+
                     <h3 class="text-xl font-black text-slate-800">Discussion ({{ $note->comments->count() }})</h3>
                     
                     <div id="comment-list-{{ $note->id }}" class="space-y-6 mb-8">
@@ -104,9 +149,14 @@
                     ⭐ {{ number_format($note->avg_rating, 1) }} <span class="text-amber-400/50">/ 5.0</span>
                 </div>
                 <div class="space-y-1">
-                    <p class="text-2xl font-black text-slate-800">{{ $note->reviews()->count() > 0 ? $note->exam_help_rate . '%' : 'Fresh' }} Trust</p>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest leading-loose">Student Authority Index</p>
+                    <p class="text-2xl font-black text-slate-800">{{ $note->reviews()->count() }} Students</p>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-loose">Academic Authority Index</p>
                 </div>
+            </div>
+
+            <!-- Note Authority & Validation Poll -->
+            <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm space-y-6">
+                <!-- Validation logic already here -->
             </div>
 
             <!-- Note Authority & Validation Poll -->

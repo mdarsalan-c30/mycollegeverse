@@ -110,9 +110,15 @@
                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    @php $rating = $note->avg_rating; @endphp
-                    <div class="flex items-center gap-1 bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-xs font-black">
-                        ⭐ {{ number_format($rating, 1) }}
+                    @php 
+                        $rating = $note->avg_rating; 
+                        $reviewCount = $note->reviews()->count();
+                    @endphp
+                    <div class="flex flex-col items-end gap-1">
+                        <div class="flex items-center gap-1 bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm ring-4 ring-amber-50">
+                            ⭐ {{ number_format($rating, 1) }}
+                        </div>
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $reviewCount }} Validations</span>
                     </div>
                 </div>
 
