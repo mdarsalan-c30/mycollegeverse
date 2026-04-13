@@ -5,11 +5,78 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Professor;
 use App\Models\ApprovalLog;
+use App\Models\ProfessorRequest;
+use App\Models\College;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfessorController extends Controller
 {
+    /**
+     * Display the Faculty Moderation Queue.
+     */
+    public function requests()
+    {
+        $requests = ProfessorRequest::with('user.college')->latest()->paginate(15);
+        $colleges = College::orderBy('name')->get();
+        return view('admin.professors.requests', compact('requests', 'colleges'));
+    }
+
+    /**
+     * Approve a faculty request and establish a new node.
+     */
+    public function approveRequest(Request $request, ProfessorRequest $profRequest)
+    {
+        $request->validate([
+            'college_id' => 'required|exists:colleges,id',
+            'name' => 'required|string',
+            'department' => 'required|string',
+        ]);
+
+        // Create the actual Professor node
+        $professor = Professor::create([
+            'name' => $request->name,
+            'department' => $request->department,
+            'college_id' => $request->college_id,
+            'profile_pic' => $profRequest->profile_photo_url, // Use the photo from request
+        ]);
+
+        // Update Request Status
+        $profRequest->update(['status' => 'approved']);
+
+        ApprovalLog::safeCreate([
+            'admin_id' => Auth::id(),
+            'action' => 'professor_request_approved',
+            'target_type' => 'Professor',
+            'target_id' => $professor->id,
+            'metadata' => [
+                'request_id' => $profRequest->id,
+                'professor_name' => $professor->name,
+                'college_id' => $request->college_id
+            ],
+        ]);
+
+        return redirect()->route('admin.professors.requests')->with('success', "Faculty Node '{$professor->name}' established from request.");
+    }
+
+    /**
+     * Reject a faculty request.
+     */
+    public function rejectRequest(ProfessorRequest $profRequest)
+    {
+        $profRequest->update(['status' => 'rejected']);
+
+        ApprovalLog::safeCreate([
+            'admin_id' => Auth::id(),
+            'action' => 'professor_request_rejected',
+            'target_type' => 'ProfessorRequest',
+            'target_id' => $profRequest->id,
+            'metadata' => ['professor_name' => $profRequest->professor_name],
+        ]);
+
+        return redirect()->route('admin.professors.requests')->with('success', "Request for '{$profRequest->professor_name}' rejected.");
+    }
+
     /**
      * Display the Faculty Registry.
      */

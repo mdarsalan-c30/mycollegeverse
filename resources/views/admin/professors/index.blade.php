@@ -7,9 +7,15 @@
                 <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.2em] mt-1 italic">Managing the academic advisors of the multiverse</p>
             </div>
             
-            <button type="button" @click="openCreate = true" class="px-6 py-4 bg-admin-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-admin-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
-                Initialize Faculty Node
-            </button>
+            <div class="flex items-center gap-3">
+                <a href="{{ route('admin.professors.requests') }}" class="px-6 py-4 bg-white border border-admin-border text-admin-secondary rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-sm hover:bg-slate-50 transition-all flex items-center gap-3">
+                    <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                    Manage Requests
+                </a>
+                <button type="button" @click="openCreate = true" class="px-6 py-4 bg-admin-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-admin-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Initialize Node
+                </button>
+            </div>
         </div>
 
         <!-- Faculty Registry Table (Stitch UI Mirror) -->

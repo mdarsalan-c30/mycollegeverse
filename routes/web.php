@@ -147,7 +147,10 @@ Route::middleware(['auth', 'role:admin'])->prefix('mcv-admin')->name('admin.')->
     Route::delete('/colleges/{college}', [App\Http\Controllers\Admin\CollegeController::class, 'destroy'])->name('colleges.destroy');
 
     Route::get('/professors', [App\Http\Controllers\Admin\ProfessorController::class, 'index'])->name('professors');
+    Route::get('/professors/requests', [App\Http\Controllers\Admin\ProfessorController::class, 'requests'])->name('professors.requests');
     Route::post('/professors', [App\Http\Controllers\Admin\ProfessorController::class, 'store'])->name('professors.store');
+    Route::post('/professors/requests/{profRequest}/approve', [App\Http\Controllers\Admin\ProfessorController::class, 'approveRequest'])->name('professors.approve');
+    Route::post('/professors/requests/{profRequest}/reject', [App\Http\Controllers\Admin\ProfessorController::class, 'rejectRequest'])->name('professors.reject');
     Route::delete('/professors/{professor}', [App\Http\Controllers\Admin\ProfessorController::class, 'destroy'])->name('professors.destroy');
 
     // Command Center (Settings & Admins) ⚙️👑
