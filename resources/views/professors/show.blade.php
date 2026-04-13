@@ -91,12 +91,12 @@
                 {{-- Reviewer --}}
                 <div class="flex items-start justify-between gap-4 mb-5">
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('profile.show', $review->user->username) }}" class="flex-shrink-0">
+                        <a href="{{ route('profile.show', optional($review->user)->username) }}" class="flex-shrink-0">
                             <img src="{{ $review->user->profile_photo_url }}"
                                  class="w-11 h-11 rounded-[0.85rem] border-2 border-white shadow-sm object-cover group-hover:scale-105 transition-transform" />
                         </a>
                         <div>
-                            <a href="{{ route('profile.show', $review->user->username) }}" class="text-sm font-black text-slate-900 hover:text-primary transition-colors">{{ $review->user->name }}</a>
+                            <a href="{{ route('profile.show', optional($review->user)->username) }}" class="text-sm font-black text-slate-900 hover:text-primary transition-colors">{{ $review->user->name }}</a>
                             <div class="flex items-center gap-2 mt-0.5">
                                 <span class="text-[10px] text-slate-400 font-bold">{{ $review->created_at->diffForHumans() }}</span>
                                 @if($review->created_at->gt(now()->subDays(7)))

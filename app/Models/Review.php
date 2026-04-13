@@ -14,7 +14,9 @@ class Review extends Model
     public function user()
     {
         return $this->belongsTo(User::class)->withDefault([
-            'name' => 'Former Citizen'
+            'name' => 'Former Citizen',
+            'username' => 'citizen',
+            'profile_photo_url' => 'https://ui-avatars.com/api/?name=Former+Citizen&background=E2E8F0&color=475569'
         ]);
     }
 
