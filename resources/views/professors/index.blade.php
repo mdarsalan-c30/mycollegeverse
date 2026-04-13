@@ -39,41 +39,64 @@
                     <p class="text-xs text-slate-400 font-bold mt-1">Can't find your professor? submit their details and we'll add them.</p>
                 </div>
 
-                <form action="{{ route('professors.request') }}" method="POST" class="space-y-4">
+                <form action="{{ route('professors.request') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Professor Name *</label>
-                        <input type="text" name="professor_name" required placeholder="e.g. Dr. John Doe"
-                               class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder-slate-300" />
-                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Professor Name *</label>
+                            <input type="text" name="professor_name" required placeholder="e.g. Dr. John Doe"
+                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30" />
+                        </div>
 
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Department *</label>
-                        <input type="text" name="department" required placeholder="e.g. Computer Science"
-                               class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder-slate-300" />
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Department *</label>
+                            <input type="text" name="department" required placeholder="e.g. Computer Science"
+                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30" />
+                        </div>
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">College Name *</label>
                         @auth
                             <input type="text" name="college_name" required value="{{ Auth::user()->college->name ?? '' }}" placeholder="e.g. VIT Vellore"
-                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder-slate-300" />
+                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30" />
                         @else
                             <input type="text" name="college_name" required placeholder="e.g. VIT Vellore"
-                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 placeholder-slate-300" />
+                                   class="w-full h-11 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30" />
                         @endauth
+                    </div>
+
+                    <div class="space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-xl">📸</span>
+                            <p class="text-[10px] font-black text-slate-900 uppercase tracking-[0.1em]">Faculty Portrait <span class="text-slate-400 font-bold">(Optional)</span></p>
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <input type="url" name="profile_photo_url" placeholder="Paste Image URL (Unsplash/LinkedIn/Staff Bio)..."
+                                   class="w-full h-10 bg-white border border-slate-200 rounded-lg px-4 text-[11px] font-medium text-slate-600 focus:ring-2 focus:ring-primary/10" />
+                            
+                            <div class="flex items-center gap-4 px-2">
+                                <div class="h-px flex-1 bg-slate-200"></div>
+                                <span class="text-[9px] font-black text-slate-300 uppercase">OR Upload</span>
+                                <div class="h-px flex-1 bg-slate-200"></div>
+                            </div>
+
+                            <input type="file" name="profile_photo_file" 
+                                   class="w-full text-[10px] text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-[10px] file:font-black file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer" />
+                        </div>
                     </div>
 
                     <div class="space-y-1.5">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Additional Notes <span class="text-slate-300">(optional)</span></label>
-                        <textarea name="message" rows="3" placeholder="Tell us more about this professor..."
-                                  class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 resize-none placeholder-slate-300"></textarea>
+                        <textarea name="message" rows="2" placeholder="Tell us more about this professor..."
+                                  class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-xs font-medium text-slate-700 focus:ring-2 focus:ring-primary/20 resize-none"></textarea>
                     </div>
 
                     <button type="submit"
-                            class="w-full bg-primary text-white h-12 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                        Submit Request 🚀
+                            class="w-full bg-slate-900 text-white h-14 rounded-xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-900/10 hover:bg-slate-800 transition-all">
+                        Dispatch Request 🚀
                     </button>
                 </form>
             </div>

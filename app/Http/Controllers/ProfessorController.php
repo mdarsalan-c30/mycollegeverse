@@ -35,40 +35,80 @@ class ProfessorController extends Controller
         return view('professors.show', compact('professor'));
     }
 
-    public function rate(Request $request, $id)
+    public function rate(Request $request, $id, \App\Services\ImageKitService $imageKit)
     {
-        $request->validate([
+        $user = Auth::user();
+
+        $rules = [
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
-        ]);
+        ];
+
+        // Optional ID card for professor reviews (for anonymity/safety)
+        if ($request->hasFile('id_card_image')) {
+            $rules['id_card_image'] = 'image|max:2048';
+        }
+
+        $request->validate($rules);
+
+        // Upload ID Card if provided and user doesn't have one
+        if ($request->hasFile('id_card_image') && !$user->id_card_url) {
+            $upload = $imageKit->upload(
+                $request->file('id_card_image'),
+                "id_card_{$user->id}_" . time() . ".jpg",
+                '/verifications'
+            );
+            
+            if ($upload) {
+                $user->update(['id_card_url' => $upload->filePath]);
+            }
+        }
 
         Review::create([
-            'user_id' => Auth::id(),
+            'user_id' => $user->id,
             'professor_id' => $id,
             'rating' => $request->rating,
             'comment' => $request->comment,
         ]);
 
-        return back()->with('success', 'Professor reviewed successfully!');
+        return back()->with('success', 'Observations recorded in the faculty ledger.');
     }
 
-    public function requestProfessor(Request $request)
+    public function requestProfessor(Request $request, \App\Services\ImageKitService $imageKit)
     {
         $request->validate([
             'professor_name' => 'required|string|max:255',
             'department'     => 'required|string|max:255',
             'college_name'   => 'required|string|max:255',
             'message'        => 'nullable|string|max:500',
+            'profile_photo_url' => 'nullable|url',
+            'profile_photo_file' => 'nullable|image|max:1024', // 1MB max for faculty
         ]);
 
-        // Prevent duplicate pending requests for same professor by same user
+        // Prevent duplicate pending requests
         $exists = ProfessorRequest::where('user_id', Auth::id())
             ->where('professor_name', $request->professor_name)
             ->where('status', 'pending')
             ->exists();
 
         if ($exists) {
-            return back()->with('info', 'You already have a pending request for this professor!');
+            return back()->with('info', 'Synchronization in progress for this faculty node.');
+        }
+
+        $photoUrl = $request->profile_photo_url;
+
+        // Handle File Upload (Prioritize over URL for higher fidelity)
+        if ($request->hasFile('profile_photo_file')) {
+            $upload = $imageKit->upload(
+                $request->file('profile_photo_file'),
+                "request_" . \Illuminate\Support\Str::slug($request->professor_name) . "_" . time() . ".jpg",
+                '/requests'
+            );
+            
+            if ($upload) {
+                // Optimization: Store the path. Service will handle transformation during retrieval.
+                $photoUrl = $upload->filePath;
+            }
         }
 
         ProfessorRequest::create([
@@ -77,8 +117,9 @@ class ProfessorController extends Controller
             'department'     => $request->department,
             'college_name'   => $request->college_name,
             'message'        => $request->message,
+            'profile_photo_url' => $photoUrl,
         ]);
 
-        return back()->with('success', 'Your professor request has been submitted! We\'ll review and add them soon. 🎓');
+        return back()->with('success', "Faculty integration request dispatched to the multiverse council.");
     }
 }

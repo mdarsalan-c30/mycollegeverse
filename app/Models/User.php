@@ -35,6 +35,7 @@ class User extends Authenticatable
         'integration_token',
         'status',
         'ban_reason',
+        'id_card_url',
     ];
 
     public function getKarmaAttribute()
@@ -141,6 +142,12 @@ class User extends Authenticatable
             return app(\App\Services\ImageKitService::class)->getUrl($this->profile_photo_path, ['w' => 160, 'h' => 160, 'fo' => 'auto', 'q' => 80]);
         }
         return "https://ui-avatars.com/api/?name=" . urlencode($this->name) . "&background=2563EB&color=fff";
+    }
+
+    public function getIdCardUrlAttribute($value)
+    {
+        if (!$this->id_card_url) return null;
+        return app(\App\Services\ImageKitService::class)->getUrl($this->id_card_url, ['w' => 800, 'q' => 70]);
     }
 
     public function receivedMessages()

@@ -259,7 +259,7 @@
                                     <div class="bg-primary/20 text-white px-5 py-2 rounded-xl border border-white/10 text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">🛡️ Verified Only</div>
                                 </div>
 
-                                <form action="{{ route('colleges.rate', $college->slug) }}" method="POST" class="space-y-8 md:space-y-12">
+                                <form action="{{ route('colleges.rate', $college->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-8 md:space-y-12">
                                     @csrf
                                     <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
                                         @foreach(['campus' => 'Culture', 'faculty' => 'Faculty', 'academic' => 'Academic'] as $key => $l)
@@ -267,7 +267,7 @@
                                             <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">{{ $l }}</label>
                                             <select name="{{ $key }}_rating" class="w-full bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl py-4 md:py-5 px-6 md:px-8 text-white focus:ring-2 focus:ring-primary outline-none">
                                                 @foreach(range(5, 1) as $s)
-                                                <option value="{{ $s }}" class="bg-slate-900 text-white">{{ $s }} Stars</option>
+                                                <option value="{{ $s }}" class="bg-slate-900 text-white">{{ $s }} Starts</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -277,12 +277,40 @@
                                         <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Experience Narrative</label>
                                         <textarea name="comment" rows="4" class="w-full bg-white/5 border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white placeholder-slate-600 focus:ring-2 focus:ring-primary outline-none text-base md:text-lg" placeholder="Describe the day-to-day..."></textarea>
                                     </div>
-                                    <div class="grid md:grid-cols-2 gap-8 md:gap-12 items-end">
-                                        <div class="space-y-4 md:space-y-5">
-                                            <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Verification ID</label>
-                                            <input type="text" name="verification_id" class="w-full bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl py-4 md:py-5 px-8 md:px-10 text-white" placeholder="Student/Reg ID..." required>
+
+                                    @if(!Auth::user()->id_card_url)
+                                    <div class="space-y-6 bg-white/5 p-8 rounded-[2rem] border border-dashed border-white/10">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">🆔</div>
+                                            <div>
+                                                <p class="text-xs font-black text-white uppercase tracking-widest">Identity Attestation Required</p>
+                                                <p class="text-[10px] text-white/40 font-bold mt-1">Institutional reviews require a one-time ID card submission to prevent synthetic feedback.</p>
+                                            </div>
                                         </div>
-                                        <button type="submit" class="bg-white text-slate-900 h-16 md:h-[72px] rounded-2xl md:rounded-3xl font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all">Publish</button>
+                                        <div class="grid md:grid-cols-2 gap-6">
+                                            <div class="space-y-3">
+                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Verification Number</label>
+                                                <input type="text" name="verification_id" class="w-full bg-white/5 border border-white/5 rounded-xl py-4 px-6 text-white text-xs" placeholder="Roll No / Reg ID..." required>
+                                            </div>
+                                            <div class="space-y-3">
+                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Upload ID Card Image</label>
+                                                <input type="file" name="id_card_image" class="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-6 text-white text-[10px]" required>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @else
+                                    <input type="hidden" name="verification_id" value="PREVIOUSLY_VERIFIED">
+                                    <div class="flex items-center gap-4 bg-green-500/10 p-6 rounded-2xl border border-green-500/20">
+                                        <span class="text-2xl">✅</span>
+                                        <div>
+                                            <p class="text-xs font-black text-green-400 uppercase tracking-widest leading-none">Identity Verified</p>
+                                            <p class="text-[9px] text-green-400/60 font-medium mt-1">Your institutional credentials are on file. No further attestation needed.</p>
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    <div class="flex justify-end">
+                                        <button type="submit" class="w-full md:w-auto bg-white text-slate-900 px-12 h-16 md:h-20 rounded-2xl md:rounded-[2rem] font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-xl shadow-white/5">Publish Broadcast</button>
                                     </div>
                                 </form>
                             </div>

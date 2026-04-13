@@ -215,7 +215,7 @@
                 </h3>
 
                 @auth
-                <form action="{{ route('professors.rate', $professor->id) }}" method="POST" class="space-y-4">
+                <form action="{{ route('professors.rate', $professor->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
                     @csrf
 
                     {{-- Star Rating Selector --}}
@@ -245,9 +245,20 @@
                                   class="w-full bg-white border border-slate-100 rounded-xl p-4 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 resize-none placeholder-slate-300"></textarea>
                     </div>
 
+                    @if(!Auth::user()->id_card_url)
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-lg">🆔</span>
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Optional Verification</p>
+                        </div>
+                        <p class="text-[9px] text-slate-400 leading-tight font-medium">Verify your identity once to increase review weight. This stays private on your profile.</p>
+                        <input type="file" name="id_card_image" class="w-full text-[9px] text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[9px] file:font-black file:bg-slate-200 file:text-slate-600 hover:file:bg-slate-300" />
+                    </div>
+                    @endif
+
                     <button type="submit"
                             class="w-full bg-primary text-white h-12 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                        Submit Verified Review
+                        {{ Auth::user()->id_card_url ? 'Submit Verified Review' : 'Submit Review' }}
                     </button>
                 </form>
                 @else

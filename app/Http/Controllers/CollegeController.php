@@ -54,19 +54,41 @@ class CollegeController extends Controller
         return view('colleges.show', compact('college', 'seoTitle', 'seoDescription', 'schema'));
     }
 
-    public function rate(Request $request, College $college)
+    public function rate(Request $request, College $college, \App\Services\ImageKitService $imageKit)
     {
-        $request->validate([
+        $user = Auth::user();
+        
+        $rules = [
             'campus_rating' => 'required|integer|min:1|max:5',
             'faculty_rating' => 'required|integer|min:1|max:5',
             'academic_rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
             'verification_id' => 'required|string|max:50',
-        ]);
+        ];
+
+        // Require ID card ONLY if user hasn't verified yet
+        if (!$user->id_card_url) {
+            $rules['id_card_image'] = 'required|image|max:2048'; // 2MB max
+        }
+
+        $request->validate($rules);
+
+        // Upload ID Card if provided
+        if ($request->hasFile('id_card_image')) {
+            $upload = $imageKit->upload(
+                $request->file('id_card_image'),
+                "id_card_{$user->id}_" . time() . ".jpg",
+                '/verifications'
+            );
+            
+            if ($upload) {
+                $user->update(['id_card_url' => $upload->filePath]);
+            }
+        }
 
         CollegeReview::updateOrCreate(
             [
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'college_id' => $college->id
             ],
             [
@@ -79,7 +101,7 @@ class CollegeController extends Controller
             ]
         );
 
-        return back()->with('success', 'Your review has been submitted for verification. It will be published once approved by a moderator!');
+        return back()->with('success', 'Your review has been submitted for institutional verification. It will be live once approved!');
     }
 
     public function requestCollege(Request $request)

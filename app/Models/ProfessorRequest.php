@@ -15,6 +15,7 @@ class ProfessorRequest extends Model
         'department',
         'college_name',
         'message',
+        'profile_photo_url',
         'status',
     ];
 
