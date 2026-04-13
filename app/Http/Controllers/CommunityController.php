@@ -33,6 +33,27 @@ class CommunityController extends Controller
         return view('community.index', compact('posts', 'trendingHubs', 'topContributors'));
     }
 
+    /**
+     * Display a focused community thread.
+     */
+    public function show(\App\Models\User $user, Post $post)
+    {
+        // Safety: Ensure the post belongs to the user in the URL
+        if ($post->user_id !== $user->id) {
+            abort(404);
+        }
+
+        $post->load(['user', 'comments.user', 'likes'])
+            ->loadCount('comments')
+            ->loadSum('likes as score', 'value');
+
+        // Data for Sidebars (Keep consistency with Index)
+        $trendingHubs = \App\Models\College::withCount('posts')->orderBy('posts_count', 'desc')->take(5)->get();
+        $topContributors = \App\Models\User::withCount('posts')->orderBy('posts_count', 'desc')->take(6)->get();
+
+        return view('community.show', compact('post', 'trendingHubs', 'topContributors'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

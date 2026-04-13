@@ -22,6 +22,23 @@ Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->nam
 Route::get('/notes/{id}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
 Route::get('/community', [App\Http\Controllers\CommunityController::class, 'index'])->name('community.index');
+Route::get('/community/{user:username}/{post:slug}', [App\Http\Controllers\CommunityController::class, 'show'])->name('community.show');
+
+Route::get('/multiverse-post-slug-sync', function() {
+    try {
+        $posts = \App\Models\Post::whereNull('slug')->get();
+        $count = 0;
+        foreach($posts as $p) {
+            $p->update([
+                'slug' => \Illuminate\Support\Str::slug($p->title) . '-' . \Illuminate\Support\Str::random(6)
+            ]);
+            $count++;
+        }
+        return "🌌 Community identity mapped! Generated $count post slugs.";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
 
 Route::get('/jobs', [App\Http\Controllers\JobBoardController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [App\Http\Controllers\JobBoardController::class, 'show'])->name('jobs.show');

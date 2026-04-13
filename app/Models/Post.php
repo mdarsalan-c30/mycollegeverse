@@ -9,7 +9,21 @@ class Post extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'college_id', 'category', 'title', 'content', 'image_path'];
+    protected $fillable = ['user_id', 'college_id', 'category', 'title', 'slug', 'content', 'image_path'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($post) {
+            $post->slug = \Illuminate\Support\Str::slug($post->title) . '-' . \Illuminate\Support\Str::random(6);
+        });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 
     public function user()
     {
