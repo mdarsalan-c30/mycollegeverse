@@ -215,8 +215,9 @@ Route::get('/multiverse-sync', function() {
 
 Route::get('/multiverse-migrate', function() {
     try {
+        Artisan::call('optimize:clear');
         Artisan::call('migrate', ['--force' => true]);
-        return "🌌 Multiverse Manifested! Database schema updated. You can now delete this route from web.php for security.";
+        return "🌌 Multiverse Manifested! Database schema updated. You can now visit <a href='/multiverse-post-slug-sync'>/multiverse-post-slug-sync</a> to finalize the identity mapping.";
     } catch (\Exception $e) {
         return "Migration Error: " . $e->getMessage();
     }
