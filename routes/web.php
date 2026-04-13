@@ -79,6 +79,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update-photo', [App\Http\Controllers\ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
 
+    // Student Only Routes
+    Route::middleware(['role:student'])->group(function () {
         Route::post('/notes', [App\Http\Controllers\NoteController::class, 'store'])->name('notes.store');
         Route::post('/notes/{note}/review', [App\Http\Controllers\NoteController::class, 'addReview'])->name('notes.review');
         Route::get('/notes/{slug}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
