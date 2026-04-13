@@ -145,7 +145,7 @@
                     @endauth
                     
                     <div class="flex items-center gap-6 mb-8">
-                        <img src="{{ $prof->profile_pic ?? 'https://ui-avatars.com/api/?name='.urlencode($prof->name).'&background=primary&color=fff' }}" class="w-16 h-16 rounded-2xl shadow-xl shadow-primary/10" alt="{{ $prof->name }}" />
+                        <img src="{{ $prof->profile_photo_url }}" class="w-16 h-16 rounded-2xl shadow-xl shadow-primary/10 object-cover" alt="{{ $prof->name }}" />
                         <div>
                             <h4 class="text-xl font-extrabold text-slate-900 group-hover:text-primary transition-colors">{{ $prof->name }}</h4>
                             <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ $prof->department }}</p>

@@ -15,8 +15,8 @@
         <div class="px-8 pb-8 relative">
             {{-- Avatar overlapping banner --}}
             <div class="flex flex-col md:flex-row md:items-end gap-6 -mt-12">
-                <img src="https://ui-avatars.com/api/?name={{ urlencode($professor->name) }}&background=2563EB&color=fff&size=160&bold=true"
-                     class="w-28 h-28 md:w-32 md:h-32 rounded-[1.75rem] shadow-2xl border-[3px] border-white ring-4 ring-primary/10 flex-shrink-0" />
+                <img src="{{ $professor->profile_photo_url }}"
+                     class="w-28 h-28 md:w-32 md:h-32 rounded-[1.75rem] shadow-2xl border-[3px] border-white ring-4 ring-primary/10 flex-shrink-0 object-cover" />
 
                 <div class="flex-1 md:pb-2 space-y-2">
                     <div class="flex flex-wrap items-start justify-between gap-4">
