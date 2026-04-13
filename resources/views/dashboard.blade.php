@@ -41,7 +41,7 @@
                 </div>
                 <div>
                     <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Total Karma</h4>
-                    <p class="text-3xl font-black text-slate-800">{{ number_format(Auth::user()->karma) }}</p>
+                    <p class="text-3xl font-black text-slate-800">{{ number_format(Auth::user()->karma ?? 0) }}</p>
                 </div>
             </div>
 
@@ -58,7 +58,7 @@
             </div>
 
             @php
-                $karma = Auth::user()->karma;
+                $karma = Auth::user()->karma ?? 0;
                 $rank = 'Verse Novice';
                 $rankColor = 'text-slate-500';
                 $rankBg = 'bg-slate-100';
@@ -156,8 +156,8 @@
                     @forelse ($topPerformers as $performer)
                     <div class="flex items-center justify-between p-4 rounded-3xl bg-white/40 border border-white hover:bg-white transition-colors cursor-pointer group">
                         <div class="flex items-center gap-4">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($performer->name) }}&background=random" class="w-12 h-12 rounded-2xl shadow-sm"/>
-                            <p class="font-bold text-slate-800">{{ $performer->name }}</p>
+                            <img src="https://ui-avatars.com/api/?name={{ urlencode($performer->name ?? 'User') }}&background=random" class="w-12 h-12 rounded-2xl shadow-sm"/>
+                            <p class="font-bold text-slate-800">{{ $performer->name ?? 'Shadow User' }}</p>
                         </div>
                         <div class="bg-primary/10 text-primary px-4 py-1.5 rounded-xl font-black text-sm group-hover:bg-primary group-hover:text-white">
                             {{ $performer->notes_count }} Shares
@@ -190,7 +190,7 @@
                                 <span class="text-[8px] font-black uppercase tracking-widest text-slate-400">{{ $job->created_at->diffForHumans() }}</span>
                             </div>
                             <h4 class="text-sm font-black text-slate-900 group-hover:text-primary transition-colors">{{ $job->title }}</h4>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{{ $job->recruiter->company_name }}</p>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">{{ $job->recruiter->company_name ?? 'Partner Agency' }}</p>
                         </a>
                         @empty
                         <div class="p-8 text-center bg-slate-50/50 rounded-[2rem] border-2 border-dashed border-slate-200">
