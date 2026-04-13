@@ -47,7 +47,7 @@ class CommunityController extends Controller
     {
         $post->update(['is_pinned' => !$post->is_pinned]);
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => $post->is_pinned ? 'post_pinned' : 'post_unpinned',
             'target_type' => 'Post',
@@ -63,7 +63,8 @@ class CommunityController extends Controller
      */
     public function destroy(Post $post)
     {
-        $content = substr($post->content, 0, 50);
+        $id = $post->id;
+        $authorName = optional($post->user)->name ?? 'Unknown Author';
         
         ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),

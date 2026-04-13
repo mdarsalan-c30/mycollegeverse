@@ -17,19 +17,25 @@ class ReviewController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type', 'college');
+        $search = $request->get('search');
 
         if ($type === 'professor') {
             $query = Review::query()->with(['user', 'professor']);
         } else {
-    public function index()
-    {
-        $reviews = Review::with(['user', 'professor'])->latest()->paginate(15);
-        
-        if ($reviews->isEmpty()) {
-            session()->flash('info', 'Observation queue empty. No student feedback nodes detected.');
+            $query = CollegeReview::query()->with(['user', 'college']);
         }
-        
-        return view('admin.reviews.index', compact('reviews'));
+
+        if ($search) {
+            $query->where('comment', 'like', "%{$search}%");
+        }
+
+        $reviews = $query->latest()->paginate(15);
+
+        if ($reviews->isEmpty()) {
+            session()->flash('info', "Observation Registry is currently blank for '{$type}' feedback signals.");
+        }
+
+        return view('admin.reviews.index', compact('reviews', 'type'));
     }
 
     /**
