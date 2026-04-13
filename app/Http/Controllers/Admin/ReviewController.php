@@ -44,7 +44,10 @@ class ReviewController extends Controller
     public function destroy($type, $id)
     {
         $review = $type === 'professor' ? Review::findOrFail($id) : CollegeReview::findOrFail($id);
-        $targetName = $type === 'professor' ? $review->professor->name : $review->college->name;
+        
+        $targetName = ($type === 'professor') 
+            ? optional($review->professor)->name ?? 'Legacy Advisor'
+            : optional($review->college)->name ?? 'Legacy Institution';
         
         // Log before deletion
         // Audit Logging 🛡️
@@ -54,13 +57,14 @@ class ReviewController extends Controller
             'target_type' => 'Review',
             'target_id' => $review->id,
             'metadata' => [
+                'type' => $type,
                 'user' => optional($review->user)->name ?? 'Unknown',
-                'professor' => optional($review->professor)->name ?? 'Unknown',
+                'target' => $targetName,
             ],
         ]);
 
         $review->delete();
 
-        return back()->with('success', "Feedback node for '{$targetName}' has been collapsed.");
+        return back()->with('success', "Feedback node for '{$targetName}' has been dissolved.");
     }
 }

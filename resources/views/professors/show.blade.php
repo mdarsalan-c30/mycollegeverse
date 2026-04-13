@@ -87,6 +87,7 @@
 
             {{-- Review Cards --}}
             @forelse($professor->reviews->sortByDesc('created_at') as $review)
+            @if($review->user)
             <div class="glass p-6 md:p-8 rounded-[2rem] border-white/80 shadow-sm hover:shadow-md transition-shadow group">
                 {{-- Reviewer --}}
                 <div class="flex items-start justify-between gap-4 mb-5">
@@ -135,6 +136,7 @@
                     </span>
                 </div>
             </div>
+            @endif
             @empty
             <div class="text-center py-20 glass rounded-[2rem] border-white/80">
                 <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">🎓</div>

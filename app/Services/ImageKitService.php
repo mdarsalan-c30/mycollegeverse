@@ -16,7 +16,7 @@ class ImageKitService
     {
         $this->publicKey = config('services.imagekit.public_key');
         $this->privateKey = config('services.imagekit.private_key');
-        $this->endpoint = config('services.imagekit.endpoint');
+        $this->endpoint = config('services.imagekit.endpoint') ?? 'https://ik.imagekit.io/mcv-fallback';
         $this->client = new Client();
     }
 

@@ -34,8 +34,13 @@ class ProfessorController extends Controller
 
     public function show(Professor $professor)
     {
-        $professor->load(['reviews.user', 'college']);
-        return view('professors.show', compact('professor'));
+        try {
+            $professor->load(['reviews.user', 'college']);
+            return view('professors.show', compact('professor'));
+        } catch (\Exception $e) {
+            \Log::error("Faculty Detail Crash | Professor ID: {$professor->id} | Error: " . $e->getMessage());
+            return redirect()->route('professors.index')->with('error', "Faculty Node Data Corrupted: " . $e->getMessage());
+        }
     }
 
     public function rate(Request $request, Professor $professor, \App\Services\ImageKitService $imageKit)

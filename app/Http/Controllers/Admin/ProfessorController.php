@@ -18,9 +18,14 @@ class ProfessorController extends Controller
      */
     public function requests()
     {
-        $requests = ProfessorRequest::with('user.college')->latest()->paginate(15);
-        $colleges = College::orderBy('name')->get();
-        return view('admin.professors.requests', compact('requests', 'colleges'));
+        try {
+            $requests = ProfessorRequest::with('user.college')->latest()->paginate(15);
+            $colleges = College::orderBy('name')->get();
+            return view('admin.professors.requests', compact('requests', 'colleges'));
+        } catch (\Exception $e) {
+            \Log::error("Faculty Moderation Queue Crash | Error: " . $e->getMessage());
+            return redirect()->route('admin.dashboard')->with('error', "Moderation Hub Connection Error: " . $e->getMessage());
+        }
     }
 
     /**
