@@ -106,7 +106,7 @@
                                         </div>
                                         <div>
                                             <p class="text-xs font-black text-admin-dark truncate">{{ $note->title }}</p>
-                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">By {{ $note->user->name }}</p>
+                                            <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">By {{ $note->user->name ?? 'Unknown Identity' }}</p>
                                         </div>
                                     </div>
                                 </td>
@@ -146,7 +146,7 @@
                                     <span class="text-[8px] font-bold text-slate-400">{{ $report->created_at->diffForHumans() }}</span>
                                 </div>
                                 <p class="text-xs font-bold text-admin-dark leading-tight">{{ $report->reason }}</p>
-                                <p class="text-[9px] font-medium text-slate-400 mt-2 uppercase">By Citizen: {{ $report->reporter->name }}</p>
+                                <p class="text-[9px] font-medium text-slate-400 mt-2 uppercase">By Citizen: {{ $report->reporter->name ?? 'Sentinel' }}</p>
                             </div>
                         </div>
                     </div>
