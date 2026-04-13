@@ -65,12 +65,12 @@ class CommunityController extends Controller
     {
         $content = substr($post->content, 0, 50);
         
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'post_purged',
             'target_type' => 'Post',
-            'target_id' => $post->id,
-            'metadata' => ['content_preview' => $content],
+            'target_id' => $id,
+            'metadata' => ['author' => $authorName],
         ]);
 
         $post->delete();

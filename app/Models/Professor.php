@@ -13,7 +13,9 @@ class Professor extends Model
 
     public function college()
     {
-        return $this->belongsTo(College::class);
+        return $this->belongsTo(College::class)->withDefault([
+            'name' => 'Legacy Institution'
+        ]);
     }
 
     public function reviews()

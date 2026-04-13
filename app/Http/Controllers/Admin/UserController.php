@@ -36,6 +36,11 @@ class UserController extends Controller
             ->latest()
             ->paginate(15);
 
+        // Handle empty collection gracefully
+        if ($users->isEmpty() && $request->has('search')) {
+            session()->flash('warning', "No citizen found matching '{$request->search}'. Registry is currently blank for this query.");
+        }
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -56,7 +61,7 @@ class UserController extends Controller
         ]);
 
         // Audit Logging 🛡️
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'status_update',
             'target_type' => 'User',
@@ -79,7 +84,7 @@ class UserController extends Controller
         if ($user->role === 'student') {
             $user->update(['role' => 'contributor']);
 
-            ApprovalLog::create([
+            ApprovalLog::safeCreate([
                 'admin_id' => Auth::id(),
                 'action' => 'promotion',
                 'target_type' => 'User',

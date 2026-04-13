@@ -21,17 +21,15 @@ class ReviewController extends Controller
         if ($type === 'professor') {
             $query = Review::query()->with(['user', 'professor']);
         } else {
-            $query = CollegeReview::query()->with(['user', 'college']);
+    public function index()
+    {
+        $reviews = Review::with(['user', 'professor'])->latest()->paginate(15);
+        
+        if ($reviews->isEmpty()) {
+            session()->flash('info', 'Observation queue empty. No student feedback nodes detected.');
         }
-
-        if ($request->has('search')) {
-            $search = $request->get('search');
-            $query->where('comment', 'like', "%{$search}%");
-        }
-
-        $reviews = $query->latest()->paginate(15);
-
-        return view('admin.reviews.index', compact('reviews', 'type'));
+        
+        return view('admin.reviews.index', compact('reviews'));
     }
 
     /**
@@ -43,15 +41,15 @@ class ReviewController extends Controller
         $targetName = $type === 'professor' ? $review->professor->name : $review->college->name;
         
         // Log before deletion
-        ApprovalLog::create([
+        // Audit Logging 🛡️
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'review_purged',
-            'target_type' => ucfirst($type) . 'Review',
-            'target_id' => $id,
+            'target_type' => 'Review',
+            'target_id' => $review->id,
             'metadata' => [
-                'comment' => $review->comment,
-                'target' => $targetName,
-                'user' => $review->user->name
+                'user' => optional($review->user)->name ?? 'Unknown',
+                'professor' => optional($review->professor)->name ?? 'Unknown',
             ],
         ]);
 

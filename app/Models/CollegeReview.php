@@ -22,11 +22,11 @@ class CollegeReview extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault(['name' => 'Former Citizen']);
     }
 
     public function college()
     {
-        return $this->belongsTo(College::class);
+        return $this->belongsTo(College::class)->withDefault(['name' => 'Legacy Institution']);
     }
 }

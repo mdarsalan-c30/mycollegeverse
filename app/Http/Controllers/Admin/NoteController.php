@@ -33,9 +33,11 @@ class NoteController extends Controller
                   });
         }
 
-        $notes = $query->with(['user', 'college', 'subject'])
-            ->latest()
-            ->paginate(15);
+        $notes = $query->with(['user', 'college'])->latest()->paginate(15);
+        
+        if ($notes->isEmpty() && $request->has('search')) {
+            session()->flash('warning', "Knowledge Archive blank for query: '{$request->search}'");
+        }
 
         return view('admin.notes.index', compact('notes'));
     }
@@ -48,14 +50,14 @@ class NoteController extends Controller
         $note->update(['is_verified' => true]);
 
         // Audit Logging 🛡️
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'note_verified',
             'target_type' => 'Note',
             'target_id' => $note->id,
             'metadata' => [
                 'title' => $note->title,
-                'user' => $note->user->name
+                'author' => optional($note->user)->name ?? 'Unknown',
             ],
         ]);
 
@@ -68,18 +70,17 @@ class NoteController extends Controller
     public function destroy(Note $note)
     {
         $title = $note->title;
-        $userName = $note->user->name;
+        $authorName = optional($note->user)->name ?? 'Unknown';
 
         // Log before deletion to preserve asset history
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
-            'action' => 'note_rejected',
+            'action' => 'note_purged',
             'target_type' => 'Note',
             'target_id' => $note->id,
             'metadata' => [
                 'title' => $title,
-                'user' => $userName,
-                'action' => 'deleted'
+                'author' => $authorName,
             ],
         ]);
 

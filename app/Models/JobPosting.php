@@ -26,12 +26,12 @@ class JobPosting extends Model
 
     public function recruiter()
     {
-        return $this->belongsTo(User::class, 'recruiter_id');
+        return $this->belongsTo(User::class, 'recruiter_id')->withDefault(['name' => 'Former Recruiter']);
     }
 
     public function targetCollege()
     {
-        return $this->belongsTo(College::class, 'target_college_id');
+        return $this->belongsTo(College::class, 'target_college_id')->withDefault(['name' => 'Legacy Hub']);
     }
 
     public function applications()

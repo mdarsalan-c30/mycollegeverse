@@ -43,17 +43,13 @@ class SettingController extends Controller
         }
 
         // Audit Logging 🛡️ — safe if approval_logs table missing
-        try {
-            ApprovalLog::create([
-                'admin_id'    => Auth::id(),
-                'action'      => 'settings_updated',
-                'target_type' => 'System',
-                'target_id'   => 0,
-                'metadata'    => ['changes' => array_keys($data)],
-            ]);
-        } catch (\Throwable $e) {
-            \Log::warning('ApprovalLog create failed: ' . $e->getMessage());
-        }
+        ApprovalLog::safeCreate([
+            'admin_id'    => Auth::id(),
+            'action'      => 'settings_updated',
+            'target_type' => 'System',
+            'target_id'   => 0,
+            'metadata'    => ['changes' => array_keys($data)],
+        ]);
 
         return back()->with('success', 'Global configurations updated and synchronized.');
     }

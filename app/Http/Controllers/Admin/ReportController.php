@@ -61,7 +61,7 @@ class ReportController extends Controller
         ]);
 
         // Audit Logging 🛡️
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'report_resolution',
             'target_type' => 'Report',

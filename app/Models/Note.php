@@ -20,17 +20,23 @@ class Note extends Model
 
     public function college()
     {
-        return $this->belongsTo(College::class);
+        return $this->belongsTo(College::class)->withDefault([
+            'name' => 'Global Hub'
+        ]);
     }
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Former Citizen'
+        ]);
     }
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class)->withDefault([
+            'name' => 'General Topic'
+        ]);
     }
 
     public function comments()

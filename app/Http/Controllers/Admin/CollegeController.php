@@ -53,9 +53,9 @@ class CollegeController extends Controller
             'rating' => 5.0,
         ]);
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
-            'action' => 'college_created',
+            'action' => 'college_registered',
             'target_type' => 'College',
             'target_id' => $college->id,
             'metadata' => ['name' => $college->name],
@@ -188,13 +188,14 @@ class CollegeController extends Controller
     public function destroy(College $college)
     {
         $name = $college->name;
+        $id = $college->id;
         $college->delete();
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'college_purged',
             'target_type' => 'College',
-            'target_id' => $college->id,
+            'target_id' => $id,
             'metadata' => ['name' => $name],
         ]);
 

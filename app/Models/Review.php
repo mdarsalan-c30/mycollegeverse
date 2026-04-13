@@ -13,11 +13,15 @@ class Review extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Former Citizen'
+        ]);
     }
 
     public function professor()
     {
-        return $this->belongsTo(Professor::class);
+        return $this->belongsTo(Professor::class)->withDefault([
+            'name' => 'Legacy Advisor'
+        ]);
     }
 }

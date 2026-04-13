@@ -42,12 +42,12 @@ class AdminManagementController extends Controller
         ]);
 
         // Audit Logging 🛡️
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
-            'action' => 'admin_created',
+            'action' => 'admin_promoted',
             'target_type' => 'User',
             'target_id' => $admin->id,
-            'metadata' => ['role' => 'admin', 'email' => $admin->email],
+            'metadata' => ['email' => $admin->email],
         ]);
 
         return back()->with('success', "Administrative node for '{$admin->name}' has been initialized.");
@@ -65,12 +65,12 @@ class AdminManagementController extends Controller
         $name = $admin->name;
         $admin->delete();
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'admin_removed',
             'target_type' => 'User',
             'target_id' => $admin->id,
-            'metadata' => ['role' => 'admin', 'name' => $name],
+            'metadata' => ['email' => $admin->email],
         ]);
 
         return back()->with('success', "Authority for '{$name}' has been revoked and the node collapsed.");

@@ -42,7 +42,7 @@ class ProfessorController extends Controller
 
         $professor = Professor::create($request->all());
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'professor_created',
             'target_type' => 'Professor',
@@ -59,13 +59,14 @@ class ProfessorController extends Controller
     public function destroy(Professor $professor)
     {
         $name = $professor->name;
+        $id = $professor->id;
         $professor->delete();
 
-        ApprovalLog::create([
+        ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'professor_purged',
             'target_type' => 'Professor',
-            'target_id' => $professor->id,
+            'target_id' => $id,
             'metadata' => ['name' => $name],
         ]);
 

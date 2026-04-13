@@ -21,11 +21,11 @@ class JobApplication extends Model
 
     public function job()
     {
-        return $this->belongsTo(JobPosting::class, 'job_id');
+        return $this->belongsTo(JobPosting::class, 'job_id')->withDefault(['title' => 'Deleted Opportunity']);
     }
 
     public function student()
     {
-        return $this->belongsTo(User::class, 'student_id');
+        return $this->belongsTo(User::class, 'student_id')->withDefault(['name' => 'Former Applicant']);
     }
 }
