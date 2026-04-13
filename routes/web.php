@@ -177,6 +177,15 @@ Route::get('/multiverse-sync', function() {
     }
 });
 
+Route::get('/multiverse-migrate', function() {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return "🌌 Multiverse Manifested! Database schema updated. You can now delete this route from web.php for security.";
+    } catch (\Exception $e) {
+        return "Migration Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-init', function() {
     try {
         Artisan::call('config:clear');
