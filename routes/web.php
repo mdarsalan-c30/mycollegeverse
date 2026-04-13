@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 
-Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth'])->name('dashboard');
-
-// Public Reading Routes (SEO Friendly)
+// Public Knowledge Routes (SEO Friendly)
 Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
@@ -65,7 +63,6 @@ Route::get('/colleges', [App\Http\Controllers\CollegeController::class, 'index']
 Route::get('/colleges/{college:slug}', [App\Http\Controllers\CollegeController::class, 'show'])->name('colleges.show');
 
 Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
-Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
 
 // Multiverse SEO Pages (Privacy, Terms, About, etc.)
 Route::get('/p/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
@@ -73,16 +70,15 @@ Route::get('/p/{slug}', [App\Http\Controllers\PageController::class, 'show'])->n
 // Interaction Routes (Auth Required)
 Route::middleware(['auth'])->group(function () {
     // Shared Routes (Dynamic Layouts)
-    Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
-    Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
-    Route::delete('/chat/message/{id}', [App\Http\Controllers\ChatController::class, 'deleteMessage'])->name('chat.delete');
+    Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/chat/{user?}', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
+    Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
+    Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
+    Route::delete('/chat/message/{id}', [App\Http\Controllers\ChatController::class, 'deleteMessage'])->name('chat.delete');
+
     Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
     Route::post('/profile/update-photo', [App\Http\Controllers\ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
 
-    // Student Only Routes
-    Route::middleware(['role:student'])->group(function () {
-        Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
         Route::post('/notes', [App\Http\Controllers\NoteController::class, 'store'])->name('notes.store');
         Route::post('/notes/{note}/review', [App\Http\Controllers\NoteController::class, 'addReview'])->name('notes.review');
         Route::get('/notes/{slug}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
