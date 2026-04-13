@@ -8,7 +8,11 @@
                         Hey {{ Auth::user()->name }}, <br/>Ready to level up? 🚀
                     </h1>
                     <p class="text-primary-100/80 text-lg font-medium">
-                        Your academic progress is looking great this week. You've earned **120 credits** from new note contributions!
+                        @if($weeklyCredits > 0)
+                            Your academic progress is looking great this week. You've earned **{{ number_format($weeklyCredits) }} credits** from new note contributions!
+                        @else
+                            Start sharing your academy insights today! You can earn **50 credits** for every high-quality note verified in the Multiverse.
+                        @endif
                     </p>
                     <div class="pt-4 flex gap-4">
                         @php $resumeRoute = $myNotes->isNotEmpty() ? route('notes.show', $myNotes->first()->id) : route('notes.index'); @endphp

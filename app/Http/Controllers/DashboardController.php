@@ -56,6 +56,10 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
-        return view('dashboard', compact('myNotes', 'topPerformers', 'subjects', 'matchedJobs'));
+        // Weekly Performance Analytics
+        $weeklyNotes = $user->notes()->where('created_at', '>=', now()->subDays(7))->count();
+        $weeklyCredits = $weeklyNotes * 50;
+
+        return view('dashboard', compact('myNotes', 'topPerformers', 'subjects', 'matchedJobs', 'weeklyCredits'));
     }
 }
