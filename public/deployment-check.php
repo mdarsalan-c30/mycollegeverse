@@ -21,6 +21,7 @@ echo "<ul>";
 echo "<li><strong>Environment:</strong> " . (php_sapi_name() === 'fpm-fcgi' ? 'Production (Hostinger)' : 'Local/Unknown') . "</li>";
 echo "<li><strong>PHP Version:</strong> " . phpversion() . "</li>";
 echo "<li><strong>Laravel Version:</strong> " . $app->version() . "</li>";
+echo "<li><strong>App Key Status:</strong> " . (env('APP_KEY') ? "<span class='status'>✅ Generated</span>" : "<span style='color:#ef4444;'>❌ MISSING (Run php artisan key:generate)</span>") . "</li>";
 echo "</ul>";
 
 echo "<h3>Check Instructions:</h3>";
