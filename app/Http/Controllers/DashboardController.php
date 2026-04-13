@@ -15,7 +15,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
-        // Redirect recruiters if they hit the student dashboard
+        // Redirect nodes to their respective command centers
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
         if ($user->role === 'recruiter') {
             return redirect()->route('recruiter.dashboard');
         }

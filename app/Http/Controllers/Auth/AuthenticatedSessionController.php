@@ -42,20 +42,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        $user = Auth::user();
-        
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
-        }
-
-        if ($user->role === 'recruiter') {
-            Auth::logout();
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            throw \Illuminate\Validation\ValidationException::withMessages([
-                'email' => __('Account detected as Recruiter. Please use the official Pipeline Terminal at /recruiter/login.'),
-            ]);
         }
 
         return redirect()->intended(RouteServiceProvider::HOME);
