@@ -413,79 +413,80 @@
             </div>
         </section>
 
-        <!-- SEO Content Block: The Student OS Advantage 🚀 -->
-        <section class="max-w-7xl mx-auto px-6 py-24 bg-white/40 rounded-[4rem] border border-white/60 my-16 shadow-glass relative overflow-hidden">
-            <div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse"></div>
-            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl"></div>
-            
-            <div class="relative z-10 space-y-20">
-                <!-- Top Header -->
-                <div class="max-w-3xl">
-                    <h2 class="text-4xl md:text-6xl font-black text-slate-900 leading-tight mb-8">
-                        Beyond just notes. This is your <span class="gradient-text">Academic Command Center.</span>
-                    </h2>
-                    <p class="text-xl text-slate-600 leading-relaxed font-medium">
-                        MyCollegeVerse is engineered to solve the most critical friction points in a student's life. Why hunt through disorganized Telegram groups or pay for low-quality materials when you can access the ultimate **Academic Multiverse**?
+        <!-- Multiverse Intelligence Bento Grid 🌌 -->
+        <section class="max-w-7xl mx-auto px-6 py-24 relative overflow-hidden">
+            <div class="mb-16 text-center lg:text-left">
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 leading-tight">
+                    Beyond just notes. <br class="hidden md:block"> This is your <span class="gradient-text">Academic Command Center.</span>
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-6">
+                <!-- Large Feature: Syllabus Synced Nodes -->
+                <div class="md:col-span-4 lg:col-span-4 glass p-10 rounded-[3rem] border-white/80 shadow-glass flex flex-col justify-between group overflow-hidden relative">
+                    <div class="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <svg class="w-32 h-32" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold text-[10px] uppercase tracking-widest mb-6">
+                            Syllabus-Synced Nodes
+                        </div>
+                        <h3 class="text-3xl font-black text-slate-800 mb-6 italic">Precision Knowledge Hub</h3>
+                        <p class="text-slate-500 font-medium leading-relaxed max-w-md">
+                            Get precise study material mapped to your specific syllabus (**AKTU**, **BTech**, **DU**) with one-click access. No more dead links.
+                        </p>
+                    </div>
+
+                    <div class="mt-12 flex flex-wrap gap-3 relative z-10">
+                        @php $tags = ['DBMS', 'OS', 'Quantum', 'Mathematics', 'AKTU', 'BTech', 'Python']; @endphp
+                        @foreach($tags as $tag)
+                        <span class="px-4 py-2 glass rounded-xl text-xs font-black text-secondary border-primary/10 animate-pulse shadow-sm hover:scale-110 transition-transform cursor-default">
+                            #{{ $tag }}
+                        </span>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Small Feature: Faculty Intel -->
+                <div class="md:col-span-2 lg:col-span-2 bg-slate-900 p-10 rounded-[3rem] text-white flex flex-col justify-between group relative overflow-hidden">
+                    <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-transparent"></div>
+                    <div class="relative z-10">
+                        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-xl mb-6">🧠</div>
+                        <h3 class="text-2xl font-black leading-tight italic">Campus <br> Intel</h3>
+                    </div>
+                    <p class="text-slate-400 text-xs font-medium leading-loose relative z-10 mt-6">
+                        Read honest reviews about your faculty and teaching styles before you enter the classroom.
                     </p>
                 </div>
 
-                <!-- Feature Grid -->
-                <div class="grid lg:grid-cols-3 gap-8">
-                    <!-- Feature: SEO -->
-                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group">
-                        <div class="w-14 h-14 bg-blue-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-blue-500/20 mb-6 group-hover:rotate-12 transition-transform">
-                            🚀
-                        </div>
-                        <h3 class="text-2xl font-black text-slate-800 mb-4">Programmatic SEO</h3>
-                        <p class="text-sm text-slate-500 leading-loose font-medium">
-                            Get precise study material mapped to your specific syllabus (**AKTU, BTech, DU**) with one-click access. No more dead links.
-                        </p>
+                <!-- Small Feature: Karma Identity -->
+                <div class="md:col-span-2 lg:col-span-2 glass p-10 rounded-[3rem] border-white/80 shadow-glass flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center text-xl mb-6 animate-bounce">✨</div>
+                        <h3 class="text-2xl font-black text-slate-800 italic">Karma <br> Economy</h3>
                     </div>
-
-                    <!-- Feature: Intel -->
-                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group lg:translate-y-8">
-                        <div class="w-14 h-14 bg-indigo-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/20 mb-6 group-hover:rotate-12 transition-transform">
-                            🧠
-                        </div>
-                        <h3 class="text-2xl font-black text-slate-800 mb-4">Professor Intel</h3>
-                        <p class="text-sm text-slate-500 leading-loose font-medium">
-                            Read honest reviews about your faculty and understand their teaching style before you even enter the classroom. Knowledge is power.
-                        </p>
-                    </div>
-
-                    <!-- Feature: Karma -->
-                    <div class="glass p-8 rounded-[2.5rem] border-white/80 hover:scale-[1.02] transition-all group">
-                        <div class="w-14 h-14 bg-amber-500 text-white rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-amber-500/20 mb-6 group-hover:rotate-12 transition-transform">
-                            ✨
-                        </div>
-                        <h3 class="text-2xl font-black text-slate-800 mb-4">Karma Economy</h3>
-                        <p class="text-sm text-slate-500 leading-loose font-medium">
-                            Share resources, help peers, and earn Karma points. High-authority students get exclusive access to **Carrier Pipelines** and top recruiters.
-                        </p>
+                    <div class="mt-6 border-t border-slate-100 pt-6">
+                        <p class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Share. Earn. Build.</p>
+                        <p class="text-slate-400 text-xs mt-2 font-medium">Unlock exclusive career pipelines.</p>
                     </div>
                 </div>
 
-                <!-- Detailed Advantage -->
-                <div class="bg-primary/5 p-10 md:p-16 rounded-[4rem] border border-primary/10 relative overflow-hidden group">
-                    <div class="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
-                    
-                    <div class="relative z-10 grid lg:grid-cols-5 gap-12 items-center">
-                        <div class="lg:col-span-3 space-y-6">
-                            <h4 class="text-2xl font-black text-secondary uppercase tracking-tighter">The Multiverse Advantage</h4>
-                            <p class="text-lg md:text-xl text-slate-700 leading-relaxed font-medium">
-                                Whether you are looking for **DBMS important questions**, **Operating System revision notes**, or detailed **College placement reviews**, MyCollegeVerse provides a peer-verified identity platform.
-                            </p>
-                            <p class="text-lg text-slate-500 leading-relaxed">
-                                Our "Multiverse" approach ensures that every campus has its own dedicated community hub, allowing for hyper-local collaboration. By sharing high-quality resources, you don't just help others—you build your own **Academic Identity**.
-                            </p>
-                        </div>
-                        <div class="lg:col-span-2">
-                            <div class="glass p-8 rounded-[3rem] border-white text-center space-y-4 shadow-xl">
-                                <p class="text-5xl font-black text-primary italic">Join </p>
-                                <p class="text-slate-600 font-bold">thousands of students who are turning their college journey into a data-driven success story.</p>
-                                <a href="{{ route('register') }}" class="block w-full bg-primary text-white py-4 rounded-2xl font-black shadow-lg shadow-primary/20 hover:scale-105 transition-all">Create My Identity</a>
-                            </div>
-                        </div>
+                <!-- Large Feature: Multiverse Hub -->
+                <div class="md:col-span-4 lg:col-span-4 glass p-10 rounded-[3rem] border-primary/20 bg-primary/5 flex flex-col md:flex-row gap-10 items-center justify-between group overflow-hidden">
+                    <div class="flex-1">
+                        <h3 class="text-2xl md:text-3xl font-black text-secondary leading-tight mb-4 italic">The Multiverse Advantage</h3>
+                        <p class="text-sm text-slate-600 leading-relaxed font-medium mb-6">
+                            Whether you're looking for **DBMS questions**, **Revision notes**, or **Placement reviews**, we provide a peer-verified identity platform.
+                        </p>
+                        <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-black text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                            Create Identity
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </a>
+                    </div>
+                    <div class="w-full md:w-1/3 glass p-6 rounded-[2rem] border-white text-center shadow-lg transform group-hover:rotate-2 transition-transform">
+                        <p class="text-4xl font-black text-primary mb-1">Join</p>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Thousands of Students</p>
                     </div>
                 </div>
             </div>
