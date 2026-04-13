@@ -21,11 +21,14 @@ class DashboardController extends Controller
         }
         
         // Personalized Campus Notes
-        $myNotes = Note::where('college_id', $user->college_id)
-            ->with(['user', 'subject'])
-            ->latest()
-            ->take(4)
-            ->get();
+        $myNotes = collect();
+        if ($user->college_id) {
+            $myNotes = Note::where('college_id', $user->college_id)
+                ->with(['user', 'subject'])
+                ->latest()
+                ->take(4)
+                ->get();
+        }
 
         // Top Performers across the platform
         $topPerformers = User::withCount('notes')
@@ -33,10 +36,10 @@ class DashboardController extends Controller
             ->take(3)
             ->get();
 
-        // Real Subjects
-        $subjects = Subject::take(6)->get();
+        // Real Subjects (Resilient Check)
+        $subjects = \Schema::hasTable('subjects') ? Subject::take(6)->get() : collect();
 
-        // Matched Job Opportunities (Global + Targeted)
+        // Matched Job Opportunities (Global + Targeted) 
         $matchedJobs = \App\Models\JobPosting::where('is_approved', true)
             ->where(function($q) use ($user) {
                 $q->whereNull('target_college_id');

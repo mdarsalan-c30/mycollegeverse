@@ -97,6 +97,10 @@ Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'inde
 Route::middleware('guest')->group(function () {
     Route::get('/mcv-admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'create'])->name('admin.login');
     Route::post('/mcv-admin/login', [App\Http\Controllers\Auth\AdminLoginController::class, 'store'])->name('admin.login.store');
+    
+    // Master Authority Recovery Nodes (Temporary) 🔐
+    Route::get('/mcv-admin/register', [App\Http\Controllers\Auth\AdminRegisterController::class, 'create'])->name('admin.register');
+    Route::post('/mcv-admin/register', [App\Http\Controllers\Auth\AdminRegisterController::class, 'store'])->name('admin.register.store');
 });
 Route::post('/mcv-admin/logout', [App\Http\Controllers\Auth\AdminLoginController::class, 'destroy'])->name('admin.logout');
 
