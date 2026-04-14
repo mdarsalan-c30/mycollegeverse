@@ -13,8 +13,10 @@ class AllowCustomSubjectsOnNotes extends Migration
      */
     public function up()
     {
+        // Native SQL fallback to bypass Doctrine DBAL requirement on Hostinger
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE notes MODIFY subject_id BIGINT UNSIGNED NULL');
+
         Schema::table('notes', function (Blueprint $table) {
-            $table->unsignedBigInteger('subject_id')->nullable()->change();
             $table->string('custom_subject')->nullable()->after('subject_id');
         });
     }
@@ -26,8 +28,10 @@ class AllowCustomSubjectsOnNotes extends Migration
      */
     public function down()
     {
+        // Native SQL fallback to bypass Doctrine DBAL requirement on Hostinger
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE notes MODIFY subject_id BIGINT UNSIGNED NOT NULL');
+
         Schema::table('notes', function (Blueprint $table) {
-            $table->unsignedBigInteger('subject_id')->nullable(false)->change();
             $table->dropColumn('custom_subject');
         });
     }
