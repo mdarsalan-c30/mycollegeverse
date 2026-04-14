@@ -35,6 +35,12 @@ class LandingController extends Controller
             ->take(3)
             ->get();
 
-        return view('welcome', compact('stats', 'recentNotes', 'topColleges', 'trendingDiscussions'));
+        $latestBlogs = \App\Models\Blog::where('is_published', true)
+            ->with('category')
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('welcome', compact('stats', 'recentNotes', 'topColleges', 'trendingDiscussions', 'latestBlogs'));
     }
 }

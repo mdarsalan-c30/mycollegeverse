@@ -147,6 +147,7 @@
                 
                 <div class="hidden md:flex items-center gap-8 font-medium text-slate-600">
                     <a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Browse Notes</a>
+                    <a href="/blog" class="hover:text-primary transition-colors">Editorial Hub</a>
                     <a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community Hub</a>
                     <a href="{{ route('jobs.index') }}" class="hover:text-primary transition-colors">Jobs</a>
                     <a href="{{ route('professors.index') }}" class="hover:text-primary transition-colors">Professors</a>
@@ -213,6 +214,7 @@
                 <div class="space-y-6 text-left">
                     <div class="space-y-1">
                         <a href="{{ route('notes.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Browse NotesHub</a>
+                        <a href="/blog" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Editorial Hub</a>
                         <a href="{{ route('community.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Community Verse</a>
                         <a href="{{ route('jobs.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Carrier Pipeline</a>
                         <a href="{{ route('professors.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Professor Intel</a>
@@ -509,7 +511,39 @@
                     </div>
                 </div>
             </div>
+        <!-- Latest Insights Editorial Matrix 🚀 -->
+        @if(count($latestBlogs) > 0)
+        <section class="max-w-7xl mx-auto px-6 py-24 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-12">
+                <div>
+                    <h2 class="text-3xl md:text-4xl font-black text-secondary tracking-tight italic text-left uppercase">Latest Insights</h2>
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-[0.3em] mt-2 italic">Strategic Intelligence from the Editorial Node</p>
+                </div>
+                <a href="/blog" class="px-6 py-2 bg-slate-100 text-slate-500 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all shadow-sm">View Full Hub</a>
+            </div>
+
+            <div class="flex gap-8 overflow-x-auto pb-10 hide-scrollbar snap-x snap-mandatory">
+                @foreach($latestBlogs as $blog)
+                <a href="{{ route('blogs.show', $blog->slug) }}" class="snap-start min-w-[280px] md:min-w-[350px] group bg-white p-4 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl transition-all duration-500">
+                    <div class="aspect-[4/3] rounded-[2rem] overflow-hidden mb-6 relative">
+                        <img src="{{ $blog->featured_image ? (str_contains($blog->featured_image, 'http') ? $blog->featured_image : 'https://ik.imagekit.io/studycubsfranchise/' . $blog->featured_image) : 'https://images.unsplash.com/photo-1523050338692-7b83b907024f?auto=format&fit=crop&q=80' }}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $blog->title }}">
+                        <div class="absolute top-4 left-4">
+                            <span class="px-4 py-1.5 bg-white/95 backdrop-blur-md text-[9px] font-black text-secondary rounded-full uppercase tracking-widest border border-white/50">{{ optional($blog->category)->name ?? 'Intelligence' }}</span>
+                        </div>
+                    </div>
+                    <div class="px-2 pb-2">
+                        <h3 class="text-lg font-black text-secondary leading-tight group-hover:text-primary transition-colors min-h-[3rem] line-clamp-2 uppercase tracking-tighter">{{ $blog->title }}</h3>
+                        <div class="flex items-center gap-3 mt-6 pt-4 border-t border-slate-50">
+                            <div class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-400">{{ substr($blog->author->name ?? 'A', 0, 1) }}</div>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">{{ $blog->published_at ? $blog->published_at->format('M d, Y') : 'Recent' }}</span>
+                        </div>
+                    </div>
+                </a>
+                @endforeach
+            </div>
         </section>
+        @endif
 
         <section class="max-w-7xl mx-auto px-6 py-20 text-center space-y-8">
             <h2 class="text-4xl font-black text-slate-900">Ready to enter your <span class="gradient-text">Academic Multiverse?</span></h2>
