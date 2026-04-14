@@ -23,8 +23,9 @@ class BlogController extends Controller
             return view('blogs.index', compact('categories', 'featuredBlogs'));
         } catch (\Exception $e) {
             \Log::error("Blog Index Error: " . $e->getMessage());
-            $blogs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 9);
-            return view('blogs.index', compact('blogs'));
+            $categories = collect(); 
+            $featuredBlogs = collect();
+            return view('blogs.index', compact('categories', 'featuredBlogs'))->with('error', 'Editorial signals are faint. Please refresh or check back later.');
         }
     }
 
