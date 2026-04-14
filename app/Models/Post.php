@@ -16,7 +16,8 @@ class Post extends Model
         parent::boot();
 
         static::creating(function ($post) {
-            $post->slug = \Illuminate\Support\Str::slug($post->title) . '-' . \Illuminate\Support\Str::random(6);
+            $base = $post->title ?: 'community-post';
+            $post->slug = \Illuminate\Support\Str::slug(\Illuminate\Support\Str::limit($base, 50)) . '-' . \Illuminate\Support\Str::random(8);
         });
     }
 

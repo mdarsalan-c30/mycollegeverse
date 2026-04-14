@@ -104,14 +104,27 @@ class CommunityController extends Controller
             }
         }
 
-        Post::create([
-            'user_id' => Auth::id(),
-            'college_id' => $collegeId,
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'category' => $validated['category'],
-            'image_path' => $imagePath,
-        ]);
+        try {
+            Post::create([
+                'user_id' => Auth::id(),
+                'college_id' => $collegeId,
+                'title' => $validated['title'],
+                'content' => $validated['content'],
+                'category' => $validated['category'],
+                'image_path' => $imagePath,
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            \Illuminate\Support\Facades\Log::error("Community Manifestation Failure: " . $e->getMessage());
+            
+            if (str_contains($e->getMessage(), 'Unknown column')) {
+                return back()->with('error', 'Multiverse Sync Required! Please visit /multiverse-migrate to finalize the Community Identity schema.');
+            }
+            
+            return back()->with('error', 'Post Node collapsed during manifestation. Please try again.');
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("General Community Error: " . $e->getMessage());
+            return back()->with('error', 'Verse Sync Failure: ' . $e->getMessage());
+        }
 
         return back()->with('success', 'Launched to the Verse!');
     }
