@@ -20,41 +20,66 @@ class MediaSearchController extends Controller
         
         if (empty($query)) return response()->json([]);
 
-        return Cache::remember('wiki_search_' . md5($query), 3600, function() use ($query) {
+        // Strip "University" or "College" common suffixes for broader search if needed
+        $cleanQuery = trim(preg_replace('/\b(University|College|Institute|of|In)\b/i', '', $query));
+
+        return Cache::remember('wiki_search_' . md5($query), 3600, function() use ($query, $cleanQuery) {
             try {
-                $response = Http::withUserAgent('MyCollegeVerse/1.0 (contact@mycollegeverse.in)')
-                    ->get('https://commons.wikimedia.org/w/api.php', [
-                        'action' => 'query',
-                        'format' => 'json',
-                        'generator' => 'search',
-                        'gsrsearch' => "filetype:bitmap " . $query,
-                        'gsrnamespace' => 6, // File namespace
-                        'gsrlimit' => 10,
-                        'prop' => 'imageinfo',
-                        'iiprop' => 'url|size|mime',
-                        'iiurlwidth' => 600, // Get high-res thumbnails
-                    ]);
+                // Strategy: Search for Name + Keywords for better campus architecture results 🗺️
+                $searchTerms = [
+                    $query,
+                    $query . " Building",
+                    $query . " Campus",
+                    $cleanQuery . " University",
+                ];
 
-                if ($response->failed()) return [];
-
-                $pages = $response->json('query.pages', []);
                 $results = [];
 
-                foreach ($pages as $page) {
-                    if (isset($page['imageinfo'][0])) {
-                        $info = $page['imageinfo'][0];
-                        // Filter out small or non-representative images if possible
-                        if (str_contains($info['mime'], 'image/')) {
-                            $results[] = [
-                                'title' => $page['title'],
-                                'url' => $info['url'],
-                                'thumb' => $info['thumburl'] ?? $info['url'],
-                            ];
+                foreach ($searchTerms as $term) {
+                    $response = Http::withUserAgent('MyCollegeVerse/1.0 (contact@mycollegeverse.in)')
+                        ->get('https://commons.wikimedia.org/w/api.php', [
+                            'action' => 'query',
+                            'format' => 'json',
+                            'generator' => 'search',
+                            'gsrsearch' => $term,
+                            'gsrnamespace' => 6, // File namespace
+                            'gsrlimit' => 5,
+                            'prop' => 'imageinfo',
+                            'iiprop' => 'url|size|mime',
+                            'iiurlwidth' => 800,
+                        ]);
+
+                    if ($response->successful()) {
+                        $pages = $response->json('query.pages', []);
+                        foreach ($pages as $page) {
+                            if (isset($page['imageinfo'][0])) {
+                                $info = $page['imageinfo'][0];
+                                if (isset($info['url']) && str_contains($info['mime'], 'image/')) {
+                                    $results[] = [
+                                        'title' => $page['title'],
+                                        'url' => $info['url'],
+                                        'thumb' => $info['thumburl'] ?? $info['url'],
+                                    ];
+                                }
+                            }
                         }
+                    }
+
+                    // If we have 3+ good results, stop searching broader terms 🛡️
+                    if (count($results) >= 3) break;
+                }
+
+                // De-duplicate results by URL 🛰️
+                $uniqueResults = [];
+                $seenUrls = [];
+                foreach ($results as $item) {
+                    if (!in_array($item['url'], $seenUrls)) {
+                        $uniqueResults[] = $item;
+                        $seenUrls[] = $item['url'];
                     }
                 }
 
-                return $results;
+                return $uniqueResults;
             } catch (\Exception $e) {
                 return [];
             }
