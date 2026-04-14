@@ -93,7 +93,7 @@
                     @forelse ($colleges as $college)
                     <div class="glass overflow-hidden rounded-[2.5rem] border-white/60 shadow-glass group hover:scale-[1.02] transition-all duration-500">
                         <div class="relative h-48 overflow-hidden">
-                            <img src="{{ $college->thumbnail_url ?? 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=600' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $college->name }}">
+                            <img src="{{ $college->campusimg ?? 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=600' }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $college->name }}">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
                             <div class="absolute bottom-6 left-6 right-6">
                                 <div class="flex flex-wrap gap-2 mb-2">

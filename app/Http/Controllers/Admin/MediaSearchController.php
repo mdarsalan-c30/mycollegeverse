@@ -120,17 +120,17 @@ class MediaSearchController extends Controller
     public function update(Request $request, College $college)
     {
         $request->validate([
-            'thumbnail_url' => 'required|url',
+            'campusimg' => 'required|url',
         ]);
 
         $college->update([
-            'thumbnail_url' => $request->thumbnail_url,
+            'campusimg' => $request->campusimg,
         ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Institutional identity re-calibrated successfully.',
-            'thumbnail_url' => $college->thumbnail_url
+            'message' => 'Campus identity re-calibrated successfully.',
+            'campusimg' => $college->campusimg
         ]);
     }
 }

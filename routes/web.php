@@ -83,8 +83,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/chat/{user?}', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
     // Institutional Media Intelligence
-    Route::get('/media/search', [App\Http\Controllers\Admin\MediaSearchController::class, 'search'])->name('media.search');
-    Route::post('/colleges/{college}/update-image', [App\Http\Controllers\Admin\MediaSearchController::class, 'update'])->name('colleges.update_image');
+    Route::get('/admin/media/search', [App\Http\Controllers\Admin\MediaSearchController::class, 'search'])->name('media.search');
+    Route::post('/admin/colleges/{college}/update-image', [App\Http\Controllers\Admin\MediaSearchController::class, 'update'])->name('colleges.update_image');
     Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
     Route::delete('/chat/message/{id}', [App\Http\Controllers\ChatController::class, 'deleteMessage'])->name('chat.delete');
 

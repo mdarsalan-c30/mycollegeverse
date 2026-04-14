@@ -131,7 +131,7 @@
 
             <!-- Digital Astral Hero -->
             <div class="relative h-[300px] md:h-[480px] rounded-[2.5rem] md:rounded-[3.5rem] overflow-hidden shadow-2xl group cursor-default">
-                <img src="{{ $college->thumbnail_url ?? 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=1200' }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" alt="{{ $college->name }}">
+                <img src="{{ $college->campusimg ?? 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=1200' }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" alt="{{ $college->name }}">
                 <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
                 
                 <!-- Floating Institutional Card -->

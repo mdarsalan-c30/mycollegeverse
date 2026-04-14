@@ -18,7 +18,7 @@ class College extends Model
         'state',
         'city',
         'description',
-        'thumbnail_url',
+        'campusimg',
         'student_count',
         'rating',
         'tags',
@@ -33,7 +33,7 @@ class College extends Model
      * Aesthetic Resilience Hub 🛰️
      * Returns a premium academic visual if the database link is missing.
      */
-    public function getThumbnailUrlAttribute($value)
+    public function getCampusimgAttribute($value)
     {
         if (!empty($value) && !str_contains($value, 'placeholder.com')) {
             return $value;

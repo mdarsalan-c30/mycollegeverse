@@ -8,6 +8,7 @@
         mediaResults: [],
         mediaLoading: false,
         activeCollegeId: null,
+        customUrl: '',
         editNode: { 
             id: '', 
             name: '', 
@@ -17,7 +18,7 @@
             city: '',
             location: '', 
             description: '', 
-            thumbnail_url: '', 
+            campusimg: '', 
             tags: '' 
         },
         async searchMedia(query, collegeId) {
@@ -44,7 +45,7 @@
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     },
-                    body: JSON.stringify({ thumbnail_url: url })
+                    body: JSON.stringify({ campusimg: url })
                 });
                 const result = await response.json();
                 if (result.success) {
@@ -89,7 +90,7 @@
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-5">
                                 <div class="relative">
-                                    <img src="{{ $college->thumbnail_url }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform" />
+                                    <img src="{{ $college->campusimg }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform" />
                                 </div>
                                 <div>
                                     <p class="text-sm font-black text-admin-dark">{{ $college->name }}</p>
@@ -130,7 +131,7 @@
                                     city: '{{ addslashes($college->city) }}',
                                     location: '{{ addslashes($college->location) }}', 
                                     description: '{{ addslashes($college->description) }}', 
-                                    thumbnail_url: '{{ $college->thumbnail_url }}', 
+                                    campusimg: '{{ $college->campusimg }}', 
                                     tags: '{{ addslashes(is_array($college->tags) ? implode(', ', $college->tags) : ($college->tags ?? '')) }}' 
                                 }"
                                         class="p-3 text-slate-400 hover:text-admin-primary transition-all rounded-xl" title="Deep Scan Hub">
@@ -187,7 +188,7 @@
                         <div class="border-2 border-dashed border-slate-100 rounded-[2.5rem] p-8 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 transition-colors group relative cursor-pointer">
                             <input type="file" name="import_file" class="absolute inset-0 opacity-0 cursor-pointer">
                             <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">📄</span>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Drop node or browse<br><span class="opacity-50 text-[7px] italic mt-1 block">Expected Order: Name | Type | State | City | Streams | Location | Description | Logo | Tags</span></p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Drop node or browse<br><span class="opacity-50 text-[7px] italic mt-1 block">Expected Order: Name | Type | State | City | Streams | Location | Description | CampusImg | Tags</span></p>
                         </div>
                     </div>
 
@@ -196,7 +197,7 @@
                             <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Pathway B: Terminal (ChatGPT Format)</label>
                             <span class="text-[8px] font-black bg-admin-primary/10 text-admin-primary px-2 py-1 rounded-full uppercase tracking-tighter">Strict 9-Column Standard</span>
                         </div>
-                        <textarea name="paste_data" rows="6" class="w-full bg-slate-50 border-none rounded-[2.5rem] px-8 py-8 text-xs font-bold focus:ring-4 focus:ring-admin-primary/5 transition-all italic placeholder:text-slate-300" placeholder="Hindu College | Government | Delhi | New Delhi | Arts, Science | North Campus | ..."></textarea>
+                        <textarea name="paste_data" rows="6" class="w-full bg-slate-50 border-none rounded-[2.5rem] px-8 py-8 text-xs font-bold focus:ring-4 focus:ring-admin-primary/5 transition-all italic placeholder:text-slate-300" placeholder="Hindu College | Government | Delhi | New Delhi | Arts, Science | North Campus | One of India's most prestigious colleges. | https://image.jpg | DU, Tier1"></textarea>
                         <p class="text-[9px] font-bold text-slate-300 italic px-4 mt-2">Note: To ensure filters work, use exact State/Type keywords and comma-separated Streams.</p>
                     </div>
 
@@ -284,8 +285,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold">
                         <div class="space-y-2">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Thumbnail/Logo URL</label>
-                            <input type="url" name="thumbnail_url" placeholder="https://..." class="w-full h-14 bg-slate-50 border-none rounded-2xl px-6">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Campus Image URL (Direct Link)</label>
+                            <input type="url" name="campusimg" placeholder="https://..." class="w-full h-14 bg-slate-50 border-none rounded-2xl px-6">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Core Tags (comma separated)</label>
@@ -378,8 +379,8 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold">
                         <div class="space-y-2">
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Thumbnail/Logo URL</label>
-                            <input type="url" name="thumbnail_url" x-model="editNode.thumbnail_url" class="w-full h-14 bg-slate-50 border-none rounded-2xl px-6 text-xs font-bold">
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Campus Image URL (Direct Link)</label>
+                            <input type="url" name="campusimg" x-model="editNode.campusimg" class="w-full h-14 bg-slate-50 border-none rounded-2xl px-6 text-xs font-bold">
                         </div>
                         <div class="space-y-2">
                             <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest ml-4">Core Tags</label>
@@ -406,11 +407,23 @@
                     <div class="flex items-center gap-5">
                         <div class="w-14 h-14 bg-admin-primary text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-admin-primary/20">✨</div>
                         <div>
-                            <h3 class="text-2xl font-black text-admin-secondary leading-none">Magic Image Discovery</h3>
+                            <h3 class="text-2xl font-black text-admin-secondary leading-none">Campus Identity Discovery</h3>
                             <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Sourcing high-fidelity visuals for <span x-text="mediaQuery" class="text-admin-primary"></span></p>
                         </div>
                     </div>
                     <button type="button" @click="openMediaSearch = false" class="text-slate-300 hover:text-slate-600">✕</button>
+                </div>
+
+                <!-- Manual Identity Override 🛰️ -->
+                <div class="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 flex items-center gap-4">
+                    <div class="flex-1">
+                        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 px-1">Found a better Campus Image? Paste the URL here:</p>
+                        <input type="url" x-model="customUrl" placeholder="https://example.com/campus-photo.jpg" 
+                               class="w-full bg-white border-0 rounded-xl px-4 py-3 text-[11px] font-bold text-admin-dark focus:ring-2 focus:ring-admin-primary">
+                    </div>
+                    <button type="button" @click="selectMedia(customUrl)" class="mt-4 px-6 py-3 bg-admin-dark text-white rounded-xl text-[9px] font-black uppercase tracking-widest">
+                        Save Identity
+                    </button>
                 </div>
 
                 <!-- Results Grid -->

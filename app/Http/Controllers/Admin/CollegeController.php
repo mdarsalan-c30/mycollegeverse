@@ -42,7 +42,7 @@ class CollegeController extends Controller
             'city' => 'required|string',
             'location' => 'required|string',
             'description' => 'required|string',
-            'thumbnail_url' => 'nullable|url',
+            'campusimg' => 'nullable|url',
             'tags' => 'nullable|string',
         ]);
 
@@ -55,7 +55,7 @@ class CollegeController extends Controller
             'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
-            'thumbnail_url' => $request->thumbnail_url ?? 'https://via.placeholder.com/300?text=MCV+Node',
+            'campusimg' => $request->campusimg ?? 'https://via.placeholder.com/600?text=Campus+Identity',
             'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
             'student_count' => rand(1000, 5000),
             'rating' => 0.0,
@@ -134,7 +134,7 @@ class CollegeController extends Controller
                         
                         $location = $row[5] ?? 'Unknown Node';
                         $description = $row[6] ?? 'Institutional narrative in development.';
-                        $logo = $row[7] ?? 'https://via.placeholder.com/300?text=MCV+Node';
+                        $logo = $row[7] ?? 'https://via.placeholder.com/600?text=Campus+Identity';
                         
                         // Handle Tags (Comma separated -> Array)
                         $tags = isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'];
@@ -148,7 +148,7 @@ class CollegeController extends Controller
                             'city' => $city,
                             'location' => $location,
                             'description' => $description,
-                            'thumbnail_url' => $logo,
+                            'campusimg' => $logo,
                             'tags' => $tags,
                             'student_count' => rand(1000, 5000),
                             'rating' => 0.0, // Initialized as 0.0, will sync from student reviews
