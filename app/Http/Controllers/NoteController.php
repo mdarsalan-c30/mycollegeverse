@@ -17,6 +17,36 @@ class NoteController extends Controller
         $user = Auth::user();
         $query = Note::with(['college', 'user', 'subject']);
 
+        // High-Performance Intelligence Filtering 🛰️
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhereHas('subject', function($sq) use ($search) {
+                      $sq->where('name', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('college', function($cq) use ($search) {
+                      $cq->where('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($request->filled('course_id') && $request->course_id !== 'All') {
+            $query->whereHas('subject', function($q) use ($request) {
+                $q->where('course_id', $request->course_id);
+            });
+        }
+
+        if ($request->filled('semester') && $request->semester !== 'All') {
+            $query->whereHas('subject', function($q) use ($request) {
+                $q->where('semester', $request->semester);
+            });
+        }
+
+        if ($request->boolean('is_verified')) {
+            $query->where('is_verified', true);
+        }
+
         if ($request->has('subject_id')) {
             $query->where('subject_id', $request->subject_id);
         }

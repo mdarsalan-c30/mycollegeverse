@@ -4,29 +4,25 @@
 
     <div class="space-y-10 pb-20" x-data="{ 
         showUploadModal: false,
-        search: '',
-        activeCourse: 'All',
-        activeSemester: 'All',
-        activeFilter: 'Verified Only',
-        showVerifiedOnly: false,
+        search: '{{ request('search') }}',
+        activeCourse: '{{ request('course_id', 'All') }}',
+        activeSemester: '{{ request('semester', 'All') }}',
+        showVerifiedOnly: {{ request('is_verified') ? 'true' : 'false' }},
 
         // For Upload Modal
         uploadStep: 1,
         selectedCourse: '',
         selectedSemester: '',
         selectedSubject: '',
+        allSubjects: {{ $subjects->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'course_id' => $s->course_id, 'semester' => $s->semester])->toJson() }},
 
-        matches(note) {
-            const searchMatch = !this.search || 
-                note.title.toLowerCase().includes(this.search.toLowerCase()) || 
-                note.subject_name.toLowerCase().includes(this.search.toLowerCase()) ||
-                note.college.toLowerCase().includes(this.search.toLowerCase());
-            
-            let courseMatch = this.activeCourse === 'All' || note.course_id == this.activeCourse;
-            let semesterMatch = this.activeSemester === 'All' || note.semester == this.activeSemester;
-            let verifiedMatch = !this.showVerifiedOnly || note.is_verified;
-            
-            return searchMatch && courseMatch && semesterMatch && verifiedMatch;
+        get filteredSubjects() {
+            if (!this.selectedCourse || !this.selectedSemester) return [];
+            return this.allSubjects.filter(s => s.course_id == this.selectedCourse && s.semester == this.selectedSemester);
+        },
+
+        submitFilters() {
+            this.$refs.filterForm.submit();
         }
     }">
         <!-- Page Header -->
@@ -53,11 +49,11 @@
             @endauth
         </div>
 
-        <!-- Filters & Search -->
-        <div class="glass p-5 rounded-[2.5rem] shadow-sm border-white/40 flex flex-wrap items-center gap-6">
+        <!-- Filters & Search (Intel Hub) 🛰️ -->
+        <form action="{{ route('notes.index') }}" method="GET" x-ref="filterForm" class="glass p-5 rounded-[2.5rem] shadow-sm border-white/40 flex flex-wrap items-center gap-6">
             <!-- Search -->
             <div class="flex-1 min-w-[250px] relative">
-                <input type="text" x-model="search" @keydown.enter="$el.blur()" placeholder="Search by title, subject or college..." class="w-full h-14 bg-white/50 border border-slate-100 rounded-2xl px-12 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all">
+                <input type="text" name="search" x-model="search" @keydown.enter="submitFilters()" placeholder="Search by title, subject or college..." class="w-full h-14 bg-white/50 border border-slate-100 rounded-2xl px-12 focus:ring-primary/20 focus:border-primary text-sm font-medium transition-all">
                 <svg class="absolute left-4 top-4.5 h-6 w-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -66,10 +62,10 @@
             <!-- Course Filter -->
             <div class="min-w-[150px]">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Academic Path</label>
-                <select x-model="activeCourse" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
+                <select name="course_id" x-model="activeCourse" @change="submitFilters()" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
                     <option value="All">All Courses</option>
                     @foreach($courses as $course)
-                        <option value="{{ $course->id }}">{{ $course->name }}</option>
+                        <option value="{{ $course->id }}" {{ request('course_id') == $course->id ? 'selected' : '' }}>{{ $course->name }}</option>
                     @endforeach
                 </select>
             </div>
@@ -77,10 +73,10 @@
             <!-- Semester Filter -->
             <div class="min-w-[150px]">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Semester</label>
-                <select x-model="activeSemester" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
+                <select name="semester" x-model="activeSemester" @change="submitFilters()" class="w-full h-12 bg-white/60 border border-slate-100 rounded-xl px-4 text-xs font-bold text-slate-600 focus:ring-primary/20 transition-all">
                     <option value="All">All Semesters</option>
                     @foreach($availableSemesters as $sem)
-                        <option value="{{ $sem }}">Semester {{ $sem }}</option>
+                        <option value="{{ $sem }}" {{ request('semester') == $sem ? 'selected' : '' }}>Semester {{ $sem }}</option>
                     @endforeach
                 </select>
             </div>
@@ -88,29 +84,19 @@
             <!-- Verified Toggle -->
             <div class="flex flex-col items-center">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Verified</label>
-                <button @click="showVerifiedOnly = !showVerifiedOnly" 
+                <input type="hidden" name="is_verified" :value="showVerifiedOnly ? '1' : ''">
+                <button type="button" @click="showVerifiedOnly = !showVerifiedOnly; submitFilters();" 
                         :class="showVerifiedOnly ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"
                         class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                     🛡️ <span class="ml-1" x-text="showVerifiedOnly ? 'ON' : 'OFF'"></span>
                 </button>
             </div>
-        </div>
+        </form>
 
         <!-- Notes Grid -->
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             @forelse($notes as $note)
             <a href="{{ route('notes.show', $note->slug ?? $note->id) }}" 
-               x-show="matches({ 
-                   title: '{{ addslashes($note->title) }}', 
-                   subject_name: '{{ addslashes($note->subject->name ?? '') }}', 
-                   college: '{{ addslashes(optional($note->college)->name ?? '') }}',
-                   semester: '{{ $note->subject->semester ?? 0 }}',
-                   course_id: '{{ $note->subject->course_id ?? 0 }}',
-                   is_verified: {{ $note->is_verified ? 'true' : 'false' }} 
-               })"
-               x-transition:enter="transition ease-out duration-300"
-               x-transition:enter-start="opacity-0 scale-95"
-               x-transition:enter-end="opacity-100 scale-100"
                class="glass p-6 rounded-[2.5rem] shadow-glass border-white hover:shadow-xl transition-all group relative overflow-hidden block">
                 <!-- Priority Badge -->
                 @if(Auth::check() && $note->college_id == Auth::user()->college_id)
@@ -232,11 +218,9 @@
                                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Subject Node</label>
                                     <select name="subject_id" x-model="selectedSubject" :disabled="!selectedCourse || !selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 disabled:opacity-50 transition-opacity">
                                         <option value="">Select Subject</option>
-                                        @foreach($subjects as $subject)
-                                            <template x-if="selectedCourse == '{{ $subject->course_id }}' && selectedSemester == '{{ $subject->semester }}'">
-                                                <option value="{{ $subject->id }}">{{ $subject->name }}</option>
-                                            </template>
-                                        @endforeach
+                                        <template x-for="subject in filteredSubjects" :key="subject.id">
+                                            <option :value="subject.id" x-text="subject.name"></option>
+                                        </template>
                                     </select>
                                 </div>
 

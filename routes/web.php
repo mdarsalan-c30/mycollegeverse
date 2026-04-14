@@ -174,12 +174,15 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::post('/reviews/{type}/{id}/approve', [App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('reviews.approve');
     Route::delete('/reviews/{type}/{id}', [App\Http\Controllers\Admin\ReviewController::class, 'destroy'])->name('reviews.destroy');
 
-    // Institutional Registries (Colleges & Professors)
+    // Institutional Registries (Colleges, Professors, Courses, & Subjects)
     Route::get('/colleges', [App\Http\Controllers\Admin\CollegeController::class, 'index'])->name('colleges');
     Route::post('/colleges', [App\Http\Controllers\Admin\CollegeController::class, 'store'])->name('colleges.store');
     Route::post('/colleges/import', [App\Http\Controllers\Admin\CollegeController::class, 'import'])->name('colleges.import');
     Route::patch('/colleges/{college}', [App\Http\Controllers\Admin\CollegeController::class, 'update'])->name('colleges.update');
     Route::delete('/colleges/{college}', [App\Http\Controllers\Admin\CollegeController::class, 'destroy'])->name('colleges.destroy');
+
+    Route::resource('courses', App\Http\Controllers\Admin\CourseController::class)->except(['create', 'edit', 'show', 'update']);
+    Route::resource('subjects', App\Http\Controllers\Admin\SubjectController::class)->except(['create', 'edit', 'show', 'update']);
 
     Route::get('/professors', [App\Http\Controllers\Admin\ProfessorController::class, 'index'])->name('professors');
     Route::get('/professors/requests', [App\Http\Controllers\Admin\ProfessorController::class, 'requests'])->name('professors.requests');

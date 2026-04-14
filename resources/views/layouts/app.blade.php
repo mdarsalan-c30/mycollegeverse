@@ -198,14 +198,14 @@
                 <!-- Header (Always Visible) -->
                 <header class="h-24 glass flex items-center justify-between px-8 py-4 relative z-30 shadow-sm shrink-0">
                     <div class="flex-1 max-w-2xl">
-                        <div class="relative group">
+                        <form action="{{ route('notes.index') }}" method="GET" class="relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
-                            <input type="text" placeholder="Search notes, colleges, or students..." class="block w-full pl-12 pr-4 h-12 bg-white/50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium">
-                        </div>
+                            <input type="text" name="search" value="{{ request('search') }}" placeholder="Search notes, colleges, or students..." class="block w-full pl-12 pr-4 h-12 bg-white/50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium">
+                        </form>
                     </div>
 
                     <div class="flex items-center gap-4" x-data="{ open: false }">
