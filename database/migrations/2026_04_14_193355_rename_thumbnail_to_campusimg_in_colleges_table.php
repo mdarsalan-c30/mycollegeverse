@@ -14,7 +14,7 @@ class RenameThumbnailToCampusimgInCollegesTable extends Migration
     public function up()
     {
         Schema::table('colleges', function (Blueprint $table) {
-            $table->renameColumn('thumbnail_url', 'campusimg');
+            //
         });
     }
 
@@ -26,7 +26,7 @@ class RenameThumbnailToCampusimgInCollegesTable extends Migration
     public function down()
     {
         Schema::table('colleges', function (Blueprint $table) {
-            $table->renameColumn('campusimg', 'thumbnail_url');
+            //
         });
     }
 }

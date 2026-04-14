@@ -36,47 +36,40 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name',
-            'type' => 'required|string|in:' . implode(',', config('college_metadata.types')),
-            'streams' => 'required|array',
-            'state' => 'required|string|in:' . implode(',', config('college_metadata.states')),
-            'city' => 'required|string',
+            'type' => 'nullable|string',
+            'streams' => 'nullable|array',
+            'state' => 'nullable|string',
+            'city' => 'nullable|string',
             'location' => 'required|string',
             'description' => 'required|string',
-            'campusimg' => 'nullable|url',
+            'thumbnail_url' => 'nullable|url',
             'tags' => 'nullable|string',
         ]);
 
-        try {
-            $college = College::create([
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'type' => $request->type,
-                'streams' => $request->streams,
-                'state' => $request->state,
-                'city' => $request->city,
-                'location' => $request->location,
-                'description' => $request->description,
-                'campusimg' => $request->campusimg ?? 'https://via.placeholder.com/600?text=Campus+Identity',
-                'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
-                'student_count' => rand(1000, 5000),
-                'rating' => 0.0,
-            ]);
+        $college = College::create([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'type' => $request->type,
+            'streams' => $request->streams ?? [],
+            'state' => $request->state,
+            'city' => $request->city,
+            'location' => $request->location,
+            'description' => $request->description,
+            'thumbnail_url' => $request->thumbnail_url ?? 'https://via.placeholder.com/300?text=MCV+Node',
+            'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
+            'student_count' => 0,
+            'rating' => 5.0,
+        ]);
 
-            ApprovalLog::safeCreate([
-                'admin_id' => Auth::id(),
-                'action' => 'college_registered',
-                'target_type' => 'College',
-                'target_id' => $college->id,
-                'metadata' => ['name' => $college->name],
-            ]);
+        ApprovalLog::safeCreate([
+            'admin_id' => Auth::id(),
+            'action' => 'college_registered',
+            'target_type' => 'College',
+            'target_id' => $college->id,
+            'metadata' => ['name' => $college->name],
+        ]);
 
-            return back()->with('success', "College Node '{$college->name}' initialized in the multiverse.");
-
-        } catch (\Exception $e) {
-            \Log::error("Manual Add Failed: " . $e->getMessage());
-            return back()->with('error', "Initialization Failed: " . $e->getMessage())
-                         ->withInput();
-        }
+        return back()->with('success', "College Node '{$college->name}' initialized in the multiverse.");
     }
 
     /**
@@ -123,42 +116,22 @@ class CollegeController extends Controller
             }
 
             foreach ($rows as $row) {
-                // Formatting Check: Standard 9-column flux 🛡️
-                // Order: Name | Type | State | City | Streams | Location | Description | LogoURL | Tags
                 if (count($row) >= 1) {
-                    $name = trim($row[0]);
-                    
-                    // Code Guard: Skip accidental PHP code lines
-                    if (str_contains($name, '=>') || str_contains($name, '[')) continue;
-
+                    $name = $row[0];
                     if (!College::where('name', $name)->exists()) {
-                        $type = $row[1] ?? 'Private';
-                        $state = $row[2] ?? 'Unknown';
-                        $city = $row[3] ?? 'Unknown';
-                        
-                        // Handle Streams (Comma separated -> Array)
-                        $streams = isset($row[4]) ? array_map('trim', explode(',', $row[4])) : ['General'];
-                        
-                        $location = $row[5] ?? 'Unknown Node';
-                        $description = $row[6] ?? 'Institutional narrative in development.';
-                        $logo = $row[7] ?? 'https://via.placeholder.com/600?text=Campus+Identity';
-                        
-                        // Handle Tags (Comma separated -> Array)
-                        $tags = isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'];
-
                         College::create([
                             'name' => $name,
                             'slug' => Str::slug($name),
-                            'type' => $type,
-                            'streams' => $streams,
-                            'state' => $state,
-                            'city' => $city,
-                            'location' => $location,
-                            'description' => $description,
-                            'campusimg' => $logo,
-                            'tags' => $tags,
-                            'student_count' => rand(1000, 5000),
-                            'rating' => 0.0, // Initialized as 0.0, will sync from student reviews
+                            'type' => $row[1] ?? 'Private',
+                            'streams' => isset($row[2]) ? array_map('trim', explode(',', $row[2])) : ['General'],
+                            'state' => $row[3] ?? 'Unknown',
+                            'city' => $row[4] ?? 'Unknown',
+                            'location' => $row[5] ?? ($row[4] ?? 'Unknown Node'),
+                            'description' => $row[6] ?? 'Academic expansion in progress.',
+                            'thumbnail_url' => $row[7] ?? 'https://via.placeholder.com/300?text=MCV+Node',
+                            'tags' => isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'],
+                            'student_count' => 0,
+                            'rating' => 5.0,
                         ]);
                         $importCount++;
                     } else {
@@ -189,13 +162,13 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name,' . $college->id,
-            'type' => 'required|string|in:' . implode(',', config('college_metadata.types')),
-            'streams' => 'required|array',
-            'state' => 'required|string|in:' . implode(',', config('college_metadata.states')),
-            'city' => 'required|string',
+            'type' => 'nullable|string',
+            'streams' => 'nullable|array',
+            'state' => 'nullable|string',
+            'city' => 'nullable|string',
             'location' => 'required|string',
             'description' => 'required|string',
-            'campusimg' => 'nullable|url',
+            'thumbnail_url' => 'nullable|url',
             'tags' => 'nullable|string',
         ]);
 
@@ -210,7 +183,7 @@ class CollegeController extends Controller
             'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
-            'campusimg' => $request->campusimg,
+            'thumbnail_url' => $request->thumbnail_url,
             'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
         ]);
 
