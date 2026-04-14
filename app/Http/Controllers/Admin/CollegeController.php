@@ -46,30 +46,37 @@ class CollegeController extends Controller
             'tags' => 'nullable|string',
         ]);
 
-        $college = College::create([
-            'name' => $request->name,
-            'slug' => Str::slug($request->name),
-            'type' => $request->type,
-            'streams' => $request->streams,
-            'state' => $request->state,
-            'city' => $request->city,
-            'location' => $request->location,
-            'description' => $request->description,
-            'campusimg' => $request->campusimg ?? 'https://via.placeholder.com/600?text=Campus+Identity',
-            'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
-            'student_count' => rand(1000, 5000),
-            'rating' => 0.0,
-        ]);
+        try {
+            $college = College::create([
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'type' => $request->type,
+                'streams' => $request->streams,
+                'state' => $request->state,
+                'city' => $request->city,
+                'location' => $request->location,
+                'description' => $request->description,
+                'campusimg' => $request->campusimg ?? 'https://via.placeholder.com/600?text=Campus+Identity',
+                'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
+                'student_count' => rand(1000, 5000),
+                'rating' => 0.0,
+            ]);
 
-        ApprovalLog::safeCreate([
-            'admin_id' => Auth::id(),
-            'action' => 'college_registered',
-            'target_type' => 'College',
-            'target_id' => $college->id,
-            'metadata' => ['name' => $college->name],
-        ]);
+            ApprovalLog::safeCreate([
+                'admin_id' => Auth::id(),
+                'action' => 'college_registered',
+                'target_type' => 'College',
+                'target_id' => $college->id,
+                'metadata' => ['name' => $college->name],
+            ]);
 
-        return back()->with('success', "College Node '{$college->name}' initialized in the multiverse.");
+            return back()->with('success', "College Node '{$college->name}' initialized in the multiverse.");
+
+        } catch (\Exception $e) {
+            \Log::error("Manual Add Failed: " . $e->getMessage());
+            return back()->with('error', "Initialization Failed: " . $e->getMessage())
+                         ->withInput();
+        }
     }
 
     /**

@@ -116,7 +116,7 @@
                         <td class="px-8 py-6 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <button type="button" 
-                                        @click="searchMedia('{{ addslashes($college->name) }}', '{{ $college->slug }}')"
+                                        @click="searchMedia(@json($college->name), '{{ $college->slug }}')"
                                         class="p-3 bg-admin-primary/10 text-admin-primary hover:bg-admin-primary hover:text-white transition-all rounded-xl" 
                                         title="Magic Image Discovery ✨">
                                     ✨
@@ -124,15 +124,15 @@
                                 <button type="button" 
                                 @click="openEdit = true; editNode = { 
                                     id: '{{ $college->slug }}', 
-                                    name: '{{ addslashes($college->name) }}', 
+                                    name: @json($college->name), 
                                     type: '{{ $college->type }}',
                                     streams: @json($college->streams ?? []),
                                     state: '{{ $college->state }}',
-                                    city: '{{ addslashes($college->city) }}',
-                                    location: '{{ addslashes($college->location) }}', 
-                                    description: '{{ addslashes($college->description) }}', 
-                                    campusimg: '{{ $college->campusimg }}', 
-                                    tags: '{{ addslashes(is_array($college->tags) ? implode(', ', $college->tags) : ($college->tags ?? '')) }}' 
+                                    city: @json($college->city),
+                                    location: @json($college->location), 
+                                    description: @json($college->description), 
+                                    campusimg: @json($college->campusimg), 
+                                    tags: @json(is_array($college->tags) ? implode(', ', $college->tags) : ($college->tags ?? ''))
                                 }"
                                         class="p-3 text-slate-400 hover:text-admin-primary transition-all rounded-xl" title="Deep Scan Hub">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
