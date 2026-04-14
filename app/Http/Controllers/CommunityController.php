@@ -82,10 +82,14 @@ class CommunityController extends Controller
             'image' => 'nullable|image|max:5120', // 5MB limit
         ]);
 
-        /** @var \App\Models\User $user */
         $user = Auth::user();
-
         $collegeId = $validated['college_id'] ?? ($user->college_id ?? null);
+
+        // Registry Integrity Verification: Ensure the college node actually exists
+        if ($collegeId && !\App\Models\College::where('id', $collegeId)->exists()) {
+            \Illuminate\Support\Facades\Log::warning("Community Identity Mismatch: User #{$user->id} attempted to post to non-existent College #{$collegeId}");
+            return back()->with('error', 'Your Institutional Registry Node is missing or out of sync. Please update your profile.');
+        }
 
         if (!$collegeId) {
             return back()->with('error', 'You must be part of a College Verse to post here!');
@@ -121,7 +125,7 @@ class CommunityController extends Controller
                 return back()->with('error', 'Multiverse Sync Required! Your database is missing columns (slug/image_path). Please visit /multiverse-migrate immediately.');
             }
             
-            return back()->with('error', 'Post Manifestation Failed: ' . \Illuminate\Support\Str::limit($errorMsg, 100));
+            return back()->with('error', 'Post Manifestation Failed. Please try again or visit /multiverse-sync.');
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("General Community Error: " . $e->getMessage());
             return back()->with('error', 'Verse Sync Failure: ' . $e->getMessage());
