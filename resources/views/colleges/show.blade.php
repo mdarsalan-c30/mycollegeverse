@@ -206,12 +206,12 @@
                                 </div>
                             </div>
 
-                            <!-- Institutional Pillars -->
+                            <!-- Institutional Pillars: Council Verified 🛡️ -->
                             <div class="grid md:grid-cols-2 gap-8 md:gap-10">
                                 <div class="bg-primary rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl group">
                                     <div class="relative z-10 space-y-4 md:space-y-6">
                                         <div class="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl md:text-3xl">🧩</div>
-                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Vibrant Synergy</h5>
+                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Verified Synergy</h5>
                                         <p class="text-xs md:text-sm font-medium text-white/80 leading-relaxed">
                                             {{ number_format($college->users_count) }}+ verified nodes contributing to the digital hive.
                                         </p>
@@ -221,9 +221,9 @@
                                 <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl group">
                                     <div class="relative z-10 space-y-4 md:space-y-6">
                                         <div class="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl md:text-3xl">🌍</div>
-                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Global Reputation</h5>
+                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Multiverse Impact</h5>
                                         <p class="text-xs md:text-sm font-medium text-slate-400 leading-relaxed">
-                                            Consistently recognized as a Tier-1 center for research and innovation.
+                                            {{ $college->notes()->count() }} Study Notes & {{ $college->professors()->withCount('reviews')->get()->sum('reviews_count') }} Faculty Reviews manifested.
                                         </p>
                                     </div>
                                     <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
@@ -231,16 +231,12 @@
                             </div>
                         </div>
 
-                        <!-- Side Metrics -->
+                        <!-- Side Metrics: Council Intelligence 🛡️ -->
                         <div class="lg:col-span-4 space-y-12">
                             <div class="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] space-y-10">
-                                <h4 class="text-xl md:text-2xl font-black text-slate-900">Academic Power</h4>
+                                <h4 class="text-xl md:text-2xl font-black text-slate-900">Council Intelligence</h4>
                                 <div class="space-y-8 md:space-y-10">
-                                    @foreach([
-                                        ['label' => 'Faculty Synergy', 'percent' => 95, 'text' => 'Elite 5:1'],
-                                        ['label' => 'Research Capital', 'percent' => 88, 'text' => '$1.2B+'],
-                                        ['label' => 'Financial Ingress', 'percent' => 75, 'text' => 'Aid: 70%']
-                                    ] as $metric)
+                                    @foreach($college->academic_metrics as $metric)
                                     <div class="space-y-3 md:space-y-4">
                                         <div class="flex justify-between items-end">
                                             <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $metric['label'] }}</span>
@@ -258,118 +254,147 @@
 
                     <!-- Tab Content: Reviews -->
                     <div x-show="tab === 'reviews'" class="space-y-10 md:space-y-16 max-w-5xl mx-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4">
-                                       @auth
-                        @php
-                            $myPendingReview = $college->reviews()->where('user_id', Auth::id())->where('status', 'pending')->first();
-                        @endphp
-
-                        @if($myPendingReview)
-                        <div class="bg-amber-900/90 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-6 relative overflow-hidden shadow-2xl border border-amber-500/30">
-                            <div class="flex items-center gap-6">
-                                <span class="text-4xl animate-pulse">⏳</span>
+                        <!-- Council Review Hub 🛡️ -->
+                        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-xl shadow-slate-200/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-16">
+                            <div class="flex items-center gap-8">
+                                <div class="bg-primary/5 p-6 rounded-[2.5rem] flex flex-col items-center">
+                                    <span class="text-4xl md:text-5xl font-black text-primary">{{ number_format($college->reviews()->where('status', 'approved')->avg(DB::raw('(campus_rating + faculty_rating + academic_rating) / 3')), 1) ?: '0.0' }}</span>
+                                    <div class="flex gap-0.5 mt-2">
+                                        @foreach(range(1,5) as $i)
+                                        <span class="text-[10px]">{{ $i <= ($college->reviews()->where('status', 'approved')->avg(DB::raw('(campus_rating + faculty_rating + academic_rating) / 3')) ?? 0) ? '⭐' : '☆' }}</span>
+                                        @endforeach
+                                    </div>
+                                </div>
                                 <div>
-                                    <h3 class="text-2xl font-black text-white">Evaluation in Verification</h3>
-                                    <p class="text-amber-200/70 text-sm font-medium mt-1 uppercase tracking-widest">Pending Council Approval</p>
+                                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Council Verification</h3>
+                                    <p class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Based on {{ $college->reviews()->where('status', 'approved')->count() }} verified signals</p>
                                 </div>
                             </div>
-                            <p class="text-amber-50/60 text-base leading-relaxed italic">"{{ Str::limit($myPendingReview->comment, 150) }}"</p>
-                            <div class="pt-6 border-t border-white/10">
-                                <p class="text-[10px] font-bold text-amber-200/50 uppercase tracking-[0.2em]">Your peer intelligence is currently being verified against institutional records. It will be public once approved.</p>
+
+                            @auth
+                                @php
+                                    $myPendingReview = $college->reviews()->where('user_id', Auth::id())->where('status', 'pending')->first();
+                                    $myApprovedReview = $college->reviews()->where('user_id', Auth::id())->where('status', 'approved')->first();
+                                @endphp
+
+                                @if($myPendingReview)
+                                    <div class="bg-amber-50 text-amber-600 px-8 py-4 rounded-2xl border border-amber-100 text-[10px] font-black uppercase tracking-widest animate-pulse">Verification in Progress</div>
+                                @elseif($myApprovedReview)
+                                    <div class="bg-emerald-50 text-emerald-600 px-8 py-4 rounded-2xl border border-emerald-100 text-[10px] font-black uppercase tracking-widest">Signal Manifested ✅</div>
+                                @else
+                                    <button @click="toggleReviewForm()" class="bg-primary text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Signify Your Experience ✍️</button>
+                                @endif
+                            @else
+                                <a href="{{ route('login') }}" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all">Join to Signify ⭐</a>
+                            @endauth
+                        </div>
+
+                        <!-- Smooth Review Form Anchor -->
+                        <div id="review-form-anchor"></div>
+
+                        @auth
+                        @if(!$myPendingReview && !$myApprovedReview)
+                        <div x-show="showReviewForm" 
+                             x-collapse
+                             x-transition:enter="transition ease-out duration-500"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             class="mb-20">
+                            <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl">
+                                <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
+                                <div class="relative z-10 space-y-10 md:space-y-12">
+                                    <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                                        <div class="space-y-2 md:space-y-3">
+                                            <h3 class="text-2xl md:text-3xl font-black text-white">Campus Evaluation</h3>
+                                            <p class="text-slate-400 text-base md:text-lg">Contribute your authentic perspective to the multiverse.</p>
+                                        </div>
+                                        <button @click="showReviewForm = false" class="text-white/30 hover:text-white transition-colors text-2xl">✕</button>
+                                    </div>
+
+                                    <form action="{{ route('colleges.rate', $college->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-8 md:space-y-12">
+                                        @csrf
+                                        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
+                                            @foreach(['campus' => 'Culture', 'faculty' => 'Faculty', 'academic' => 'Academic'] as $key => $l)
+                                            <div class="space-y-4 md:space-y-5">
+                                                <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">{{ $l }}</label>
+                                                <select name="{{ $key }}_rating" class="w-full bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl py-4 md:py-5 px-6 md:px-8 text-white focus:ring-2 focus:ring-primary outline-none">
+                                                    @foreach(range(5, 1) as $s)
+                                                    <option value="{{ $s }}" class="bg-slate-900 text-white">{{ $s }} Stars</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            @endforeach
+                                        </div>
+
+                                        <!-- Placement Intelligence Inputs 💰 -->
+                                        <div class="bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 space-y-8">
+                                            <div class="flex items-center gap-4 mb-2">
+                                                <span class="text-xl">💰</span>
+                                                <div>
+                                                    <h4 class="text-xs font-black text-white uppercase tracking-widest leading-none">Placement Intelligence</h4>
+                                                    <p class="text-[9px] text-white/40 font-bold mt-1 italic">Optional but highly encouraged for peer verification (LPA)</p>
+                                                </div>
+                                            </div>
+                                            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                                                <div class="space-y-4">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Avg Package</label>
+                                                    <input type="number" step="0.1" name="average_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 7.5">
+                                                </div>
+                                                <div class="space-y-4">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Lowest Package</label>
+                                                    <input type="number" step="0.1" name="lowest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 3.5">
+                                                </div>
+                                                <div class="space-y-4">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Highest Package</label>
+                                                    <input type="number" step="0.1" name="highest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 24.0">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-4 md:space-y-5">
+                                            <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Experience Narrative</label>
+                                            <textarea name="comment" rows="4" class="w-full bg-white/5 border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white placeholder-white/20 focus:ring-2 focus:ring-primary outline-none text-base md:text-lg" placeholder="Describe the day-to-day..."></textarea>
+                                        </div>
+
+                                        @if(!Auth::user()->id_card_url)
+                                        <div class="space-y-6 bg-white/5 p-8 rounded-[2rem] border border-dashed border-white/10">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">🆔</div>
+                                                <div>
+                                                    <p class="text-xs font-black text-white uppercase tracking-widest">Identity Attestation Required</p>
+                                                    <p class="text-[10px] text-white/40 font-bold mt-1">Institutional reviews require a one-time ID card submission to prevent synthetic feedback.</p>
+                                                </div>
+                                            </div>
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div class="space-y-3">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Verification Number</label>
+                                                    <input type="text" name="verification_id" class="w-full bg-white/5 border border-white/5 rounded-xl py-4 px-6 text-white text-xs" placeholder="Roll No / Reg ID..." required>
+                                                </div>
+                                                <div class="space-y-3">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Upload ID Card Image</label>
+                                                    <input type="file" name="id_card_image" class="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-6 text-white text-[10px]" required>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @else
+                                        <input type="hidden" name="verification_id" value="PREVIOUSLY_VERIFIED">
+                                        <div class="flex items-center gap-4 bg-green-500/10 p-6 rounded-2xl border border-green-500/20">
+                                            <span class="text-2xl">✅</span>
+                                            <div>
+                                                <p class="text-xs font-black text-green-400 uppercase tracking-widest leading-none">Identity Verified</p>
+                                                <p class="text-[9px] text-green-400/60 font-medium mt-1">Your institutional credentials are on file. No further attestation needed.</p>
+                                            </div>
+                                        </div>
+                                        @endif
+
+                                        <div class="flex justify-end">
+                                            <button type="submit" class="w-full md:w-auto bg-white text-slate-900 px-12 h-16 md:h-20 rounded-2xl md:rounded-[2rem] font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-xl shadow-white/5">Publish Broadcast</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                         @else
-                        <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl">
-                            <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-                            <div class="relative z-10 space-y-10 md:space-y-12">
-                                <div class="flex flex-col md:flex-row justify-between items-start gap-6">
-                                    <div class="space-y-2 md:space-y-3">
-                                        <h3 class="text-2xl md:text-3xl font-black text-white">Campus Evaluation</h3>
-                                        <p class="text-slate-400 text-base md:text-lg">Contribute your authentic perspective.</p>
-                                    </div>
-                                    <div class="bg-primary/20 text-white px-5 py-2 rounded-xl border border-white/10 text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">🛡️ Verified Only</div>
-                                </div>
-
-                                <form action="{{ route('colleges.rate', $college->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-8 md:space-y-12">
-                                    @csrf
-                                    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-10">
-                                        @foreach(['campus' => 'Culture', 'faculty' => 'Faculty', 'academic' => 'Academic'] as $key => $l)
-                                        <div class="space-y-4 md:space-y-5">
-                                            <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">{{ $l }}</label>
-                                            <select name="{{ $key }}_rating" class="w-full bg-white/5 border border-white/10 rounded-2xl md:rounded-3xl py-4 md:py-5 px-6 md:px-8 text-white focus:ring-2 focus:ring-primary outline-none">
-                                                @foreach(range(5, 1) as $s)
-                                                <option value="{{ $s }}" class="bg-slate-900 text-white">{{ $s }} Starts</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        @endforeach
-                                    </div>
-
-                                    <!-- Placement Intelligence Inputs 💰 -->
-                                    <div class="bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 space-y-8">
-                                        <div class="flex items-center gap-4 mb-2">
-                                            <span class="text-xl">💰</span>
-                                            <div>
-                                                <h4 class="text-xs font-black text-white uppercase tracking-widest leading-none">Placement Intelligence</h4>
-                                                <p class="text-[9px] text-white/40 font-bold mt-1 italic">Optional but highly encouraged for peer verification (LPA)</p>
-                                            </div>
-                                        </div>
-                                        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                                            <div class="space-y-4">
-                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Avg Package</label>
-                                                <input type="number" step="0.1" name="average_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 7.5">
-                                            </div>
-                                            <div class="space-y-4">
-                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Lowest Package</label>
-                                                <input type="number" step="0.1" name="lowest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 3.5">
-                                            </div>
-                                            <div class="space-y-4">
-                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Highest Package</label>
-                                                <input type="number" step="0.1" name="highest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 24.0">
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="space-y-4 md:space-y-5">
-                                        <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Experience Narrative</label>
-                                        <textarea name="comment" rows="4" class="w-full bg-white/5 border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white placeholder-slate-600 focus:ring-2 focus:ring-primary outline-none text-base md:text-lg" placeholder="Describe the day-to-day..."></textarea>
-                                    </div>
-
-                                    @if(!Auth::user()->id_card_url)
-                                    <div class="space-y-6 bg-white/5 p-8 rounded-[2rem] border border-dashed border-white/10">
-                                        <div class="flex items-center gap-4">
-                                            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-xl">🆔</div>
-                                            <div>
-                                                <p class="text-xs font-black text-white uppercase tracking-widest">Identity Attestation Required</p>
-                                                <p class="text-[10px] text-white/40 font-bold mt-1">Institutional reviews require a one-time ID card submission to prevent synthetic feedback.</p>
-                                            </div>
-                                        </div>
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div class="space-y-3">
-                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Verification Number</label>
-                                                <input type="text" name="verification_id" class="w-full bg-white/5 border border-white/5 rounded-xl py-4 px-6 text-white text-xs" placeholder="Roll No / Reg ID..." required>
-                                            </div>
-                                            <div class="space-y-3">
-                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Upload ID Card Image</label>
-                                                <input type="file" name="id_card_image" class="w-full bg-white/5 border border-white/5 rounded-xl py-3 px-6 text-white text-[10px]" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    @else
-                                    <input type="hidden" name="verification_id" value="PREVIOUSLY_VERIFIED">
-                                    <div class="flex items-center gap-4 bg-green-500/10 p-6 rounded-2xl border border-green-500/20">
-                                        <span class="text-2xl">✅</span>
-                                        <div>
-                                            <p class="text-xs font-black text-green-400 uppercase tracking-widest leading-none">Identity Verified</p>
-                                            <p class="text-[9px] text-green-400/60 font-medium mt-1">Your institutional credentials are on file. No further attestation needed.</p>
-                                        </div>
-                                    </div>
-                                    @endif
-
-                                    <div class="flex justify-end">
-                                        <button type="submit" class="w-full md:w-auto bg-white text-slate-900 px-12 h-16 md:h-20 rounded-2xl md:rounded-[2rem] font-black text-[10px] md:text-[11px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-xl shadow-white/5">Publish Broadcast</button>
-                                    </div>
-                                </form>
-                            </div>
                         </div>
                         @endif
                         @else

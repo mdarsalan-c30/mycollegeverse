@@ -82,4 +82,43 @@ class College extends Model
             'has_data' => true
         ];
     }
+
+    /**
+     * Council Intelligence Hub 🛡️
+     * Aggregates diverse rating signals into normalized percentages.
+     */
+    public function getAcademicMetricsAttribute()
+    {
+        $approvedReviews = $this->reviews()->where('status', 'approved');
+        
+        if ($approvedReviews->count() === 0) {
+            return [
+                ['label' => 'Campus Culture', 'percent' => 0, 'text' => 'Awaiting Hub Intel'],
+                ['label' => 'Faculty Quality', 'percent' => 0, 'text' => 'N/A'],
+                ['label' => 'Academic Rigor', 'percent' => 0, 'text' => '---']
+            ];
+        }
+
+        $campus = $approvedReviews->avg('campus_rating');
+        $faculty = $approvedReviews->avg('faculty_rating');
+        $academic = $approvedReviews->avg('academic_rating');
+
+        return [
+            [
+                'label' => 'Campus Culture', 
+                'percent' => ($campus / 5) * 100, 
+                'text' => number_format($campus, 1) . ' / 5.0'
+            ],
+            [
+                'label' => 'Faculty Quality', 
+                'percent' => ($faculty / 5) * 100, 
+                'text' => number_format($faculty, 1) . ' / 5.0'
+            ],
+            [
+                'label' => 'Academic Rigor', 
+                'percent' => ($academic / 5) * 100, 
+                'text' => number_format($academic, 1) . ' / 5.0'
+            ]
+        ];
+    }
 }
