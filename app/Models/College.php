@@ -12,7 +12,11 @@ class College extends Model
     protected $fillable = [
         'name',
         'slug',
+        'type',
+        'streams',
         'location',
+        'state',
+        'city',
         'description',
         'thumbnail_url',
         'student_count',
@@ -22,11 +26,53 @@ class College extends Model
 
     protected $casts = [
         'tags' => 'array',
+        'streams' => 'array',
     ];
 
     public function getRouteKeyName()
     {
         return 'slug';
+    }
+
+    /**
+     * Institutional Identity Hub 🛡️
+     * Returns the dynamic average rating or a recruitment status.
+     */
+    public function getAverageRatingAttribute()
+    {
+        $approvedReviews = $this->reviews()->where('status', 'approved');
+        
+        if ($approvedReviews->count() === 0) {
+            return "Yet to Review";
+        }
+
+        $campus = $approvedReviews->avg('campus_rating');
+        $faculty = $approvedReviews->avg('faculty_rating');
+        $academic = $approvedReviews->avg('academic_rating');
+
+        return round(($campus + $faculty + $academic) / 3, 1);
+    }
+
+    /**
+     * Rating Synchronizer 🛰️
+     * Updates the cached 'rating' column for high-performance listing.
+     */
+    public function syncRating()
+    {
+        $approvedReviews = $this->reviews()->where('status', 'approved');
+        
+        if ($approvedReviews->count() === 0) {
+            $this->update(['rating' => 0.0]);
+            return;
+        }
+
+        $campus = $approvedReviews->avg('campus_rating');
+        $faculty = $approvedReviews->avg('faculty_rating');
+        $academic = $approvedReviews->avg('academic_rating');
+
+        $avg = round(($campus + $faculty + $academic) / 3, 1);
+        
+        $this->update(['rating' => $avg]);
     }
 
     public function reviews()

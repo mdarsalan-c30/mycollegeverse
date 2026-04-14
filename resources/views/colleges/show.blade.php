@@ -150,9 +150,16 @@
                                     <span class="text-sm md:text-xl">📍</span> {{ Str::limit($college->location, 20) }}
                                 </span>
                                 <span class="text-white/30">•</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="text-amber-400 text-sm md:text-xl">⭐</span>
-                                    <span class="text-white font-black text-sm md:text-lg">{{ number_format($college->reviews->avg('rating') ?: 4.8, 1) }}</span>
+                                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20">
+                                    <span class="text-amber-400 text-sm md:text-xl shrink-0">⭐</span>
+                                    @php $avg = $college->average_rating; @endphp
+                                    <span @class([
+                                        'text-white font-black leading-none',
+                                        'text-sm md:text-lg' => is_numeric($avg),
+                                        'text-[8px] md:text-[10px] uppercase tracking-widest' => !is_numeric($avg)
+                                    ])>
+                                        {{ is_numeric($avg) ? number_format($avg, 1) : $avg }}
+                                    </span>
                                 </div>
                             </div>
                         </div>

@@ -338,17 +338,36 @@
 
             <div class="flex gap-6 overflow-x-auto pb-8 hide-scrollbar snap-x snap-mandatory">
                 @foreach ($topColleges as $college)
-                <a href="{{ route('colleges.show', $college->slug) }}" class="snap-start min-w-[280px] group">
-                    <div class="glass p-6 rounded-[2rem] border-white/50 hover:bg-white transition-all hover:shadow-xl shadow-glass flex flex-col gap-4">
+                <a href="{{ route('colleges.show', $college->slug) }}" class="snap-start min-w-[300px] group">
+                    <div class="glass p-8 rounded-[2.5rem] border-white/50 hover:bg-white transition-all hover:shadow-xl shadow-glass flex flex-col gap-5 relative overflow-hidden h-full">
+                        {{-- Advanced Rating Badge 📡 --}}
+                        @php $avg = $college->average_rating; @endphp
+                        <div @class([
+                            'absolute top-4 right-4 backdrop-blur-2xl border border-white/20 text-white px-3 py-1.5 flex flex-col items-center justify-center rounded-2xl min-w-[3rem] z-10',
+                            'bg-emerald-500/40' => is_numeric($avg) && $avg >= 4,
+                            'bg-indigo-500/40' => is_numeric($avg) && $avg < 4,
+                            'bg-slate-500/40 italic' => !is_numeric($avg)
+                        ])>
+                            @if(is_numeric($avg))
+                                <span class="text-xs font-black leading-none">{{ number_format($avg, 1) }}</span>
+                                <span class="text-[7px] font-black uppercase tracking-tighter mt-0.5">Rating</span>
+                            @else
+                                <span class="text-[8px] font-black uppercase leading-tight text-center">{{ $avg }}</span>
+                            @endif
+                        </div>
+
                         <div class="w-14 h-14 rounded-2xl bg-primary/5 flex items-center justify-center text-primary text-2xl group-hover:scale-110 transition-transform">
                             🏫
                         </div>
-                        <div>
-                            <h4 class="font-black text-slate-800 group-hover:text-primary transition-colors truncate">{{ $college->name }}</h4>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{{ $college->posts_count }} Active Discussions</p>
+                        <div class="flex-1">
+                            <h4 class="font-black text-slate-800 group-hover:text-primary transition-colors text-lg leading-tight">{{ $college->name }}</h4>
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">📍 {{ $college->city ?? $college->location }}</span>
+                            </div>
+                            <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-2">{{ number_format($college->posts_count) }} Active Nodes</p>
                         </div>
                         <div class="flex items-center justify-between mt-2 pt-4 border-t border-slate-50">
-                            <span class="text-[10px] font-black text-primary uppercase">Enter Hub</span>
+                            <span class="text-[10px] font-black text-primary uppercase tracking-widest">Enter Hub Verse</span>
                             <div class="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:translate-x-1 transition-transform">
                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
                             </div>

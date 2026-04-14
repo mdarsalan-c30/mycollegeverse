@@ -36,6 +36,10 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name',
+            'type' => 'nullable|string',
+            'streams' => 'nullable|array',
+            'state' => 'nullable|string',
+            'city' => 'nullable|string',
             'location' => 'required|string',
             'description' => 'required|string',
             'thumbnail_url' => 'nullable|url',
@@ -45,6 +49,10 @@ class CollegeController extends Controller
         $college = College::create([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'type' => $request->type,
+            'streams' => $request->streams ?? [],
+            'state' => $request->state,
+            'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
             'thumbnail_url' => $request->thumbnail_url ?? 'https://via.placeholder.com/300?text=MCV+Node',
@@ -66,6 +74,7 @@ class CollegeController extends Controller
 
     /**
      * Massive Institutional Injection (Bulk Import) 🚀
+     * Format: Name | Type | Streams | State | City | Location | Description | LogoURL | Tags
      */
     public function import(Request $request)
     {
@@ -78,70 +87,72 @@ class CollegeController extends Controller
         $importCount = 0;
         $skipCount = 0;
 
-        // Method 1: CSV Upload 📄
-        if ($request->hasFile('import_file')) {
-            if (($handle = fopen($request->file('import_file')->getRealPath(), "r")) !== FALSE) {
-                $header = fgetcsv($handle, 1000, ","); 
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    $rows[] = $data;
-                }
-                fclose($handle);
-            }
-        } 
-        // Method 2: Text/AI Paste 🤖 (Multiple delimiter support)
-        elseif ($request->filled('paste_data')) {
-            $lines = explode("\n", str_replace("\r", "", $request->paste_data));
-            foreach ($lines as $line) {
-                if (trim($line)) {
-                    // Support |, \t, or simple comma
-                    if (str_contains($line, '|')) {
-                        $data = explode('|', $line);
-                    } elseif (str_contains($line, "\t")) {
-                        $data = explode("\t", $line);
-                    } else {
-                        $data = str_getcsv($line); // Fallback to standard CSV line parsing
+        try {
+            // Method 1: CSV Upload 📄
+            if ($request->hasFile('import_file')) {
+                if (($handle = fopen($request->file('import_file')->getRealPath(), "r")) !== FALSE) {
+                    $header = fgetcsv($handle, 1000, ","); 
+                    while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                        $rows[] = $data;
                     }
-                    $rows[] = array_map('trim', $data);
+                    fclose($handle);
+                }
+            } 
+            // Method 2: Text/AI Paste 🤖
+            elseif ($request->filled('paste_data')) {
+                $lines = explode("\n", str_replace("\r", "", $request->paste_data));
+                foreach ($lines as $line) {
+                    if (trim($line)) {
+                        if (str_contains($line, '|')) {
+                            $data = explode('|', $line);
+                        } elseif (str_contains($line, "\t")) {
+                            $data = explode("\t", $line);
+                        } else {
+                            $data = str_getcsv($line);
+                        }
+                        $rows[] = array_map('trim', $data);
+                    }
                 }
             }
-        }
 
-        foreach ($rows as $row) {
-            if (count($row) >= 2) {
-                $name = $row[0];
-                if (!College::where('name', $name)->exists()) {
-                    College::create([
-                        'name' => $name,
-                        'slug' => Str::slug($name),
-                        'location' => $row[1] ?? 'Unknown Node',
-                        'description' => $row[2] ?? 'Academic expansion in progress.',
-                        'thumbnail_url' => $row[3] ?? 'https://via.placeholder.com/300?text=MCV+Node',
-                        'tags' => isset($row[4]) ? array_map('trim', explode(',', $row[4])) : ['General'],
-                        'student_count' => 0,
-                        'rating' => 5.0,
-                    ]);
-                    $importCount++;
-                } else {
-                    $skipCount++;
+            foreach ($rows as $row) {
+                if (count($row) >= 1) {
+                    $name = $row[0];
+                    if (!College::where('name', $name)->exists()) {
+                        College::create([
+                            'name' => $name,
+                            'slug' => Str::slug($name),
+                            'type' => $row[1] ?? 'Private',
+                            'streams' => isset($row[2]) ? array_map('trim', explode(',', $row[2])) : ['General'],
+                            'state' => $row[3] ?? 'Unknown',
+                            'city' => $row[4] ?? 'Unknown',
+                            'location' => $row[5] ?? ($row[4] ?? 'Unknown Node'),
+                            'description' => $row[6] ?? 'Academic expansion in progress.',
+                            'thumbnail_url' => $row[7] ?? 'https://via.placeholder.com/300?text=MCV+Node',
+                            'tags' => isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'],
+                            'student_count' => 0,
+                            'rating' => 5.0,
+                        ]);
+                        $importCount++;
+                    } else {
+                        $skipCount++;
+                    }
                 }
             }
+
+            ApprovalLog::create([
+                'admin_id' => Auth::id(),
+                'action' => 'bulk_college_import',
+                'target_type' => 'System',
+                'target_id' => 0,
+                'metadata' => ['success' => $importCount, 'skipped' => $skipCount],
+            ]);
+
+            return back()->with('success', "Institutional Flux Complete: {$importCount} nodes established.");
+
+        } catch (\Exception $e) {
+            return back()->with('error', "Injection Failed: " . $e->getMessage());
         }
-
-        ApprovalLog::create([
-            'admin_id' => Auth::id(),
-            'action' => 'bulk_college_import',
-            'target_type' => 'System',
-            'target_id' => 0,
-            'metadata' => [
-                'success' => $importCount,
-                'skipped' => $skipCount,
-            ],
-        ]);
-
-        $message = "Institutional Flux Complete: {$importCount} nodes established.";
-        if ($skipCount > 0) $message .= " ({$skipCount} existing nodes skipped).";
-
-        return back()->with('success', $message);
     }
 
     /**
@@ -151,17 +162,25 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name,' . $college->id,
+            'type' => 'nullable|string',
+            'streams' => 'nullable|array',
+            'state' => 'nullable|string',
+            'city' => 'nullable|string',
             'location' => 'required|string',
             'description' => 'required|string',
             'thumbnail_url' => 'nullable|url',
             'tags' => 'nullable|string',
         ]);
 
-        $oldData = $college->only(['name', 'location', 'description', 'thumbnail_url', 'tags']);
+        $oldData = $college->toArray();
         
         $college->update([
             'name' => $request->name,
             'slug' => Str::slug($request->name),
+            'type' => $request->type,
+            'streams' => $request->streams ?? [],
+            'state' => $request->state,
+            'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
             'thumbnail_url' => $request->thumbnail_url,
@@ -175,7 +194,7 @@ class CollegeController extends Controller
             'target_id' => $college->id,
             'metadata' => [
                 'old' => $oldData,
-                'new' => $college->only(['name', 'location', 'description', 'thumbnail_url', 'tags']),
+                'new' => $college->toArray(),
             ],
         ]);
 

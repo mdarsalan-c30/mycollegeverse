@@ -52,6 +52,15 @@ class ReviewController extends Controller
         
         $review->update(['status' => 'approved']);
 
+        // Synchronize Rating 🛰️
+        try {
+            if ($review->college) {
+                $review->college->syncRating();
+            }
+        } catch (\Exception $e) {
+            // Log but don't fail approval
+        }
+
         // Audit Logging 🛡️
         ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
@@ -78,6 +87,8 @@ class ReviewController extends Controller
             ? optional($review->professor)->name ?? 'Legacy Advisor'
             : optional($review->college)->name ?? 'Legacy Institution';
         
+        $collegeToSync = ($type === 'college') ? $review->college : null;
+
         // Log before deletion
         // Audit Logging 🛡️
         ApprovalLog::safeCreate([
@@ -93,6 +104,15 @@ class ReviewController extends Controller
         ]);
 
         $review->delete();
+
+        // Re-sync rating after deletion 🛰️
+        try {
+            if ($collegeToSync) {
+                $collegeToSync->syncRating();
+            }
+        } catch (\Exception $e) {
+            // Log but don't fail
+        }
 
         return back()->with('success', "Feedback node for '{$targetName}' has been dissolved.");
     }

@@ -12,12 +12,42 @@ use Illuminate\Support\Facades\Auth;
 
 class CollegeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $colleges = College::withCount(['notes', 'professors', 'users'])->get();
+        $query = College::withCount(['notes', 'professors', 'users']);
+
+        // Horizontal Filtering Logic 🛰️
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('location', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('type')) {
+            $query->where('type', $request->get('type'));
+        }
+
+        if ($request->filled('stream')) {
+            $query->whereJsonContains('streams', $request->get('stream'));
+        }
+
+        if ($request->filled('state')) {
+            $query->where('state', $request->get('state'));
+        }
+
+        if ($request->filled('rating')) {
+            $query->where('rating', '>=', $request->get('rating'));
+        }
+
+        $colleges = $query->get();
+
         $myPendingRequest = Auth::check()
             ? CollegeRequest::where('user_id', Auth::id())->where('status', 'pending')->first()
             : null;
+
         return view('colleges.index', compact('colleges', 'myPendingRequest'));
     }
 
