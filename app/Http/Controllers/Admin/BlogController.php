@@ -21,8 +21,14 @@ class BlogController extends Controller
 
     public function index()
     {
-        $blogs = Blog::with('author')->latest()->paginate(10);
-        return view('admin.blogs.index', compact('blogs'));
+        try {
+            $blogs = Blog::with('author')->latest()->paginate(10);
+            return view('admin.blogs.index', compact('blogs'));
+        } catch (\Exception $e) {
+            \Log::error("Editorial Hub Error: " . $e->getMessage());
+            $blogs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
+            return view('admin.blogs.index', compact('blogs'))->with('error', 'Multiverse connection unstable. Displaying emergency recovery view.');
+        }
     }
 
     public function create()

@@ -43,11 +43,7 @@
             </a>
             
             <div class="p-8 flex-1 flex flex-col">
-                <div class="flex items-center gap-3 mb-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
-                    <span>{{ $blog->published_at->format('M d, Y') }}</span>
-                    <span class="w-1 h-1 bg-slate-200 rounded-full"></span>
-                    <span>{{ ceil(str_word_count(strip_tags($blog->content)) / 200) }} MIN READ</span>
-                </div>
+                <p class="text-[10px] font-black tracking-widest text-slate-400 mb-2">{{ optional($blog->author)->name ?? 'Multiverse Member' }} · {{ optional($blog->published_at)->format('M d, Y') ?? 'Luminated' }}</p>
                 
                 <h2 class="text-xl font-bold text-slate-900 leading-tight mb-4 group-hover:text-primary transition-colors">
                     <a href="{{ route('blogs.show', $blog->slug) }}">{{ $blog->title }}</a>
@@ -58,11 +54,14 @@
                 </p>
                 
                 <div class="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
+                    <span class="text-[9px] font-black tracking-widest text-primary uppercase bg-primary/5 px-3 py-1.5 rounded-full">
+                        {{ ceil(str_word_count(strip_tags($blog->content ?? '')) / 200) }} MIN READ
+                    </span>
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs">
-                            {{ substr($blog->author->name, 0, 1) }}
+                            {{ substr(optional($blog->author)->name ?? 'M', 0, 1) }}
                         </div>
-                        <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">{{ $blog->author->name }}</span>
+                        <span class="text-[10px] font-black text-slate-900 uppercase tracking-widest">{{ optional($blog->author)->name ?? 'N/A' }}</span>
                     </div>
                 </div>
             </div>

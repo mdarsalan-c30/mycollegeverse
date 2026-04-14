@@ -13,12 +13,18 @@ class BlogController extends Controller
      */
     public function index()
     {
-        $blogs = Blog::where('is_published', true)
-            ->with('author')
-            ->latest('published_at')
-            ->paginate(9);
+        try {
+            $blogs = Blog::where('is_published', true)
+                ->with('author')
+                ->latest('published_at')
+                ->paginate(9);
 
-        return view('blogs.index', compact('blogs'));
+            return view('blogs.index', compact('blogs'));
+        } catch (\Exception $e) {
+            \Log::error("Blog Index Error: " . $e->getMessage());
+            $blogs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 9);
+            return view('blogs.index', compact('blogs'));
+        }
     }
 
     /**
@@ -26,29 +32,34 @@ class BlogController extends Controller
      */
     public function show($slug)
     {
-        $blog = Blog::where('slug', $slug)
-            ->where('is_published', true)
-            ->with(['author', 'comments.user'])
-            ->firstOrFail();
+        try {
+            $blog = Blog::where('slug', $slug)
+                ->where('is_published', true)
+                ->with(['author', 'comments.user'])
+                ->firstOrFail();
 
-        // Register Multiverse View 🛰️
-        $blog->increment('views');
+            // Register Multiverse View 🛰️
+            $blog->increment('views');
 
-        // Logic for Institutional Mapping (Recommended Colleges) 🧬
-        $recommendedColleges = collect();
-        
-        if ($blog->auto_recommend_colleges) {
-            // Auto-pilot: Fetch colleges based on keywords or general global priority
-            // For now, we fetch top rated colleges as a high-value default
-            $recommendedColleges = College::withCount('reviews')
-                ->orderBy('rating', 'desc')
-                ->take(6)
-                ->get();
-        } else {
-            // Manual: Use explicitly picked colleges
-            $recommendedColleges = $blog->colleges();
+            // Logic for Institutional Mapping (Recommended Colleges) 🧬
+            $recommendedColleges = collect();
+            
+            if ($blog->auto_recommend_colleges) {
+                // Auto-pilot: Fetch colleges based on keywords or general global priority
+                // For now, we fetch top rated colleges as a high-value default
+                $recommendedColleges = College::withCount('reviews')
+                    ->orderBy('rating', 'desc')
+                    ->take(6)
+                    ->get();
+            } else {
+                // Manual: Use explicitly picked colleges
+                $recommendedColleges = $blog->colleges();
+            }
+
+            return view('blogs.show', compact('blog', 'recommendedColleges'));
+        } catch (\Exception $e) {
+            \Log::error("Blog Show Error: " . $e->getMessage());
+            abort(404, "Article node lost in the multiverse transition.");
         }
-
-        return view('blogs.show', compact('blog', 'recommendedColleges'));
     }
 }

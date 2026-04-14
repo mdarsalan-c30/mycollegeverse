@@ -19,12 +19,12 @@
     <!-- Analytics Pulse -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Insights</p>
-            <h3 class="text-3xl font-black text-secondary">{{ $blogs->total() }} Articles</h3>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Avg SEO Health</p>
+            <h3 class="text-3xl font-black text-emerald-500">{{ round($blogs->getCollection()->avg('seo_score') ?? 0) }}%</h3>
         </div>
         <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
-            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Avg SEO Health</p>
-            <h3 class="text-3xl font-black text-emerald-500">{{ round($blogs->avg('seo_score')) }}%</h3>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Insights</p>
+            <h3 class="text-3xl font-black text-secondary">{{ $blogs->total() }} Articles</h3>
         </div>
         <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Multiverse Views</p>
@@ -59,7 +59,7 @@
                             </div>
                             <div>
                                 <h4 class="font-black text-secondary text-sm group-hover:text-admin-primary transition-colors">{{ $blog->title }}</h4>
-                                <p class="text-[10px] font-bold text-slate-400 mt-1 italic">{{ $blog->author->name }} · {{ $blog->created_at->format('M d, Y') }}</p>
+                                <p class="text-[10px] font-bold text-slate-400 mt-1 italic">{{ optional($blog->author)->name ?? 'System Archon' }} · {{ optional($blog->created_at)->format('M d, Y') ?? 'Eternal' }}</p>
                             </div>
                         </div>
                     </td>
