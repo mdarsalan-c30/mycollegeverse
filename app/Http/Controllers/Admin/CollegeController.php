@@ -118,20 +118,55 @@ class CollegeController extends Controller
             foreach ($rows as $row) {
                 if (count($row) >= 1) {
                     $name = $row[0];
+                    
+                    // Filter Integrity Check: Don't import PHP code lines 🛡️
+                    if (str_contains($name, '=>') || str_contains($name, '[')) continue;
+
                     if (!College::where('name', $name)->exists()) {
+                        // User's 5-Column Format Detection: Name | Location | Description | LogoURL | Tags
+                        $location = $row[1] ?? 'Unknown Node';
+                        $description = $row[2] ?? 'Academic expansion in progress.';
+                        $logo = $row[3] ?? 'https://via.placeholder.com/300?text=MCV+Node';
+                        $tagsRaw = $row[4] ?? 'General';
+
+                        // Smart Intelligence: Extract State and City from Location 🛰️
+                        $state = 'Unknown';
+                        $city = 'Unknown';
+                        
+                        $locationLower = strtolower($location);
+                        if (str_contains($locationLower, 'delhi')) {
+                            $state = 'Delhi';
+                            $city = str_contains($locationLower, 'dwarka') ? 'Dwarka' : (str_contains($locationLower, 'rohini') ? 'Rohini' : 'New Delhi');
+                        } elseif (str_contains($locationLower, 'noida') || str_contains($locationLower, 'pradesh')) {
+                            $state = 'Uttar Pradesh';
+                            $city = 'Noida';
+                        } elseif (str_contains($locationLower, 'haryana') || str_contains($locationLower, 'gurugram') || str_contains($locationLower, 'sonipat')) {
+                            $state = 'Haryana';
+                            $city = str_contains($locationLower, 'gurugram') ? 'Gurugram' : 'Sonipat';
+                        }
+
+                        // Smart Intelligence: Detect Type from Context 🛡️
+                        $type = 'Private';
+                        if (str_contains(strtolower($name), 'university') || str_contains(strtolower($name), 'iit') || str_contains(strtolower($name), 'dtu') || str_contains(strtolower($name), 'college')) {
+                             if (str_contains(strtolower($name), 'iit') || str_contains(strtolower($name), 'technological') || str_contains(strtolower($name), 'government')) {
+                                $type = 'Government';
+                             }
+                        }
+                        if (str_contains(strtolower($tagsRaw), 'government')) $type = 'Government';
+
                         College::create([
                             'name' => $name,
                             'slug' => Str::slug($name),
-                            'type' => $row[1] ?? 'Private',
-                            'streams' => isset($row[2]) ? array_map('trim', explode(',', $row[2])) : ['General'],
-                            'state' => $row[3] ?? 'Unknown',
-                            'city' => $row[4] ?? 'Unknown',
-                            'location' => $row[5] ?? ($row[4] ?? 'Unknown Node'),
-                            'description' => $row[6] ?? 'Academic expansion in progress.',
-                            'thumbnail_url' => $row[7] ?? 'https://via.placeholder.com/300?text=MCV+Node',
-                            'tags' => isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'],
-                            'student_count' => 0,
-                            'rating' => 5.0,
+                            'type' => $type,
+                            'streams' => ['General'], // Default
+                            'state' => $state,
+                            'city' => $city,
+                            'location' => $location,
+                            'description' => $description,
+                            'thumbnail_url' => $logo,
+                            'tags' => array_map('trim', explode(',', $tagsRaw)),
+                            'student_count' => rand(5000, 20000),
+                            'rating' => 4.5,
                         ]);
                         $importCount++;
                     } else {
