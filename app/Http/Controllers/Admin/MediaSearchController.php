@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
- Ame;
 use App\Http\Controllers\Controller;
 use App\Models\College;
 use Illuminate\Http\Request;
@@ -12,7 +11,8 @@ use Illuminate\Support\Facades\Cache;
 class MediaSearchController extends Controller
 {
     /**
-     * Search WikiMedia Commons for Institutional Identity.
+     * Hyper-Discovery Search for Institutional Identity.
+     * Uses Wikipedia 'PageImages' for official campus visuals.
      */
     public function search(Request $request)
     {
@@ -20,70 +20,76 @@ class MediaSearchController extends Controller
         
         if (empty($query)) return response()->json([]);
 
-        // Strip "University" or "College" common suffixes for broader search if needed
-        $cleanQuery = trim(preg_replace('/\b(University|College|Institute|of|In)\b/i', '', $query));
+        // Clear previous "empty" cache to force deep scan 🛰️
+        Cache::forget('wiki_search_' . md5($query));
 
-        return Cache::remember('wiki_search_' . md5($query), 3600, function() use ($query, $cleanQuery) {
-            try {
-                // Strategy: Search for Name + Keywords for better campus architecture results 🗺️
-                $searchTerms = [
-                    $query,
-                    $query . " Building",
-                    $query . " Campus",
-                    $cleanQuery . " University",
-                ];
+        return Cache::remember('wiki_search_' . md5($query), 3600, function() use ($query) {
+            $results = [];
 
-                $results = [];
+            // Stage 1: Search Wikipedia (Official Lead Images) 🏛️
+            $results = array_merge($results, $this->fetchFromWiki('en.wikipedia.org', $query));
 
-                foreach ($searchTerms as $term) {
-                    $response = Http::withUserAgent('MyCollegeVerse/1.0 (contact@mycollegeverse.in)')
-                        ->get('https://commons.wikimedia.org/w/api.php', [
-                            'action' => 'query',
-                            'format' => 'json',
-                            'generator' => 'search',
-                            'gsrsearch' => $term,
-                            'gsrnamespace' => 6, // File namespace
-                            'gsrlimit' => 5,
-                            'prop' => 'imageinfo',
-                            'iiprop' => 'url|size|mime',
-                            'iiurlwidth' => 800,
-                        ]);
-
-                    if ($response->successful()) {
-                        $pages = $response->json('query.pages', []);
-                        foreach ($pages as $page) {
-                            if (isset($page['imageinfo'][0])) {
-                                $info = $page['imageinfo'][0];
-                                if (isset($info['url']) && str_contains($info['mime'], 'image/')) {
-                                    $results[] = [
-                                        'title' => $page['title'],
-                                        'url' => $info['url'],
-                                        'thumb' => $info['thumburl'] ?? $info['url'],
-                                    ];
-                                }
-                            }
-                        }
-                    }
-
-                    // If we have 3+ good results, stop searching broader terms 🛡️
-                    if (count($results) >= 3) break;
-                }
-
-                // De-duplicate results by URL 🛰️
-                $uniqueResults = [];
-                $seenUrls = [];
-                foreach ($results as $item) {
-                    if (!in_array($item['url'], $seenUrls)) {
-                        $uniqueResults[] = $item;
-                        $seenUrls[] = $item['url'];
-                    }
-                }
-
-                return $uniqueResults;
-            } catch (\Exception $e) {
-                return [];
+            // Stage 2: Search Wikimedia Commons (Campus Photography) 🏢
+            if (count($results) < 3) {
+                $results = array_merge($results, $this->fetchFromWiki('commons.wikimedia.org', $query));
             }
+
+            return collect($results)->unique('url')->values()->all();
         });
+    }
+
+    /**
+     * High-Fidelity Wiki Fetch Utility.
+     */
+    private function fetchFromWiki($domain, $query)
+    {
+        try {
+            // Step A: Locate the Page Identity 🛡️
+            $searchResponse = Http::withUserAgent('MyCollegeVerse/1.0 (contact@mycollegeverse.in)')
+                ->get("https://{$domain}/w/api.php", [
+                    'action' => 'query',
+                    'list' => 'search',
+                    'srsearch' => $query,
+                    'srlimit' => 5,
+                    'format' => 'json'
+                ]);
+
+            if ($searchResponse->failed()) return [];
+
+            $searchData = $searchResponse->json('query.search', []);
+            $results = [];
+
+            foreach ($searchData as $searchItem) {
+                $title = $searchItem['title'];
+
+                // Step B: Extract Representative 'PageImage' 🛰️
+                $imageResponse = Http::withUserAgent('MyCollegeVerse/1.0 (contact@mycollegeverse.in)')
+                    ->get("https://{$domain}/w/api.php", [
+                        'action' => 'query',
+                        'format' => 'json',
+                        'titles' => $title,
+                        'prop' => 'pageimages|imageinfo',
+                        'pithumbsize' => 1000, // High-fidelity 4K-ish thumbnails
+                        'iiprop' => 'url',
+                    ]);
+
+                $pages = $imageResponse->json('query.pages', []);
+                foreach ($pages as $page) {
+                    if (isset($page['thumbnail'])) {
+                        $results[] = [
+                            'title' => $title,
+                            'url' => $page['thumbnail']['source'],
+                            'thumb' => $page['thumbnail']['source'],
+                            'source' => $domain
+                        ];
+                    }
+                }
+            }
+
+            return $results;
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     /**
