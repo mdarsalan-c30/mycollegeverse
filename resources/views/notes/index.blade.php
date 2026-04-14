@@ -8,6 +8,7 @@
         activeCourse: '{{ request('course_id', 'All') }}',
         activeSemester: '{{ request('semester', 'All') }}',
         showVerifiedOnly: {{ request('is_verified') ? 'true' : 'false' }},
+        examTrusted: {{ request('exam_trusted') ? 'true' : 'false' }},
 
         // For Upload Modal
         uploadStep: 1,
@@ -86,9 +87,20 @@
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Verified</label>
                 <input type="hidden" name="is_verified" :value="showVerifiedOnly ? '1' : ''">
                 <button type="button" @click="showVerifiedOnly = !showVerifiedOnly; submitFilters();" 
-                        :class="showVerifiedOnly ? 'bg-emerald-500 text-white' : 'bg-slate-100 text-slate-400'"
+                        :class="showVerifiedOnly ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20' : 'bg-slate-100 text-slate-400'"
                         class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                     🛡️ <span class="ml-1" x-text="showVerifiedOnly ? 'ON' : 'OFF'"></span>
+                </button>
+            </div>
+
+            <!-- Exam Trusted Toggle 🚀 (MVP Peak) -->
+            <div class="flex flex-col items-center">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Exam Trusted</label>
+                <input type="hidden" name="exam_trusted" :value="examTrusted ? '1' : ''">
+                <button type="button" @click="examTrusted = !examTrusted; submitFilters();" 
+                        :class="examTrusted ? 'bg-amber-400 text-white shadow-lg shadow-amber-400/20 scale-105' : 'bg-slate-100 text-slate-400'"
+                        class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    🚀 <span class="ml-1" x-text="examTrusted ? 'ON' : 'OFF'"></span>
                 </button>
             </div>
         </form>
@@ -218,10 +230,19 @@
                                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Subject Node</label>
                                     <select name="subject_id" x-model="selectedSubject" :disabled="!selectedCourse || !selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 disabled:opacity-50 transition-opacity">
                                         <option value="">Select Subject</option>
+                                        <option value="other" class="text-primary font-black">Other / Custom Subject ✍️</option>
                                         <template x-for="subject in filteredSubjects" :key="subject.id">
                                             <option :value="subject.id" x-text="subject.name"></option>
                                         </template>
                                     </select>
+                                </div>
+
+                                <!-- Custom Subject Input Node ✍️ -->
+                                <div x-show="selectedSubject === 'other'" x-transition class="bg-primary/5 p-6 rounded-[2rem] border border-primary/10">
+                                    <label class="block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 italic">Custom Subject Name</label>
+                                    <input type="text" name="custom_subject" placeholder="Enter full subject name..." 
+                                           class="w-full h-14 bg-white border-white/50 rounded-2xl px-6 text-sm font-bold focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
+                                    <p class="text-[10px] text-slate-400 mt-3 font-medium px-1 leading-relaxed">Ensure accuracy—this helps peers from your college discover your insights! 🛰️</p>
                                 </div>
 
                                 <button type="button" 

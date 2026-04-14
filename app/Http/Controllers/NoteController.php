@@ -22,12 +22,19 @@ class NoteController extends Controller
             $search = $request->get('search');
             $query->where(function($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('custom_subject', 'like', "%{$search}%")
                   ->orWhereHas('subject', function($sq) use ($search) {
                       $sq->where('name', 'like', "%{$search}%");
                   })
                   ->orWhereHas('college', function($cq) use ($search) {
                       $cq->where('name', 'like', "%{$search}%");
                   });
+            });
+        }
+
+        if ($request->boolean('exam_trusted')) {
+            $query->whereHas('reviews', function($q) {
+                $q->where('helped_in_exam', true);
             });
         }
 
@@ -140,12 +147,18 @@ class NoteController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_id' => 'required',
+            'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
             'file' => 'required|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
         ], [
             'file.max' => 'The file is too large! Maximum allowed is 10MB.',
             'file.mimes' => 'Unsupported file format! Please use PDF, DOC, or common images.',
+            'custom_subject.required_if' => 'Please provide the custom subject name.',
         ]);
+
+        if ($request->subject_id !== 'other') {
+            $request->validate(['subject_id' => 'exists:subjects,id']);
+        }
 
         try {
             $file = $request->file('file');
@@ -175,10 +188,11 @@ class NoteController extends Controller
 
             Note::create([
                 'title' => $request->title,
-                'file_path' => $secureUrl, // Save the cloud URL
+                'file_path' => $secureUrl,
                 'user_id' => Auth::id(),
                 'college_id' => $college_id,
-                'subject_id' => $request->subject_id,
+                'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
+                'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
             ]);
 
             return redirect()->route('notes.index')->with('success', 'Note shared successfully with the verse!');

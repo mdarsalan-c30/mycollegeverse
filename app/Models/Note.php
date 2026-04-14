@@ -16,6 +16,7 @@ class Note extends Model
         'user_id',
         'college_id',
         'subject_id',
+        'custom_subject',
         'is_verified',
     ];
 
@@ -71,9 +72,9 @@ class Note extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class)->withDefault([
-            'name' => 'General Topic'
-        ]);
+        return $this->belongsTo(Subject::class)->withDefault(function ($subject, $note) {
+            $subject->name = $note->custom_subject ?? 'General Topic';
+        });
     }
 
     public function comments()
