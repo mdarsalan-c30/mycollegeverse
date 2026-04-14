@@ -29,6 +29,29 @@ class College extends Model
         'streams' => 'array',
     ];
 
+    /**
+     * Aesthetic Resilience Hub 🛰️
+     * Returns a premium academic visual if the database link is missing.
+     */
+    public function getThumbnailUrlAttribute($value)
+    {
+        if (!empty($value) && !str_contains($value, 'placeholder.com')) {
+            return $value;
+        }
+
+        // Curated "Multiverse Aesthetic" Fallback nodes
+        $fallbacks = [
+            'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1523050853064-8504f2f40058?q=80&w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1621640100002-4c99b2446713?q=80&w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1541829070764-84a7d30dee6b?q=80&w=800&auto=format&fit=crop',
+        ];
+
+        // Seeding the random selection with the college id for consistency 🌌
+        return $fallbacks[$this->id % count($fallbacks)];
+    }
+
     public function getRouteKeyName()
     {
         return 'slug';

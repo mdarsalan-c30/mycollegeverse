@@ -3,6 +3,11 @@
         openImport: false, 
         openCreate: false,
         openEdit: false,
+        openMediaSearch: false,
+        mediaQuery: '',
+        mediaResults: [],
+        mediaLoading: false,
+        activeCollegeId: null,
         editNode: { 
             id: '', 
             name: '', 
@@ -14,6 +19,40 @@
             description: '', 
             thumbnail_url: '', 
             tags: '' 
+        },
+        async searchMedia(query, collegeId) {
+            this.activeCollegeId = collegeId;
+            this.mediaQuery = query;
+            this.openMediaSearch = true;
+            this.mediaLoading = true;
+            this.mediaResults = [];
+            
+            try {
+                const response = await fetch(`/admin/media/search?query=${encodeURIComponent(query)}`);
+                this.mediaResults = await response.json();
+            } catch (e) {
+                console.error('Search failed', e);
+            } finally {
+                this.mediaLoading = false;
+            }
+        },
+        async selectMedia(url) {
+            try {
+                const response = await fetch(`/admin/colleges/${this.activeCollegeId}/update-image`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ thumbnail_url: url })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    window.location.reload(); // Refresh to show new image 🛰️
+                }
+            } catch (e) {
+                alert('Update failed');
+            }
         }
     }">
         <!-- Header & Action Bar -->
@@ -49,7 +88,9 @@
                     <tr class="hover:bg-slate-50/30 transition-colors group">
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-5">
-                                <img src="{{ $college->thumbnail_url }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform" />
+                                <div class="relative">
+                                    <img src="{{ $college->thumbnail_url }}" class="w-14 h-14 rounded-2xl object-cover shadow-sm bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform" />
+                                </div>
                                 <div>
                                     <p class="text-sm font-black text-admin-dark">{{ $college->name }}</p>
                                     <p class="text-[9px] font-bold text-admin-primary uppercase tracking-widest">/{{ $college->slug }}</p>
@@ -73,6 +114,12 @@
                         </td>
                         <td class="px-8 py-6 text-right">
                             <div class="flex items-center justify-end gap-2">
+                                <button type="button" 
+                                        @click="searchMedia('{{ addslashes($college->name) }}', '{{ $college->slug }}')"
+                                        class="p-3 bg-admin-primary/10 text-admin-primary hover:bg-admin-primary hover:text-white transition-all rounded-xl" 
+                                        title="Magic Image Discovery ✨">
+                                    ✨
+                                </button>
                                 <button type="button" 
                                 @click="openEdit = true; editNode = { 
                                     id: '{{ $college->slug }}', 
@@ -345,6 +392,63 @@
                         <button type="submit" class="flex-[3] py-5 bg-admin-primary text-white rounded-2xl text-[11px] font-black uppercase tracking-widest shadow-xl shadow-admin-primary/20 hover:scale-[1.02] active:scale-95 transition-all">Submit Calibration Flux</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <!-- Media Search Modal ✨ -->
+        <div x-show="openMediaSearch" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 scale-95"
+             x-transition:enter-end="opacity-100 scale-100"
+             class="fixed inset-0 z-[200] flex items-center justify-center bg-admin-secondary/40 backdrop-blur-md px-4 overflow-y-auto"
+             x-cloak>
+            <div @click.away="openMediaSearch = false" class="bg-white w-full max-w-4xl rounded-[3.5rem] shadow-2xl p-12 my-10 space-y-8 text-left border border-slate-100 flex flex-col italic">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 bg-admin-primary text-white rounded-2xl flex items-center justify-center text-2xl shadow-xl shadow-admin-primary/20">✨</div>
+                        <div>
+                            <h3 class="text-2xl font-black text-admin-secondary leading-none">Magic Image Discovery</h3>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-2">Sourcing high-fidelity visuals for <span x-text="mediaQuery" class="text-admin-primary"></span></p>
+                        </div>
+                    </div>
+                    <button type="button" @click="openMediaSearch = false" class="text-slate-300 hover:text-slate-600">✕</button>
+                </div>
+
+                <!-- Results Grid -->
+                <div class="min-h-[400px]">
+                    <template x-if="mediaLoading">
+                        <div class="flex flex-col items-center justify-center py-24 space-y-4">
+                            <div class="w-12 h-12 border-4 border-admin-primary border-t-transparent rounded-full animate-spin"></div>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest animate-pulse text-center">Scanning WikiMedia Repositories...</p>
+                        </div>
+                    </template>
+
+                    <template x-if="!mediaLoading && mediaResults.length === 0">
+                        <div class="flex flex-col items-center justify-center py-24">
+                            <span class="text-4xl mb-4">🛰️</span>
+                            <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] italic">No visual nodes located for this query.</p>
+                        </div>
+                    </template>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-6 animate-fade-in" x-show="!mediaLoading">
+                        <template x-for="image in mediaResults" :key="image.url">
+                            <div class="group relative aspect-video bg-slate-50 rounded-3xl overflow-hidden border border-slate-100 cursor-pointer shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all"
+                                 @click="selectMedia(image.url)">
+                                <img :src="image.thumb" class="w-full h-full object-cover group-hover:scale-110 transition-all duration-700" />
+                                <div class="absolute inset-0 bg-gradient-to-t from-admin-dark/90 via-admin-dark/20 to-transparent opacity-60 group-hover:opacity-100 transition-opacity p-6 flex flex-col justify-end">
+                                    <p class="text-[8px] font-black text-white/60 uppercase tracking-widest mb-1">WikiMedia Asset</p>
+                                    <p class="text-[10px] font-bold text-white leading-tight truncate" x-text="image.title"></p>
+                                </div>
+                                <div class="absolute top-4 right-4 bg-admin-primary text-white px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
+                                    Select Node
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-4">
+                    <button type="button" @click="openMediaSearch = false" class="px-8 py-4 text-[11px] font-black text-slate-400 uppercase tracking-widest">Close Hub</button>
+                </div>
             </div>
         </div>
     </div>
