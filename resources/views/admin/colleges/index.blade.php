@@ -423,9 +423,16 @@
                     </template>
 
                     <template x-if="!mediaLoading && mediaResults.length === 0">
-                        <div class="flex flex-col items-center justify-center py-24">
-                            <span class="text-4xl mb-4">🛰️</span>
-                            <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] italic">No visual nodes located for this query.</p>
+                        <div class="flex flex-col items-center justify-center py-24 space-y-6">
+                            <span class="text-4xl">🛰️</span>
+                            <div class="text-center">
+                                <p class="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] italic mb-2">No visual nodes located in primary registry.</p>
+                                <a :href="'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(mediaQuery + ' campus building logo')" 
+                                   target="_blank"
+                                   class="inline-block px-6 py-3 bg-admin-primary text-white rounded-xl text-[9px] font-black uppercase tracking-widest shadow-lg shadow-admin-primary/20 hover:scale-[1.05] transition-transform">
+                                   Deep Search Google 🔍
+                                </a>
+                            </div>
                         </div>
                     </template>
 
