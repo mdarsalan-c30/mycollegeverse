@@ -97,7 +97,7 @@
             <div class="flex flex-col items-center">
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Exam Trusted</label>
                 <input type="hidden" name="exam_trusted" :value="examTrusted ? '1' : ''">
-                <button type="button" @click="examTrusted = !examTrusted; submitFilters();" 
+                <button type="button" @click="examTrusted = !examTrusted; $nextTick(() => submitFilters());" 
                         :class="examTrusted ? 'bg-amber-400 text-white shadow-lg shadow-amber-400/20 scale-105' : 'bg-slate-100 text-slate-400'"
                         class="h-12 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                     🚀 <span class="ml-1" x-text="examTrusted ? 'ON' : 'OFF'"></span>
@@ -121,8 +121,8 @@
                 
                 @if($note->exam_help_rate >= 80 && $note->reviews()->count() > 0)
                 <div class="absolute top-0 left-0 z-10">
-                    <div class="bg-emerald-500 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-br-2xl shadow-sm tracking-widest flex items-center gap-1">
-                        <span class="animate-pulse">🛡️</span> {{ $note->exam_help_rate }}% Exam Trusted
+                    <div class="bg-amber-400 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-br-2xl shadow-lg shadow-amber-400/20 tracking-widest flex items-center gap-1 group-hover:scale-105 transition-transform">
+                        <span class="animate-pulse">🚀</span> {{ $note->exam_help_rate }}% Exam Trusted
                     </div>
                 </div>
                 @endif
