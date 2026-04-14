@@ -44,19 +44,53 @@
                     </div>
                 </div>
 
-                <div class="bg-slate-50/50 rounded-2xl p-5 mb-6 group-hover:bg-white transition-colors border border-slate-50 flex-1">
+                <div class="bg-slate-50/50 rounded-2xl p-5 mb-6 group-hover:bg-white transition-colors border border-slate-50 flex-1 relative">
+                    <!-- Status Badge -->
+                    <div class="absolute -top-3 right-4">
+                        @if(($review->status ?? 'approved') === 'pending')
+                            <span class="bg-amber-100 text-amber-600 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-amber-200 shadow-sm">Pending</span>
+                        @else
+                            <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border border-emerald-200 shadow-sm">Approved</span>
+                        @endif
+                    </div>
+
                     <p class="text-xs font-bold text-admin-secondary leading-relaxed line-clamp-4">"{{ $review->comment }}"</p>
+                    
+                    @if($type === 'college' && $review->average_package)
+                    <div class="mt-4 pt-4 border-t border-slate-100/50 flex flex-wrap gap-2">
+                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-tighter italic">Package Intel:</span>
+                        <span class="text-[9px] font-black text-emerald-600">Avg: {{ $review->average_package }}L</span>
+                        <span class="text-[9px] font-black text-emerald-600">Max: {{ $review->highest_package }}L</span>
+                    </div>
+                    @endif
                 </div>
 
                 <div class="pt-6 border-t border-slate-100 flex items-center justify-between mt-auto">
-                    <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Target Identity</p>
-                        <p class="text-[10px] font-black text-admin-primary italic">
-                            {{ $type == 'college' ? ($review->college->name ?? 'Unknown Node') : ($review->professor->name ?? 'Unknown Advisor') }}
-                        </p>
+                    <div class="space-y-2">
+                        <div>
+                            <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Target Identity</p>
+                            <p class="text-[10px] font-black text-admin-primary italic">
+                                {{ $type == 'college' ? ($review->college->name ?? 'Unknown Node') : ($review->professor->name ?? 'Unknown Advisor') }}
+                            </p>
+                        </div>
+                        @if($review->user->id_card_url)
+                        <a href="{{ $review->user->profile_photo_url }}" target="_blank" class="flex items-center gap-1 text-[9px] font-black text-indigo-500 hover:text-indigo-700 transition-colors uppercase tracking-widest">
+                            <span>🆔 View ID Card</span>
+                            <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="3"/></svg>
+                        </a>
+                        @endif
                     </div>
                     
-                    <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-2">
+                        @if(($review->status ?? 'approved') === 'pending')
+                        <form action="{{ route('admin.reviews.approve', [$type, $review->id]) }}" method="POST" class="inline">
+                            @csrf
+                            <button type="submit" class="p-3 bg-emerald-500 text-white hover:bg-emerald-600 transition-all rounded-xl shadow-lg shadow-emerald-500/20" title="Verify & Publish">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                            </button>
+                        </form>
+                        @endif
+
                         <form action="{{ route('admin.reviews.destroy', [$type, $review->id]) }}" method="POST" class="inline" onsubmit="return confirm('Purge this reputational signal?')">
                             @csrf
                             @method('DELETE')

@@ -258,8 +258,26 @@
 
                     <!-- Tab Content: Reviews -->
                     <div x-show="tab === 'reviews'" class="space-y-10 md:space-y-16 max-w-5xl mx-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4">
-                        <!-- Review Form -->
-                        @auth
+                                       @auth
+                        @php
+                            $myPendingReview = $college->reviews()->where('user_id', Auth::id())->where('status', 'pending')->first();
+                        @endphp
+
+                        @if($myPendingReview)
+                        <div class="bg-amber-900/90 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-6 relative overflow-hidden shadow-2xl border border-amber-500/30">
+                            <div class="flex items-center gap-6">
+                                <span class="text-4xl animate-pulse">⏳</span>
+                                <div>
+                                    <h3 class="text-2xl font-black text-white">Evaluation in Verification</h3>
+                                    <p class="text-amber-200/70 text-sm font-medium mt-1 uppercase tracking-widest">Pending Council Approval</p>
+                                </div>
+                            </div>
+                            <p class="text-amber-50/60 text-base leading-relaxed italic">"{{ Str::limit($myPendingReview->comment, 150) }}"</p>
+                            <div class="pt-6 border-t border-white/10">
+                                <p class="text-[10px] font-bold text-amber-200/50 uppercase tracking-[0.2em]">Your peer intelligence is currently being verified against institutional records. It will be public once approved.</p>
+                            </div>
+                        </div>
+                        @else
                         <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl">
                             <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
                             <div class="relative z-10 space-y-10 md:space-y-12">
@@ -310,6 +328,7 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="space-y-4 md:space-y-5">
                                         <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Experience Narrative</label>
                                         <textarea name="comment" rows="4" class="w-full bg-white/5 border border-white/10 rounded-[2rem] md:rounded-[3rem] p-6 md:p-10 text-white placeholder-slate-600 focus:ring-2 focus:ring-primary outline-none text-base md:text-lg" placeholder="Describe the day-to-day..."></textarea>
@@ -352,6 +371,7 @@
                                 </form>
                             </div>
                         </div>
+                        @endif
                         @else
                         <div class="bg-slate-950 rounded-[2.5rem] md:rounded-[4rem] p-12 text-center text-white shadow-2xl relative overflow-hidden">
                             <div class="relative z-10">

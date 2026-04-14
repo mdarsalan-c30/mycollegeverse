@@ -39,6 +39,35 @@ class ReviewController extends Controller
     }
 
     /**
+     * Verify and publish a feedback node. 🛡️
+     */
+    public function approve($type, $id)
+    {
+        // Only Institutional (College) reviews currently require verification
+        if ($type !== 'college') {
+            return back()->with('info', "Direct verification is only required for high-fidelity Institutional nodes.");
+        }
+
+        $review = CollegeReview::findOrFail($id);
+        
+        $review->update(['status' => 'approved']);
+
+        // Audit Logging 🛡️
+        ApprovalLog::safeCreate([
+            'admin_id' => Auth::id(),
+            'action' => 'review_verified',
+            'target_type' => 'CollegeReview',
+            'target_id' => $review->id,
+            'metadata' => [
+                'user' => optional($review->user)->name ?? 'Unknown',
+                'college' => optional($review->college)->name ?? 'Unknown',
+            ],
+        ]);
+
+        return back()->with('success', "Feedback signal for '" . ($review->college->name ?? 'Hub') . "' has been verified and manifest across the multiverse.");
+    }
+
+    /**
      * Purge a specific feedback node.
      */
     public function destroy($type, $id)
