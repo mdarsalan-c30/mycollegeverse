@@ -188,7 +188,7 @@ class CollegeController extends Controller
             'city' => 'required|string',
             'location' => 'required|string',
             'description' => 'required|string',
-            'thumbnail_url' => 'nullable|url',
+            'campusimg' => 'nullable|url',
             'tags' => 'nullable|string',
         ]);
 
@@ -203,7 +203,7 @@ class CollegeController extends Controller
             'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
-            'thumbnail_url' => $request->thumbnail_url,
+            'campusimg' => $request->campusimg,
             'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
         ]);
 

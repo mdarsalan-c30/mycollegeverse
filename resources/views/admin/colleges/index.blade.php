@@ -318,7 +318,7 @@
                     <button type="button" @click="openEdit = false" class="text-slate-300 hover:text-slate-600">✕</button>
                 </div>
 
-                <form :action="`/admin/colleges/${editNode.id}`" method="POST" class="space-y-6">
+                <form :action="'/admin/colleges/' + editNode.id" method="POST" class="space-y-6">
                     @csrf
                     @method('PATCH')
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs font-bold">
