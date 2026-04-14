@@ -71,6 +71,11 @@ Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, '
 // Multiverse SEO Pages (Privacy, Terms, About, etc.)
 Route::get('/p/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
 
+// Startup Identity Nodes 🚀
+Route::view('/careers', 'pages.careers')->name('pages.careers');
+Route::view('/partner', 'pages.partner')->name('pages.partner');
+Route::view('/faq', 'pages.faq')->name('pages.faq');
+
 // Interaction Routes (Auth Required)
 Route::middleware(['auth'])->group(function () {
     // Shared Routes (Dynamic Layouts)
