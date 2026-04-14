@@ -116,11 +116,12 @@ class CommunityController extends Controller
         } catch (\Illuminate\Database\QueryException $e) {
             \Illuminate\Support\Facades\Log::error("Community Manifestation Failure: " . $e->getMessage());
             
-            if (str_contains($e->getMessage(), 'Unknown column')) {
-                return back()->with('error', 'Multiverse Sync Required! Please visit /multiverse-migrate to finalize the Community Identity schema.');
+            $errorMsg = $e->getMessage();
+            if (\Illuminate\Support\Str::contains(strtolower($errorMsg), ['unknown column', 'column not found', 'has no column'])) {
+                return back()->with('error', 'Multiverse Sync Required! Your database is missing columns (slug/image_path). Please visit /multiverse-migrate immediately.');
             }
             
-            return back()->with('error', 'Post Node collapsed during manifestation. Please try again.');
+            return back()->with('error', 'Post Manifestation Failed: ' . \Illuminate\Support\Str::limit($errorMsg, 100));
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error("General Community Error: " . $e->getMessage());
             return back()->with('error', 'Verse Sync Failure: ' . $e->getMessage());
