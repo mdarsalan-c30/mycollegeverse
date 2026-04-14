@@ -136,17 +136,21 @@
                 <form action="{{ route('admin.colleges.import') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
                     @csrf
                     <div class="space-y-4">
-                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Pathway A: Standard CSV Upload</label>
+                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Pathway A: Standard CSV Upload</label>
                         <div class="border-2 border-dashed border-slate-100 rounded-[2.5rem] p-8 flex flex-col items-center justify-center bg-slate-50/50 hover:bg-slate-50 transition-colors group relative cursor-pointer">
                             <input type="file" name="import_file" class="absolute inset-0 opacity-0 cursor-pointer">
                             <span class="text-2xl mb-2 group-hover:scale-125 transition-transform">📄</span>
-                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Drop node or browse<br><span class="opacity-50 text-[8px]">Name | Type | Streams | State | City | Location | Description | Logo | Tags</span></p>
+                            <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Drop node or browse<br><span class="opacity-50 text-[7px] italic mt-1 block">Expected Order: Name | Type | State | City | Streams | Location | Description | Logo | Tags</span></p>
                         </div>
                     </div>
 
                     <div class="space-y-4">
-                        <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest">Pathway B: Terminal (ChatGPT Format)</label>
-                        <textarea name="paste_data" rows="6" class="w-full bg-slate-50 border-none rounded-[2.5rem] px-8 py-8 text-xs font-bold focus:ring-4 focus:ring-admin-primary/5 transition-all italic placeholder:text-slate-300" placeholder="IIT Delhi | Government | Engineering, MBA | Delhi | New Delhi | Hauz Khas | ..."></textarea>
+                        <div class="flex items-center justify-between">
+                            <label class="text-[11px] font-black text-slate-500 uppercase tracking-widest italic">Pathway B: Terminal (ChatGPT Format)</label>
+                            <span class="text-[8px] font-black bg-admin-primary/10 text-admin-primary px-2 py-1 rounded-full uppercase tracking-tighter">Strict 9-Column Standard</span>
+                        </div>
+                        <textarea name="paste_data" rows="6" class="w-full bg-slate-50 border-none rounded-[2.5rem] px-8 py-8 text-xs font-bold focus:ring-4 focus:ring-admin-primary/5 transition-all italic placeholder:text-slate-300" placeholder="Hindu College | Government | Delhi | New Delhi | Arts, Science | North Campus | ..."></textarea>
+                        <p class="text-[9px] font-bold text-slate-300 italic px-4 mt-2">Note: To ensure filters work, use exact State/Type keywords and comma-separated Streams.</p>
                     </div>
 
                     <div class="flex items-center gap-6 pt-4">

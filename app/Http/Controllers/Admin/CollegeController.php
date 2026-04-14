@@ -36,10 +36,10 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name',
-            'type' => 'nullable|string',
-            'streams' => 'nullable|array',
-            'state' => 'nullable|string',
-            'city' => 'nullable|string',
+            'type' => 'required|string|in:' . implode(',', config('college_metadata.types')),
+            'streams' => 'required|array',
+            'state' => 'required|string|in:' . implode(',', config('college_metadata.states')),
+            'city' => 'required|string',
             'location' => 'required|string',
             'description' => 'required|string',
             'thumbnail_url' => 'nullable|url',
@@ -50,15 +50,15 @@ class CollegeController extends Controller
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'type' => $request->type,
-            'streams' => $request->streams ?? [],
+            'streams' => $request->streams,
             'state' => $request->state,
             'city' => $request->city,
             'location' => $request->location,
             'description' => $request->description,
             'thumbnail_url' => $request->thumbnail_url ?? 'https://via.placeholder.com/300?text=MCV+Node',
             'tags' => $request->tags ? array_map('trim', explode(',', $request->tags)) : [],
-            'student_count' => 0,
-            'rating' => 5.0,
+            'student_count' => rand(1000, 5000),
+            'rating' => 0.0,
         ]);
 
         ApprovalLog::safeCreate([
@@ -116,57 +116,42 @@ class CollegeController extends Controller
             }
 
             foreach ($rows as $row) {
+                // Formatting Check: Standard 9-column flux 🛡️
+                // Order: Name | Type | State | City | Streams | Location | Description | LogoURL | Tags
                 if (count($row) >= 1) {
-                    $name = $row[0];
+                    $name = trim($row[0]);
                     
-                    // Filter Integrity Check: Don't import PHP code lines 🛡️
+                    // Code Guard: Skip accidental PHP code lines
                     if (str_contains($name, '=>') || str_contains($name, '[')) continue;
 
                     if (!College::where('name', $name)->exists()) {
-                        // User's 5-Column Format Detection: Name | Location | Description | LogoURL | Tags
-                        $location = $row[1] ?? 'Unknown Node';
-                        $description = $row[2] ?? 'Academic expansion in progress.';
-                        $logo = $row[3] ?? 'https://via.placeholder.com/300?text=MCV+Node';
-                        $tagsRaw = $row[4] ?? 'General';
-
-                        // Smart Intelligence: Extract State and City from Location 🛰️
-                        $state = 'Unknown';
-                        $city = 'Unknown';
+                        $type = $row[1] ?? 'Private';
+                        $state = $row[2] ?? 'Unknown';
+                        $city = $row[3] ?? 'Unknown';
                         
-                        $locationLower = strtolower($location);
-                        if (str_contains($locationLower, 'delhi')) {
-                            $state = 'Delhi';
-                            $city = str_contains($locationLower, 'dwarka') ? 'Dwarka' : (str_contains($locationLower, 'rohini') ? 'Rohini' : 'New Delhi');
-                        } elseif (str_contains($locationLower, 'noida') || str_contains($locationLower, 'pradesh')) {
-                            $state = 'Uttar Pradesh';
-                            $city = 'Noida';
-                        } elseif (str_contains($locationLower, 'haryana') || str_contains($locationLower, 'gurugram') || str_contains($locationLower, 'sonipat')) {
-                            $state = 'Haryana';
-                            $city = str_contains($locationLower, 'gurugram') ? 'Gurugram' : 'Sonipat';
-                        }
-
-                        // Smart Intelligence: Detect Type from Context 🛡️
-                        $type = 'Private';
-                        if (str_contains(strtolower($name), 'university') || str_contains(strtolower($name), 'iit') || str_contains(strtolower($name), 'dtu') || str_contains(strtolower($name), 'college')) {
-                             if (str_contains(strtolower($name), 'iit') || str_contains(strtolower($name), 'technological') || str_contains(strtolower($name), 'government')) {
-                                $type = 'Government';
-                             }
-                        }
-                        if (str_contains(strtolower($tagsRaw), 'government')) $type = 'Government';
+                        // Handle Streams (Comma separated -> Array)
+                        $streams = isset($row[4]) ? array_map('trim', explode(',', $row[4])) : ['General'];
+                        
+                        $location = $row[5] ?? 'Unknown Node';
+                        $description = $row[6] ?? 'Institutional narrative in development.';
+                        $logo = $row[7] ?? 'https://via.placeholder.com/300?text=MCV+Node';
+                        
+                        // Handle Tags (Comma separated -> Array)
+                        $tags = isset($row[8]) ? array_map('trim', explode(',', $row[8])) : ['General'];
 
                         College::create([
                             'name' => $name,
                             'slug' => Str::slug($name),
                             'type' => $type,
-                            'streams' => ['General'], // Default
+                            'streams' => $streams,
                             'state' => $state,
                             'city' => $city,
                             'location' => $location,
                             'description' => $description,
                             'thumbnail_url' => $logo,
-                            'tags' => array_map('trim', explode(',', $tagsRaw)),
-                            'student_count' => rand(5000, 20000),
-                            'rating' => 4.5,
+                            'tags' => $tags,
+                            'student_count' => rand(1000, 5000),
+                            'rating' => 0.0, // Initialized as 0.0, will sync from student reviews
                         ]);
                         $importCount++;
                     } else {
@@ -197,10 +182,10 @@ class CollegeController extends Controller
     {
         $request->validate([
             'name' => 'required|string|unique:colleges,name,' . $college->id,
-            'type' => 'nullable|string',
-            'streams' => 'nullable|array',
-            'state' => 'nullable|string',
-            'city' => 'nullable|string',
+            'type' => 'required|string|in:' . implode(',', config('college_metadata.types')),
+            'streams' => 'required|array',
+            'state' => 'required|string|in:' . implode(',', config('college_metadata.states')),
+            'city' => 'required|string',
             'location' => 'required|string',
             'description' => 'required|string',
             'thumbnail_url' => 'nullable|url',
