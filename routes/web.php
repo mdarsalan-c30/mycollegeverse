@@ -19,6 +19,10 @@ Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
+// Editorial Discovery 🚀
+Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
+Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');
+
 // Master Browser Nexus (For Hostinger/Terminal-less Sync)
 Route::get('/multiverse-migrate', [App\Http\Controllers\MultiverseSyncController::class, 'sync']);
 Route::get('/multiverse-note-slug-sync', function() {
@@ -202,8 +206,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Deep Analytics Cluster
     Route::get('/analytics', [App\Http\Controllers\Admin\AnalyticsController::class, 'index'])->name('analytics');
 
-    // SEO Nucleus (Page Management)
+    // SEO Nucleus (Page & Blog Management) 🛰️
     Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
+    Route::resource('blogs', App\Http\Controllers\Admin\BlogController::class);
 });
 
 Route::get('/multiverse-slug-sync', function() {
