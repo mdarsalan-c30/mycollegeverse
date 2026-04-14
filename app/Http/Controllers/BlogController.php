@@ -18,9 +18,14 @@ class BlogController extends Controller
                 $q->where('is_published', true)->latest()->take(6);
             }])->where('is_active', true)->get();
 
-            $featuredBlogs = Blog::where('is_published', true)->where('seo_score', '>=', 80)->latest()->take(3)->get();
+            $featuredBlogs = Blog::where('is_published', true)->where('seo_score', '>=', 70)->latest()->take(3)->get();
+            if($featuredBlogs->count() < 1) {
+                $featuredBlogs = Blog::where('is_published', true)->latest()->take(3)->get();
+            }
+
+            $recentInsights = Blog::where('is_published', true)->with('category')->latest()->paginate(12);
             
-            return view('blogs.index', compact('categories', 'featuredBlogs'));
+            return view('blogs.index', compact('categories', 'featuredBlogs', 'recentInsights'));
         } catch (\Exception $e) {
             \Log::error("Blog Index Error: " . $e->getMessage());
             $categories = collect(); 

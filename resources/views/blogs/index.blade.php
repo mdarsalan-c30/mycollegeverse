@@ -73,6 +73,44 @@
         @endforeach
     </div>
 
+    <!-- Global Discovery Node: Recent Insights 🛰️ -->
+    <section class="max-w-7xl mx-auto px-6 pb-32">
+        <div class="flex items-end justify-between border-b-2 border-slate-100 pb-6 mb-12">
+            <div>
+                <h2 class="text-3xl font-black text-secondary tracking-tight">Recent Insights</h2>
+                <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Latest articles from across the academic multiverse</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            @forelse($recentInsights as $blog)
+            <article class="group relative bg-white border border-slate-100 p-4 rounded-[2rem] hover:shadow-xl hover:-translate-y-1 transition-all duration-500">
+                <a href="{{ route('blogs.show', $blog->slug) }}" class="block space-y-4">
+                    <div class="aspect-square rounded-[1.5rem] overflow-hidden bg-slate-50 relative">
+                        <img src="{{ $blog->featured_image ? (str_contains($blog->featured_image, 'http') ? $blog->featured_image : 'https://ik.imagekit.io/studycubsfranchise/' . $blog->featured_image) : 'https://images.unsplash.com/photo-1434031216660-c50938c8f3ef?auto=format&fit=crop&q=80' }}" 
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $blog->title }}">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-[8px] font-black text-secondary rounded-full uppercase tracking-widest">{{ $blog->category->name ?? 'Insight' }}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-black text-secondary leading-tight group-hover:text-primary transition-colors line-clamp-2 uppercase tracking-tighter">{{ $blog->title }}</h3>
+                        <p class="text-slate-400 text-[10px] font-bold mt-4 uppercase tracking-widest">{{ $blog->published_at ? $blog->published_at->diffForHumans() : 'Recent' }}</p>
+                    </div>
+                </a>
+            </article>
+            @empty
+            <div class="col-span-full py-20 text-center border-2 border-dashed border-slate-100 rounded-[3rem]">
+                <p class="text-slate-300 font-black text-xs uppercase tracking-widest italic">The multiverse is expanding... insights arriving soon.</p>
+            </div>
+            @endforelse
+        </div>
+
+        <div class="mt-16 flex justify-center">
+            {{ $recentInsights->links() }}
+        </div>
+    </section>
+
     <!-- Newsletter Hub 🛰️ -->
     <section class="bg-slate-900 py-24 text-center">
         <div class="max-w-4xl mx-auto px-6">
