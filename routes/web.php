@@ -20,7 +20,7 @@ Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->nam
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
 // Master Browser Nexus (For Hostinger/Terminal-less Sync)
-Route::get('/force-sync-multiverse', [App\Http\Controllers\MultiverseSyncController::class, 'sync']);
+Route::get('/multiverse-migrate', [App\Http\Controllers\MultiverseSyncController::class, 'sync']);
 Route::get('/multiverse-note-slug-sync', function() {
     try {
         $notes = \App\Models\Note::whereNull('slug')->get();
