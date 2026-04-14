@@ -69,6 +69,10 @@ class CommunityController extends Controller
             ]
         ];
 
+        // Sidebar Data Manifestation
+        $trendingHubs = \App\Models\College::withCount('posts')->orderBy('posts_count', 'desc')->take(5)->get();
+        $topContributors = \App\Models\User::withCount('posts')->orderBy('posts_count', 'desc')->take(6)->get();
+
         return view('community.show', compact('post', 'trendingHubs', 'topContributors', 'seoTitle', 'seoDescription', 'schema'));
     }
 
@@ -143,13 +147,21 @@ class CommunityController extends Controller
             'parent_id' => 'nullable|integer|exists:comments,id',
         ]);
 
-        $comment = Comment::create([
-            'user_id' => Auth::id(),
-            'commentable_id' => $validated['commentable_id'],
-            'commentable_type' => $validated['commentable_type'],
-            'content' => $validated['content'],
-            'parent_id' => $validated['parent_id'] ?? null,
-        ]);
+        try {
+            $comment = Comment::create([
+                'user_id' => Auth::id(),
+                'commentable_id' => $validated['commentable_id'],
+                'commentable_type' => $validated['commentable_type'],
+                'content' => $validated['content'],
+                'parent_id' => $validated['parent_id'] ?? null,
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error("Comment Manifestation Failure: " . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'The Verse rejected this transmission: ' . \Illuminate\Support\Str::limit($e->getMessage(), 50)
+            ], 500);
+        }
 
         // Load user immediately for the component
         $comment->load('user');

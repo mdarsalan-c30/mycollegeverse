@@ -280,6 +280,15 @@ Route::get('/multiverse-migrate', function() {
     }
 });
 
+Route::get('/multiverse-seed', function() {
+    try {
+        Artisan::call('multiverse:seed-community');
+        return "🌱 Community SEO Goldmine Initialized! Content manifested in the Verse. Visit <a href='/community'>Community</a>.";
+    } catch (\Exception $e) {
+        return "Seeding Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-editorial-seed', function() {
     try {
         $categories = [
