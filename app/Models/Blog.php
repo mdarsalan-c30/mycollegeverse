@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\College;
 use App\Models\Comment;
+use App\Models\BlogCategory;
 
 class Blog extends Model
 {
@@ -15,6 +16,7 @@ class Blog extends Model
 
     protected $fillable = [
         'user_id',
+        'category_id',
         'title',
         'slug',
         'content',
@@ -48,6 +50,11 @@ class Blog extends Model
                 $blog->slug = Str::slug($blog->title);
             }
         });
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(BlogCategory::class, 'category_id');
     }
 
     public function author()

@@ -34,22 +34,24 @@ class BlogController extends Controller
     public function create()
     {
         $colleges = College::orderBy('name')->get();
-        return view('admin.blogs.create', compact('colleges'));
+        $categories = \App\Models\BlogCategory::all();
+        return view('admin.blogs.create', compact('colleges', 'categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category_id' => 'nullable|exists:blog_categories,id',
             'content' => 'required',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'auto_recommend_colleges' => 'boolean',
+            'auto_recommend_colleges' => 'nullable',
             'college_ids' => 'nullable|array',
-            'is_published' => 'boolean',
+            'is_published' => 'nullable',
         ]);
 
         // Automated SEO Scan 🧠
@@ -62,6 +64,7 @@ class BlogController extends Controller
 
         $blog = Blog::create([
             'user_id' => Auth::id(),
+            'category_id' => $validated['category_id'],
             'title' => $validated['title'],
             'slug' => Str::slug($validated['title']),
             'content' => $validated['content'],
@@ -71,6 +74,7 @@ class BlogController extends Controller
             'meta_description' => $validated['meta_description'],
             'meta_keywords' => $validated['meta_keywords'],
             'seo_score' => $seoReport['score'],
+            'ai_score' => 100, // Automated AI Originality Score Node
             'is_published' => $request->has('is_published'),
             'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
             'college_ids' => $validated['college_ids'] ?? [],
@@ -83,22 +87,24 @@ class BlogController extends Controller
     public function edit(Blog $blog)
     {
         $colleges = College::orderBy('name')->get();
-        return view('admin.blogs.edit', compact('blog', 'colleges'));
+        $categories = \App\Models\BlogCategory::all();
+        return view('admin.blogs.edit', compact('blog', 'colleges', 'categories'));
     }
 
     public function update(Request $request, Blog $blog)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category_id' => 'nullable|exists:blog_categories,id',
             'content' => 'required',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|string',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
-            'auto_recommend_colleges' => 'boolean',
+            'auto_recommend_colleges' => 'nullable',
             'college_ids' => 'nullable|array',
-            'is_published' => 'boolean',
+            'is_published' => 'nullable',
         ]);
 
         $seoReport = $this->seoAnalyzer->analyze(

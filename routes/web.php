@@ -249,6 +249,27 @@ Route::get('/multiverse-migrate', function() {
     }
 });
 
+Route::get('/multiverse-editorial-seed', function() {
+    try {
+        $categories = [
+            ['name' => 'Career Roadmap', 'description' => 'Deep strategic insights for your future profession.'],
+            ['name' => 'College Comparison', 'description' => 'Side-by-side analysis of institutional nodes.'],
+            ['name' => 'Exam Intelligence', 'description' => 'Mastering the academic multiverse entrance nodes.'],
+            ['name' => 'Campus Life', 'description' => 'Authentic reports from the citizen ground level.'],
+        ];
+
+        foreach($categories as $cat) {
+            \App\Models\BlogCategory::firstOrCreate(
+                ['slug' => \Illuminate\Support\Str::slug($cat['name'])],
+                ['name' => $cat['name'], 'description' => $cat['description']]
+            );
+        }
+        return "🌱 Editorial Taxonomy Initialized! Seeded " . count($categories) . " categories. Visit <a href='/blog'>Blog</a>.";
+    } catch (\Exception $e) {
+        return "Seeding Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-init', function() {
     try {
         Artisan::call('config:clear');

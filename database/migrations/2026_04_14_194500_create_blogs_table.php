@@ -16,6 +16,7 @@ class CreateBlogsTable extends Migration
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id'); // Author (Admin)
+            $table->unsignedBigInteger('category_id')->nullable(); // Editorial Segment
             $table->string('title');
             $table->string('slug')->unique();
             $table->text('content');

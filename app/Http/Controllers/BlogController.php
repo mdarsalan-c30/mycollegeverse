@@ -14,12 +14,13 @@ class BlogController extends Controller
     public function index()
     {
         try {
-            $blogs = Blog::where('is_published', true)
-                ->with('author')
-                ->latest('published_at')
-                ->paginate(9);
+            $categories = \App\Models\BlogCategory::with(['blogs' => function($q) {
+                $q->where('is_published', true)->latest()->take(6);
+            }])->where('is_active', true)->get();
 
-            return view('blogs.index', compact('blogs'));
+            $featuredBlogs = Blog::where('is_published', true)->where('seo_score', '>=', 80)->latest()->take(3)->get();
+            
+            return view('blogs.index', compact('categories', 'featuredBlogs'));
         } catch (\Exception $e) {
             \Log::error("Blog Index Error: " . $e->getMessage());
             $blogs = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 9);
