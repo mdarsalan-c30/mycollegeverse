@@ -12,8 +12,24 @@ class PageController extends Controller
      */
     public function show($slug)
     {
-        $page = Page::where('slug', $slug)->active()->firstOrFail();
+        try {
+            $page = Page::where('slug', $slug)->active()->first();
 
-        return view('pages.show', compact('page'));
+            if ($page) {
+                return view('pages.show', compact('page'));
+            }
+
+            // Fallback to static blade files if they exist 🛡️
+            if (view()->exists("pages.{$slug}")) {
+                return view("pages.{$slug}");
+            }
+
+            abort(404, "Identity Node [{$slug}] not found in the multiverse.");
+        } catch (\Throwable $e) {
+            \Log::error("Multiverse Page Error for [{$slug}]: " . $e->getMessage());
+            
+            // Critical fallback to home if everything fails
+            return redirect('/')->with('error', 'Temporary synchronization error. Please try again.');
+        }
     }
 }

@@ -72,9 +72,9 @@ Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, '
 Route::get('/p/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('pages.show');
 
 // Startup Identity Nodes 🚀
-Route::view('/careers', 'pages.careers')->name('pages.careers');
-Route::view('/partner', 'pages.partner')->name('pages.partner');
-Route::view('/faq', 'pages.faq')->name('pages.faq');
+Route::get('/careers', [App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'careers')->name('pages.careers');
+Route::get('/partner', [App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'partner')->name('pages.partner');
+Route::get('/faq', [App\Http\Controllers\PageController::class, 'show'])->defaults('slug', 'faq')->name('pages.faq');
 
 // Interaction Routes (Auth Required)
 Route::middleware(['auth'])->group(function () {
@@ -229,6 +229,33 @@ Route::get('/multiverse-slug-sync', function() {
         return "🌌 Identity Sync Complete! Generated $count slugs for existing faculty nodes.";
     } catch (\Exception $e) {
         return "Sync Error: " . $e->getMessage();
+    }
+});
+
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+    // Command: Startup Hub (Social & Corporate Nodes) 🚀
+    Route::get('/startup', [App\Http\Controllers\Admin\StartupHubController::class, 'index'])->name('startup.index');
+    Route::post('/startup/social', [App\Http\Controllers\Admin\StartupHubController::class, 'updateSocial'])->name('startup.social.update');
+});
+
+Route::get('/multiverse-startup-init', function () {
+    try {
+        $nodes = [
+            ['title' => 'Careers | MyCollegeVerse', 'slug' => 'careers', 'content' => '<h1>Join the Multiverse</h1><p>We are building the future of education.</p>'],
+            ['title' => 'Partner With Us', 'slug' => 'partner', 'content' => '<h1>Institutional Partnerships</h1><p>Digitize your campus.</p>'],
+            ['title' => 'Help Center & FAQ', 'slug' => 'faq', 'content' => '<h1>Command Center</h1><p>Frequently asked questions.</p>'],
+        ];
+
+        foreach ($nodes as $node) {
+            \App\Models\Page::firstOrCreate(
+                ['slug' => $node['slug']],
+                ['title' => $node['title'], 'content' => $node['content'], 'is_active' => true]
+            );
+        }
+
+        return "Startup Identity Nodes Initialized. You can now edit them in the Startup Hub.";
+    } catch (\Exception $e) {
+        return "Initialization Error: " . $e->getMessage();
     }
 });
 
