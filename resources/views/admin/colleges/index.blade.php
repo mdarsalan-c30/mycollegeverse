@@ -75,16 +75,16 @@
                             <div class="flex items-center justify-end gap-2">
                                 <button type="button" 
                                 @click="openEdit = true; editNode = { 
-                                    id: '{{ $college->slug }}', 
-                                    name: '{{ addslashes($college->name) }}', 
-                                    type: '{{ $college->type }}',
-                                    streams: @json($college->streams ?? []),
-                                    state: '{{ $college->state }}',
-                                    city: '{{ addslashes($college->city) }}',
-                                    location: '{{ addslashes($college->location) }}', 
-                                    description: '{{ addslashes($college->description) }}', 
-                                    thumbnail_url: '{{ $college->thumbnail_url }}', 
-                                    tags: '{{ addslashes(is_array($college->tags) ? implode(', ', $college->tags) : ($college->tags ?? '')) }}' 
+                                    id: {{ json_encode($college->slug) }}, 
+                                    name: {{ json_encode($college->name) }}, 
+                                    type: {{ json_encode($college->type) }},
+                                    streams: {{ json_encode($college->streams ?? []) }},
+                                    state: {{ json_encode($college->state) }},
+                                    city: {{ json_encode($college->city) }},
+                                    location: {{ json_encode($college->location) }}, 
+                                    description: {{ json_encode($college->description) }}, 
+                                    thumbnail_url: {{ json_encode($college->thumbnail_url) }}, 
+                                    tags: {{ json_encode(is_array($college->tags) ? implode(', ', $college->tags) : ($college->tags ?? '')) }} 
                                 }"
                                         class="p-3 text-slate-400 hover:text-admin-primary transition-all rounded-xl" title="Deep Scan Hub">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>

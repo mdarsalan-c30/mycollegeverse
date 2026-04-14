@@ -214,6 +214,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // SEO Nucleus (Page & Blog Management) 🛰️
     Route::resource('pages', App\Http\Controllers\Admin\PageController::class);
     Route::resource('blogs', App\Http\Controllers\Admin\BlogController::class);
+
+    // Command: Startup Hub (Social & Corporate Nodes) 🚀
+    Route::get('/startup', [App\Http\Controllers\Admin\StartupHubController::class, 'index'])->name('startup.index');
+    Route::post('/startup/social', [App\Http\Controllers\Admin\StartupHubController::class, 'updateSocial'])->name('startup.social.update');
 });
 
 Route::get('/multiverse-slug-sync', function() {
@@ -232,11 +236,6 @@ Route::get('/multiverse-slug-sync', function() {
     }
 });
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    // Command: Startup Hub (Social & Corporate Nodes) 🚀
-    Route::get('/startup', [App\Http\Controllers\Admin\StartupHubController::class, 'index'])->name('startup.index');
-    Route::post('/startup/social', [App\Http\Controllers\Admin\StartupHubController::class, 'updateSocial'])->name('startup.social.update');
-});
 
 Route::get('/multiverse-startup-init', function () {
     try {
