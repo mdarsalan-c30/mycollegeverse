@@ -53,4 +53,33 @@ class College extends Model
     {
         return $this->hasMany(Post::class);
     }
+
+    /**
+     * Placement Analytics Hub 🛡️
+     * Aggregates approved student reports to provide real-time salary intel.
+     */
+    public function getPlacementStatsAttribute()
+    {
+        $approvedReviews = $this->reviews()->where('status', 'approved');
+        
+        $count = $approvedReviews->whereNotNull('average_package')->count();
+        
+        if ($count === 0) {
+            return [
+                'avg' => 'Awaiting Intel',
+                'min' => '---',
+                'max' => '---',
+                'count' => 0,
+                'has_data' => false
+            ];
+        }
+
+        return [
+            'avg' => round($approvedReviews->avg('average_package'), 1) . ' LPA',
+            'min' => round($approvedReviews->min('lowest_package'), 1) . ' LPA',
+            'max' => round($approvedReviews->max('highest_package'), 1) . ' LPA',
+            'count' => $count,
+            'has_data' => true
+        ];
+    }
 }

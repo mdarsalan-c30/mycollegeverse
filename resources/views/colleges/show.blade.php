@@ -179,19 +179,31 @@
                                 </p>
                             </div>
 
-                            <!-- Summary Cards Row -->
+                            <!-- Summary Cards Row: Dynamic Placement Intel 🚀 -->
                             <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                                @foreach([
-                                    ['label' => 'Entry Threshold', 'val' => '3.8%', 'color' => 'primary', 'desc' => 'Verified Selectivity'],
-                                    ['label' => 'Asset Retention', 'val' => '98.4%', 'color' => 'primary', 'desc' => 'Student Stability'],
-                                    ['label' => 'Exit Equity', 'val' => '$96k+', 'color' => 'primary', 'desc' => 'Alumni Performance']
-                                ] as $card)
                                 <div class="bg-white p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] space-y-3 group hover:border-primary/20 transition-all duration-500">
-                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $card['label'] }}</p>
-                                    <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-primary transition-colors">{{ $card['val'] }}</p>
-                                    <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">{{ $card['desc'] }}</p>
+                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Placement</p>
+                                    <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-primary transition-colors">{{ $college->placement_stats['avg'] }}</p>
+                                    <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">
+                                        @if($college->placement_stats['count'] > 0)
+                                            Based on {{ $college->placement_stats['count'] }} reports
+                                        @else
+                                            Awaiting Hub Data
+                                        @endif
+                                    </p>
                                 </div>
-                                @endforeach
+
+                                <div class="bg-white p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] space-y-3 group hover:border-primary/20 transition-all duration-500">
+                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Highest Package</p>
+                                    <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-emerald-500 transition-colors">{{ $college->placement_stats['max'] }}</p>
+                                    <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">Peer Verified Max</p>
+                                </div>
+
+                                <div class="bg-white p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] space-y-3 group hover:border-primary/20 transition-all duration-500">
+                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Lowest Package</p>
+                                    <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-amber-500 transition-colors">{{ $college->placement_stats['min'] }}</p>
+                                    <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">Institutional Floor</p>
+                                </div>
                             </div>
 
                             <!-- Institutional Pillars -->
@@ -272,6 +284,31 @@
                                             </select>
                                         </div>
                                         @endforeach
+                                    </div>
+
+                                    <!-- Placement Intelligence Inputs 💰 -->
+                                    <div class="bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 space-y-8">
+                                        <div class="flex items-center gap-4 mb-2">
+                                            <span class="text-xl">💰</span>
+                                            <div>
+                                                <h4 class="text-xs font-black text-white uppercase tracking-widest leading-none">Placement Intelligence</h4>
+                                                <p class="text-[9px] text-white/40 font-bold mt-1 italic">Optional but highly encouraged for peer verification (LPA)</p>
+                                            </div>
+                                        </div>
+                                        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
+                                            <div class="space-y-4">
+                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Avg Package</label>
+                                                <input type="number" step="0.1" name="average_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 7.5">
+                                            </div>
+                                            <div class="space-y-4">
+                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Lowest Package</label>
+                                                <input type="number" step="0.1" name="lowest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 3.5">
+                                            </div>
+                                            <div class="space-y-4">
+                                                <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Highest Package</label>
+                                                <input type="number" step="0.1" name="highest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 24.0">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="space-y-4 md:space-y-5">
                                         <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.2em] ml-2">Experience Narrative</label>

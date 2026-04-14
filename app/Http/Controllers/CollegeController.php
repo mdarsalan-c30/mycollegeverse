@@ -63,6 +63,9 @@ class CollegeController extends Controller
             'faculty_rating' => 'required|integer|min:1|max:5',
             'academic_rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string|max:1000',
+            'average_package' => 'nullable|numeric|min:0',
+            'lowest_package' => 'nullable|numeric|min:0',
+            'highest_package' => 'nullable|numeric|min:0',
             'verification_id' => 'required|string|max:50',
         ];
 
@@ -96,6 +99,9 @@ class CollegeController extends Controller
                 'faculty_rating' => $request->faculty_rating,
                 'academic_rating' => $request->academic_rating,
                 'comment' => $request->comment,
+                'average_package' => $request->average_package,
+                'lowest_package' => $request->lowest_package,
+                'highest_package' => $request->highest_package,
                 'verification_id' => $request->verification_id,
                 'status' => 'pending' // Always reset to pending for verification
             ]

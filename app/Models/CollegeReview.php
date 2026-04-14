@@ -16,6 +16,9 @@ class CollegeReview extends Model
         'faculty_rating',
         'academic_rating',
         'comment',
+        'average_package',
+        'lowest_package',
+        'highest_package',
         'verification_id',
         'status',
     ];
