@@ -7,7 +7,19 @@
         {!! json_encode($schema) !!}
     </script>
     @endpush
-    <div class="flex w-full h-screen bg-slate-50 overflow-hidden" x-data="{ tab: 'overview', sidebarOpen: false }">
+    <div class="flex w-full h-screen bg-slate-50 overflow-hidden" x-data="{ 
+        tab: 'overview', 
+        sidebarOpen: false,
+        showReviewForm: false,
+        toggleReviewForm() {
+            this.showReviewForm = !this.showReviewForm;
+            if(this.showReviewForm) {
+                this.$nextTick(() => {
+                    document.getElementById('review-form-anchor')?.scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+        }
+    }">
         <!-- VerseOS Navigation Sidebar (Desktop & Mobile) -->
         <aside 
             class="fixed inset-y-0 left-0 z-[60] w-80 bg-white border-r border-slate-200/60 flex flex-col p-8 space-y-12 shrink-0 transition-transform duration-500 lg:static lg:translate-x-0"
@@ -204,6 +216,23 @@
                                     <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-amber-500 transition-colors">{{ $college->placement_stats['min'] }}</p>
                                     <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">Institutional Floor</p>
                                 </div>
+                            </div>
+
+                            <!-- Psychological Review Trigger CTA 🛡️ -->
+                            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-16 text-white relative overflow-hidden shadow-2xl group cursor-pointer" @click="tab = 'reviews'; toggleReviewForm()">
+                                <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                    <div class="space-y-4">
+                                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/5">
+                                            <span class="text-xs">⭐</span>
+                                            <span class="text-[9px] font-black tracking-widest uppercase">Verified Evaluation Node</span>
+                                        </div>
+                                        <h4 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">Your campus experience is <br><span class="text-primary italic">institutional intelligence.</span></h4>
+                                        <p class="text-slate-400 font-medium max-w-sm">Help 2,400+ citizens of the multiverse decide their next academic pivot.</p>
+                                    </div>
+                                    <button class="bg-white text-slate-900 px-10 py-6 rounded-3xl font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-white/5 hover:bg-primary hover:text-white transition-all">Signify Now ✍️</button>
+                                </div>
+                                <div class="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+                                <div class="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-20 -mb-20"></div>
                             </div>
 
                             <!-- Institutional Pillars: Council Verified 🛡️ -->
