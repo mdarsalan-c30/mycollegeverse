@@ -24,7 +24,9 @@ class SubjectController extends Controller
             'semester' => 'required|integer|min:1|max:10',
         ]);
 
-        Subject::create($request->all());
+        $data = $request->all();
+        $data['course'] = 'deprecated'; // Temporary placeholder for legacy column constraint
+        Subject::create($data);
 
         return back()->with('success', 'Subject mapped to academic node.');
     }

@@ -13,6 +13,7 @@ class Subject extends Model
         'name',
         'course_id',
         'semester',
+        'course', // Legacy fallback to prevent 500 errors
     ];
 
     public function course()
