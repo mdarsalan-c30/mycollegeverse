@@ -211,68 +211,63 @@
                                     <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">Peer Verified Max</p>
                                 </div>
 
-                                <div class="bg-white p-8 md:p-10 rounded-[2.5rem] md:rounded-[3rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.02)] space-y-3 group hover:border-primary/20 transition-all duration-500">
-                                    <p class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">Lowest Package</p>
-                                    <p class="text-3xl md:text-4xl font-black text-slate-900 group-hover:text-amber-500 transition-colors">{{ $college->placement_stats['min'] }}</p>
-                                    <p class="text-[8px] md:text-[9px] font-bold text-slate-400 italic">Institutional Floor</p>
+                                <div class="bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm space-y-2 group hover:border-primary/20 transition-all duration-300">
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Lowest Package</p>
+                                    <p class="text-2xl md:text-3xl font-bold text-slate-900 leading-none">{{ $college->placement_stats['min'] }}</p>
+                                    <p class="text-[9px] font-medium text-slate-400">Institutional Floor</p>
                                 </div>
                             </div>
 
-                            <!-- Psychological Review Trigger CTA 🛡️ -->
-                            <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-[2.5rem] md:rounded-[3.5rem] p-10 md:p-16 text-white relative overflow-hidden shadow-2xl group cursor-pointer" @click="tab = 'reviews'; toggleReviewForm()">
+                            <!-- Simplified Review Trigger ✍️ -->
+                            <div class="bg-white rounded-3xl p-8 md:p-12 border border-slate-200 shadow-sm relative overflow-hidden group cursor-pointer" @click="tab = 'reviews'; toggleReviewForm()">
                                 <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                                    <div class="space-y-4">
-                                        <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 rounded-full border border-white/5">
-                                            <span class="text-xs">⭐</span>
-                                            <span class="text-[9px] font-black tracking-widest uppercase">Verified Evaluation Node</span>
+                                    <div class="space-y-4 text-center md:text-left">
+                                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 rounded-full border border-primary/10">
+                                            <span class="text-[10px] font-bold text-primary uppercase tracking-widest">Student Feedback</span>
                                         </div>
-                                        <h4 class="text-2xl md:text-4xl font-black tracking-tight leading-tight">Your campus experience is <br><span class="text-primary italic">institutional intelligence.</span></h4>
-                                        <p class="text-slate-400 font-medium max-w-sm">Help 2,400+ citizens of the multiverse decide their next academic pivot.</p>
+                                        <h4 class="text-2xl md:text-3xl font-bold text-slate-900 tracking-tight leading-tight italic">Help your juniors. <br>Rate this college now.</h4>
+                                        <p class="text-slate-500 font-medium text-sm max-w-sm">Share your real experience with the community.</p>
                                     </div>
-                                    <button class="bg-white text-slate-900 px-10 py-6 rounded-3xl font-black text-[11px] uppercase tracking-widest shadow-2xl shadow-white/5 hover:bg-primary hover:text-white transition-all">Signify Now ✍️</button>
+                                    <button class="bg-primary text-white px-8 py-4 rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Write Review ✍️</button>
                                 </div>
-                                <div class="absolute top-0 right-0 w-96 h-96 bg-primary/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
-                                <div class="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px] -ml-20 -mb-20"></div>
                             </div>
 
-                            <!-- Institutional Pillars: Council Verified 🛡️ -->
+                            <!-- Institutional Pillars: Student Community 🛡️ -->
                             <div class="grid md:grid-cols-2 gap-8 md:gap-10">
-                                <div class="bg-primary rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl group">
-                                    <div class="relative z-10 space-y-4 md:space-y-6">
-                                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl md:text-3xl">🧩</div>
-                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Verified Synergy</h5>
-                                        <p class="text-xs md:text-sm font-medium text-white/80 leading-relaxed">
-                                            {{ number_format($college->users_count) }}+ verified nodes contributing to the digital hive.
+                                <div class="bg-primary rounded-3xl p-8 md:p-10 text-white relative overflow-hidden shadow-xl group">
+                                    <div class="relative z-10 space-y-4">
+                                        <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">🤝</div>
+                                        <h5 class="text-xl font-bold leading-tight">Active Students</h5>
+                                        <p class="text-sm font-medium text-white/80 leading-relaxed">
+                                            {{ number_format($college->users_count) }}+ students from this college are part of our ecosystem.
                                         </p>
                                     </div>
-                                    <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-1000"></div>
                                 </div>
-                                <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[3.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl group">
-                                    <div class="relative z-10 space-y-4 md:space-y-6">
-                                        <div class="w-12 h-12 md:w-16 md:h-16 rounded-[1.2rem] md:rounded-[1.5rem] bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl md:text-3xl">🌍</div>
-                                        <h5 class="text-xl md:text-2xl font-black leading-tight">Multiverse Impact</h5>
-                                        <p class="text-xs md:text-sm font-medium text-slate-400 leading-relaxed">
-                                            {{ $college->notes()->count() }} Study Notes & {{ $college->professors()->withCount('reviews')->get()->sum('reviews_count') }} Faculty Reviews manifested.
+                                <div class="bg-slate-900 rounded-3xl p-8 md:p-10 text-white relative overflow-hidden shadow-xl group">
+                                    <div class="relative z-10 space-y-4">
+                                        <div class="w-12 h-12 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center text-2xl">📚</div>
+                                        <h5 class="text-xl font-bold leading-tight">Study Resources</h5>
+                                        <p class="text-sm font-medium text-slate-400 leading-relaxed">
+                                            {{ $college->notes()->count() }} Study Notes & {{ $college->professors()->withCount('reviews')->get()->sum('reviews_count') }} Faculty Reviews available.
                                         </p>
                                     </div>
-                                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Side Metrics: Council Intelligence 🛡️ -->
+                        <!-- Side Metrics: College Ratings 🛡️ -->
                         <div class="lg:col-span-4 space-y-12">
-                            <div class="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[3.5rem] border border-slate-100 shadow-[0_20px_50px_rgba(0,0,0,0.03)] space-y-10">
-                                <h4 class="text-xl md:text-2xl font-black text-slate-900">Council Intelligence</h4>
-                                <div class="space-y-8 md:space-y-10">
+                            <div class="bg-white p-8 md:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-8">
+                                <h4 class="text-xl font-bold text-slate-900">College Ratings</h4>
+                                <div class="space-y-6 md:space-y-8">
                                     @foreach($college->academic_metrics as $metric)
-                                    <div class="space-y-3 md:space-y-4">
+                                    <div class="space-y-2 md:space-y-3">
                                         <div class="flex justify-between items-end">
-                                            <span class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $metric['label'] }}</span>
-                                            <span class="text-[10px] md:text-xs font-black text-slate-900">{{ $metric['text'] }}</span>
+                                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $metric['label'] }}</span>
+                                            <span class="text-[10px] md:text-xs font-bold text-slate-900">{{ $metric['text'] }}</span>
                                         </div>
-                                        <div class="h-2.5 md:h-3 w-full bg-slate-50 border border-slate-100 rounded-full overflow-hidden p-0.5">
-                                            <div class="h-full bg-gradient-to-r from-indigo-500 to-primary rounded-full transition-all duration-1000 shadow-[0_0_10px_rgba(37,99,235,0.3)]" style="width: {{ $metric['percent'] }}%"></div>
+                                        <div class="h-2 w-full bg-slate-50 border border-slate-100 rounded-full overflow-hidden">
+                                            <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: {{ $metric['percent'] }}%"></div>
                                         </div>
                                     </div>
                                     @endforeach
@@ -283,11 +278,11 @@
 
                     <!-- Tab Content: Reviews -->
                     <div x-show="tab === 'reviews'" class="space-y-10 md:space-y-16 max-w-5xl mx-auto" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4">
-                        <!-- Council Review Hub 🛡️ -->
-                        <div class="bg-white p-8 md:p-12 rounded-[2.5rem] md:rounded-[4rem] border border-slate-100 shadow-xl shadow-slate-200/20 flex flex-col md:flex-row items-center justify-between gap-8 mb-16">
-                            <div class="flex items-center gap-8">
-                                <div class="bg-primary/5 p-6 rounded-[2.5rem] flex flex-col items-center">
-                                    <span class="text-4xl md:text-5xl font-black text-primary">{{ number_format($college->reviews()->where('status', 'approved')->avg(DB::raw('(campus_rating + faculty_rating + academic_rating) / 3')), 1) ?: '0.0' }}</span>
+                        <!-- Student Rating Summary 🛡️ -->
+                        <div class="bg-white p-8 md:p-10 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                            <div class="flex items-center gap-6">
+                                <div class="bg-slate-50 p-6 rounded-2xl flex flex-col items-center border border-slate-100">
+                                    <span class="text-4xl md:text-5xl font-bold text-slate-900">{{ number_format($college->reviews()->where('status', 'approved')->avg(DB::raw('(campus_rating + faculty_rating + academic_rating) / 3')), 1) ?: '0.0' }}</span>
                                     <div class="flex gap-0.5 mt-2">
                                         @foreach(range(1,5) as $i)
                                         <span class="text-[10px]">{{ $i <= ($college->reviews()->where('status', 'approved')->avg(DB::raw('(campus_rating + faculty_rating + academic_rating) / 3')) ?? 0) ? '⭐' : '☆' }}</span>
@@ -295,8 +290,8 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Council Verification</h3>
-                                    <p class="text-xs md:text-sm font-bold text-slate-400 uppercase tracking-widest mt-1 italic">Based on {{ $college->reviews()->where('status', 'approved')->count() }} verified signals</p>
+                                    <h3 class="text-2xl font-bold text-slate-900 tracking-tight">Student Reviews</h3>
+                                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Based on {{ $college->reviews()->where('status', 'approved')->count() }} ratings</p>
                                 </div>
                             </div>
 
@@ -307,14 +302,14 @@
                                 @endphp
 
                                 @if($myPendingReview)
-                                    <div class="bg-amber-50 text-amber-600 px-8 py-4 rounded-2xl border border-amber-100 text-[10px] font-black uppercase tracking-widest animate-pulse">Verification in Progress</div>
+                                    <div class="bg-amber-50 text-amber-600 px-6 py-3 rounded-xl border border-amber-100 text-[10px] font-bold uppercase tracking-widest">Processing...</div>
                                 @elseif($myApprovedReview)
-                                    <div class="bg-emerald-50 text-emerald-600 px-8 py-4 rounded-2xl border border-emerald-100 text-[10px] font-black uppercase tracking-widest">Signal Manifested ✅</div>
+                                    <div class="bg-emerald-50 text-emerald-600 px-6 py-3 rounded-xl border border-emerald-100 text-[10px] font-bold uppercase tracking-widest">Review Active ✅</div>
                                 @else
-                                    <button @click="toggleReviewForm()" class="bg-primary text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Signify Your Experience ✍️</button>
+                                    <button @click="toggleReviewForm()" class="bg-primary text-white px-8 py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Write a Review ✍️</button>
                                 @endif
                             @else
-                                <a href="{{ route('login') }}" class="bg-slate-900 text-white px-10 py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/10 hover:scale-105 active:scale-95 transition-all">Join to Signify ⭐</a>
+                                <a href="{{ route('login') }}" class="bg-slate-900 text-white px-8 py-4 rounded-xl font-bold text-[11px] uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">Sign in to Review</a>
                             @endauth
                         </div>
 
@@ -325,19 +320,15 @@
                         @if(!$myPendingReview && !$myApprovedReview)
                         <div x-show="showReviewForm" 
                              x-collapse
-                             x-transition:enter="transition ease-out duration-500"
-                             x-transition:enter-start="opacity-0 scale-95"
-                             x-transition:enter-end="opacity-100 scale-100"
-                             class="mb-20">
-                            <div class="bg-slate-900 rounded-[2.5rem] md:rounded-[4rem] p-8 md:p-16 space-y-8 md:space-y-12 relative overflow-hidden shadow-2xl">
-                                <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] -mr-64 -mt-64"></div>
-                                <div class="relative z-10 space-y-10 md:space-y-12">
-                                    <div class="flex flex-col md:flex-row justify-between items-start gap-6">
-                                        <div class="space-y-2 md:space-y-3">
-                                            <h3 class="text-2xl md:text-3xl font-black text-white">Campus Evaluation</h3>
-                                            <p class="text-slate-400 text-base md:text-lg">Contribute your authentic perspective to the multiverse.</p>
+                             class="mb-12">
+                            <div class="bg-slate-900 rounded-3xl p-8 md:p-12 space-y-8 relative overflow-hidden shadow-xl">
+                                <div class="relative z-10 space-y-8">
+                                    <div class="flex justify-between items-start">
+                                        <div class="space-y-1">
+                                            <h3 class="text-xl md:text-2xl font-bold text-white">Rate this College</h3>
+                                            <p class="text-slate-400 text-sm">Your feedback helps thousands of students.</p>
                                         </div>
-                                        <button @click="showReviewForm = false" class="text-white/30 hover:text-white transition-colors text-2xl">✕</button>
+                                        <button @click="showReviewForm = false" class="text-white/30 hover:text-white transition-colors text-xl">✕</button>
                                     </div>
 
                                     <form action="{{ route('colleges.rate', $college->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-8 md:space-y-12">
@@ -454,12 +445,13 @@
                                     <div class="sm:text-right w-full sm:w-auto flex sm:flex-col justify-between items-center sm:items-end">
                                         <div class="flex items-center gap-2">
                                             <span class="text-amber-400 text-2xl md:text-3xl">⭐</span>
+                                            <span class="text-amber-400 text-2xl">⭐</span>
                                             <span class="text-3xl md:text-4xl font-black text-slate-900">{{ number_format(($review->campus_rating + $review->faculty_rating + $review->academic_rating) / 3, 1) }}</span>
                                         </div>
-                                        <p class="text-[9px] md:text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-2">{{ $review->created_at->format('M d, Y') }}</p>
+                                        <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-2">{{ $review->created_at->format('M d, Y') }}</p>
                                     </div>
                                 </div>
-                                <p class="text-slate-600 font-medium leading-[1.8] italic text-lg md:text-2xl max-w-4xl">"{{ $review->comment }}"</p>
+                                <p class="text-slate-600 font-medium leading-relaxed italic text-lg max-w-4xl selection:bg-primary/10">"{{ $review->comment }}"</p>
                             </div>
                             @empty
                             <div class="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
