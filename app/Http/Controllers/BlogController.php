@@ -41,7 +41,7 @@ class BlogController extends Controller
             // Auto-pilot: Fetch colleges based on keywords or general global priority
             // For now, we fetch top rated colleges as a high-value default
             $recommendedColleges = College::withCount('reviews')
-                ->orderBy('avg_rating', 'desc')
+                ->orderBy('rating', 'desc')
                 ->take(6)
                 ->get();
         } else {

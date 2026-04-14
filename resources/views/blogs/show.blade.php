@@ -127,8 +127,8 @@
                 @foreach($recommendedColleges as $college)
                 <div class="college-card flex flex-col bg-white overflow-hidden shadow-sm shadow-slate-100">
                     <a href="{{ route('colleges.show', $college->slug) }}" class="block aspect-[16/9] bg-slate-100 overflow-hidden">
-                        @if($college->main_image)
-                            <img src="{{ app(\App\Services\ImageKitService::class)->url($college->main_image, ['w' => 400, 'q' => 70]) }}" class="w-full h-full object-cover">
+                        @if($college->thumbnail_url)
+                            <img src="{{ app(\App\Services\ImageKitService::class)->getUrl($college->thumbnail_url, ['w' => 400, 'q' => 70]) }}" class="w-full h-full object-cover">
                         @endif
                     </a>
                     <div class="p-6 flex-1 flex flex-col">
