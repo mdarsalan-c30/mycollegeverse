@@ -74,7 +74,7 @@
                             </p>
                         </div>
                         @if($review->user->id_card_url)
-                        <a href="{{ $review->user->profile_photo_url }}" target="_blank" class="flex items-center gap-1 text-[9px] font-black text-indigo-500 hover:text-indigo-700 transition-colors uppercase tracking-widest">
+                        <a href="{{ $review->user->id_card_url }}" target="_blank" class="flex items-center gap-1 text-[9px] font-black text-indigo-500 hover:text-indigo-700 transition-colors uppercase tracking-widest">
                             <span>🆔 View ID Card</span>
                             <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" stroke-width="3"/></svg>
                         </a>
