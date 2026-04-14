@@ -90,7 +90,7 @@
                         <img src="{{ $blog->featured_image ? (str_contains($blog->featured_image, 'http') ? $blog->featured_image : 'https://ik.imagekit.io/studycubsfranchise/' . $blog->featured_image) : 'https://images.unsplash.com/photo-1434031216660-c50938c8f3ef?auto=format&fit=crop&q=80' }}" 
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt="{{ $blog->title }}">
                         <div class="absolute top-3 left-3">
-                            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-[8px] font-black text-secondary rounded-full uppercase tracking-widest">{{ $blog->category->name ?? 'Insight' }}</span>
+                            <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-[8px] font-black text-secondary rounded-full uppercase tracking-widest">{{ optional($blog->category)->name ?? 'Insight' }}</span>
                         </div>
                     </div>
                     <div>

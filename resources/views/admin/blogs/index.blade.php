@@ -18,7 +18,7 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Avg SEO Health</p>
-                <h3 class="text-3xl font-black text-emerald-500">{{ round($blogs->getCollection()->avg('seo_score') ?? 0) }}%</h3>
+                <h3 class="text-3xl font-black text-emerald-500">{{ round($blogs->count() > 0 ? $blogs->getCollection()->avg('seo_score') : 0) }}%</h3>
             </div>
             <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Total Insights</p>
@@ -26,7 +26,7 @@
             </div>
             <div class="glass p-8 rounded-[2.5rem] border-white/60 shadow-sm">
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Multiverse Views</p>
-                <h3 class="text-3xl font-black text-blue-500">{{ number_format($blogs->sum('views')) }}</h3>
+                <h3 class="text-3xl font-black text-blue-500">{{ number_format($blogs->count() > 0 ? $blogs->getCollection()->sum('views') : 0) }}</h3>
             </div>
         </div>
 

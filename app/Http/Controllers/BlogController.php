@@ -30,7 +30,8 @@ class BlogController extends Controller
             \Log::error("Blog Index Error: " . $e->getMessage());
             $categories = collect(); 
             $featuredBlogs = collect();
-            return view('blogs.index', compact('categories', 'featuredBlogs'))->with('error', 'Editorial signals are faint. Please refresh or check back later.');
+            $recentInsights = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 12);
+            return view('blogs.index', compact('categories', 'featuredBlogs', 'recentInsights'))->with('error', 'Editorial signals are faint. Please run /multiverse-migrate on your host.');
         }
     }
 
