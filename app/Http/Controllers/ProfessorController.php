@@ -60,7 +60,7 @@ class ProfessorController extends Controller
         return view('professors.show', compact('professor', 'seoTitle', 'seoDescription', 'schema'));
     }
 
-    public function rate(Request $request, Professor $professor, \App\Services\ImageKitService $imageKit)
+    public function rate(Request $request, Professor $professor, \App\Services\ImageKitService $imageKit, \App\Services\ContentFilterService $filter)
     {
         $user = Auth::user();
 
@@ -84,6 +84,12 @@ class ProfessorController extends Controller
 
         $request->validate($rules);
 
+        // Code of Conduct Filtering 🛡️
+        $check = $filter->check($request->comment);
+        if ($check['status'] === 'block') {
+            return back()->with('error', $check['reason'])->withInput();
+        }
+
         // Upload ID Card if provided and user doesn't have one
         if ($request->hasFile('id_card_image') && !$user->id_card_url) {
             $upload = $imageKit->upload(
@@ -105,10 +111,15 @@ class ProfessorController extends Controller
             'tags' => $request->tags,
             'unit_focus' => $request->unit_focus,
             'internal_difficulty' => $request->internal_difficulty,
+            'is_flagged' => ($check['status'] === 'flag'),
             'status' => 'pending', // Faculty Intel Hub always requires verification 🛡️
         ]);
 
-        return back()->with('success', 'Intel transmission successful. Observations recorded for Council verification.');
+        $message = ($check['status'] === 'flag')
+            ? $check['reason']
+            : 'Intel transmission successful. Observations recorded for Council verification.';
+
+        return back()->with($check['status'] === 'flag' ? 'info' : 'success', $message);
     }
 
     public function requestProfessor(Request $request, \App\Services\ImageKitService $imageKit)
