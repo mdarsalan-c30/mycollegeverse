@@ -37,6 +37,7 @@ class User extends Authenticatable
         'status',
         'ban_reason',
         'id_card_url',
+        'karma_spent',
     ];
 
     public function getKarmaAttribute()
@@ -60,7 +61,8 @@ class User extends Authenticatable
             ($likesReceived * 5) + 
             ($commentCount * 10) + 
             ($reviewCount * 15) +
-            ($noteReviewCount * 5)
+            ($noteReviewCount * 5) -
+            $this->karma_spent
         );
     }
 
@@ -234,5 +236,10 @@ class User extends Authenticatable
     public function reports()
     {
         return $this->morphMany(Report::class, 'reportable');
+    }
+
+    public function claimedRewards()
+    {
+        return $this->belongsToMany(Reward::class, 'reward_claims')->withPivot('claimed_at')->withTimestamps();
     }
 }

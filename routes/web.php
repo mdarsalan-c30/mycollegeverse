@@ -106,6 +106,10 @@ Route::middleware(['auth'])->group(function () {
         // Recruitment Pipeline routes
         Route::get('/pipeline', [App\Http\Controllers\PipelineController::class, 'index'])->name('pipeline.index');
         Route::post('/jobs/{job}/apply', [App\Http\Controllers\JobApplicationController::class, 'store'])->name('jobs.apply');
+
+        // Perks & Rewards Hub 🎁
+        Route::get('/perks', [App\Http\Controllers\RewardController::class, 'index'])->name('rewards.index');
+        Route::post('/perks/{reward}/claim', [App\Http\Controllers\RewardController::class, 'claim'])->name('rewards.claim');
     });
 
     // Recruiter Only Routes
@@ -218,6 +222,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Command: Startup Hub (Social & Corporate Nodes) 🚀
     Route::get('/startup', [App\Http\Controllers\Admin\StartupHubController::class, 'index'])->name('startup.index');
     Route::post('/startup/social', [App\Http\Controllers\Admin\StartupHubController::class, 'updateSocial'])->name('startup.social.update');
+
+    // Perks & Rewards Governance 🎁
+    Route::resource('rewards', App\Http\Controllers\Admin\RewardController::class);
 });
 
 Route::get('/multiverse-slug-sync', function() {
