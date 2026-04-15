@@ -10,6 +10,9 @@
         <meta name="robots" content="index, follow, max-image-preview:large">
         <link rel="canonical" href="{{ url('/') }}" />
 
+        <!-- Google Search Console Verification 🔎 -->
+        <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
+
         <!-- Open Graph / SEO Social -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url('/') }}">

@@ -19,6 +19,9 @@
         <meta name="author" content="MyCollegeVerse Team">
         <meta name="robots" content="index, follow, max-image-preview:large">
         <link rel="canonical" href="{{ url()->current() }}" />
+
+        <!-- Google Search Console Verification 🔎 -->
+        <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
         
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">

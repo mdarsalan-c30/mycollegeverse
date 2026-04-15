@@ -9,6 +9,9 @@
         <meta name="description" content="@yield('meta_description', 'Enter the ultimate academic multiverse. Share notes, review professors, and join your campus verse.')">
         <link rel="canonical" href="{{ url()->current() }}" />
 
+        <!-- Google Search Console Verification 🔎 -->
+        <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
+
         <!-- Analytics Infrastructure 📡 -->
         <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
