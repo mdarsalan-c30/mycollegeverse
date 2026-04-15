@@ -24,7 +24,7 @@ Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name
 Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');
 
 // Master Browser Nexus (For Hostinger/Terminal-less Sync)
-Route::get('/multiverse-migrate', [App\Http\Controllers\MultiverseSyncController::class, 'sync']);
+
 Route::get('/multiverse-note-slug-sync', function() {
     try {
         $notes = \App\Models\Note::whereNull('slug')->get();
