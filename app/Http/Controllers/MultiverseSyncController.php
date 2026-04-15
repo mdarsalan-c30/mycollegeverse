@@ -15,9 +15,10 @@ class MultiverseSyncController extends Controller
     public function sync()
     {
         try {
-            Log::info("Initiating Verse Synchronization...");
+            // 1. Establish Nexus Points (Clear Caches)
+            Artisan::call('optimize:clear');
             
-            // 1. Run Migrations
+            // 2. Run Migrations
             Artisan::call('migrate', ['--force' => true]);
             $output = Artisan::output();
             

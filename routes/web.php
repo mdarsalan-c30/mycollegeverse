@@ -99,7 +99,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/professors', [App\Http\Controllers\ProfessorController::class, 'index'])->name('professors.index');
         Route::get('/professors/{professor:slug}', [App\Http\Controllers\ProfessorController::class, 'show'])->name('professors.show');
         Route::post('/professors/request', [App\Http\Controllers\ProfessorController::class, 'requestProfessor'])->name('professors.request');
-        Route::post('/professors/{professor}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
+        Route::post('/professors/{professor:slug}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
         Route::post('/colleges/{college:slug}/rate', [App\Http\Controllers\CollegeController::class, 'rate'])->name('colleges.rate');
         Route::post('/colleges/request', [App\Http\Controllers\CollegeController::class, 'requestCollege'])->name('colleges.request');
 
@@ -272,7 +272,10 @@ Route::get('/multiverse-sync', function() {
 
 Route::get('/multiverse-migrate', function() {
     try {
+        // 1. Establish Nexus Points (Clear Caches)
         Artisan::call('optimize:clear');
+        
+        // 2. Run Migrations
         Artisan::call('migrate', ['--force' => true]);
         return "🌌 Multiverse Manifested! Database schema updated. You can now visit <a href='/multiverse-post-slug-sync'>/multiverse-post-slug-sync</a> to finalize the identity mapping.";
     } catch (\Exception $e) {

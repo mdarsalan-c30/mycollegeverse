@@ -307,7 +307,7 @@
 
                 @auth
                 @if(Auth::user()->college_id === $professor->college_id)
-                <form action="{{ route('professors.rate', $professor->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <form action="{{ route('professors.rate', $professor->slug) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Star Rating Selector --}}
