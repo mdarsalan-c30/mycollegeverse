@@ -27,18 +27,55 @@
         <meta property="twitter:description" content="The absolute College OS for every student. Share notes, review faculty, and dominate your academics.">
         <meta property="twitter:image" content="{{ asset('assets/mcv/og-landing.jpg') }}">
 
-        <!-- Structured Data (JSON-LD) -->
+        <!-- Structured Data: Organization (JSON-LD) -->
         <script type="application/ld+json">
         {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "MyCollegeVerse",
-          "url": "https://mycollegeverse.in",
-          "logo": "https://mycollegeverse.in/assets/mcv/mycollegeverse.png",
+          "alternateName": "MCV",
+          "url": "https://mycollegeverse.in/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://mycollegeverse.in/assets/mcv/mycollegeverse.png",
+            "width": 512,
+            "height": 512
+          },
+          "description": "MyCollegeVerse is India's ultimate academic identity platform for students — share notes, review professors, join campus communities, and access high-quality BTech & AKTU study material.",
+          "foundingDate": "2024",
+          "areaServed": "IN",
+          "knowsAbout": ["BTech Notes", "AKTU Study Material", "Professor Reviews", "Campus Community", "Student Networking", "Engineering Notes"],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "email": "mycollegeverse@gmail.com",
+            "contactType": "customer support",
+            "availableLanguage": ["English", "Hindi"]
+          },
           "sameAs": [
-            "https://twitter.com/mycollegeverse"
-          ],
-          "description": "An academic identity platform and student OS for sharing notes, reviewing professors, and campus collaboration."
+            "https://www.instagram.com/mycollegeverse.xyz/",
+            "https://www.youtube.com/@mcvmycollegeverse160",
+            "https://www.linkedin.com/company/mycollegeverse/",
+            "https://mycollegeverse.in/"
+          ]
+        }
+        </script>
+
+        <!-- Structured Data: WebSite + Sitelinks Searchbox (JSON-LD) -->
+        <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "MyCollegeVerse",
+          "alternateName": "MCV — The Student OS",
+          "url": "https://mycollegeverse.in/",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+              "@type": "EntryPoint",
+              "urlTemplate": "https://mycollegeverse.in/notes?search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+          }
         }
         </script>
         <!-- Analytics Infrastructure 📡 -->
