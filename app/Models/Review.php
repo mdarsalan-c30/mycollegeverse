@@ -9,7 +9,11 @@ class Review extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'professor_id', 'rating', 'comment'];
+    protected $fillable = ['user_id', 'professor_id', 'rating', 'comment', 'status', 'tags', 'unit_focus', 'internal_difficulty'];
+
+    protected $casts = [
+        'tags' => 'array',
+    ];
 
     public function user()
     {

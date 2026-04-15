@@ -43,37 +43,38 @@ class ReviewController extends Controller
      */
     public function approve($type, $id)
     {
-        // Only Institutional (College) reviews currently require verification
-        if ($type !== 'college') {
-            return back()->with('info', "Direct verification is only required for high-fidelity Institutional nodes.");
-        }
+        if ($type === 'professor') {
+            $review = Review::findOrFail($id);
+            $review->update(['status' => 'approved']);
+            $targetName = optional($review->professor)->name ?? 'Legacy Advisor';
+        } else {
+            $review = CollegeReview::findOrFail($id);
+            $review->update(['status' => 'approved']);
+            $targetName = optional($review->college)->name ?? 'Legacy Institution';
 
-        $review = CollegeReview::findOrFail($id);
-        
-        $review->update(['status' => 'approved']);
-
-        // Synchronize Rating 🛰️
-        try {
-            if ($review->college) {
-                $review->college->syncRating();
+            // Synchronize Rating for Colleges 🛰️
+            try {
+                if ($review->college) {
+                    $review->college->syncRating();
+                }
+            } catch (\Exception $e) {
+                // Log but don't fail approval
             }
-        } catch (\Exception $e) {
-            // Log but don't fail approval
         }
 
         // Audit Logging 🛡️
         ApprovalLog::safeCreate([
             'admin_id' => Auth::id(),
             'action' => 'review_verified',
-            'target_type' => 'CollegeReview',
+            'target_type' => $type === 'professor' ? 'Review' : 'CollegeReview',
             'target_id' => $review->id,
             'metadata' => [
                 'user' => optional($review->user)->name ?? 'Unknown',
-                'college' => optional($review->college)->name ?? 'Unknown',
+                'target' => $targetName,
             ],
         ]);
 
-        return back()->with('success', "Feedback signal for '" . ($review->college->name ?? 'Hub') . "' has been verified and manifest across the multiverse.");
+        return back()->with('success', "Feedback signal for '{$targetName}' has been verified and manifest across the multiverse.");
     }
 
     /**

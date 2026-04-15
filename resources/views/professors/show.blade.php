@@ -63,12 +63,18 @@
                         @endif
 
                         {{-- CTA: Rate This Professor --}}
+                        @if(Auth::check() && Auth::user()->college_id === $professor->college_id)
                         <a href="#rate-form"
                            class="ml-auto inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl text-xs font-black shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.02] active:scale-[0.98] transition-all"
                            style="scroll-behavior:smooth">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                            Write a Review
+                            Record Faculty Intel
                         </a>
+                        @elseif(Auth::check())
+                        <div class="ml-auto px-4 py-2 bg-slate-100 text-slate-400 text-[10px] font-black rounded-xl uppercase tracking-widest border border-slate-200">
+                            Registry Lock: Different Hub
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -85,11 +91,80 @@
             {{-- Section Header --}}
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-xl font-black text-slate-900">Student Experiences</h2>
-                    <p class="text-xs text-slate-400 font-bold mt-0.5">Based on {{ $total }} verified {{ Str::plural('review', $total) }}</p>
+                    <h2 class="text-xl font-black text-slate-900">Faculty Intel Feed</h2>
+                    <p class="text-xs text-slate-400 font-bold mt-0.5">Based on {{ $total }} verified observations</p>
                 </div>
-                <span class="px-4 py-1.5 bg-slate-100 text-slate-600 text-xs font-black rounded-full">{{ $total }} total</span>
+                <span class="px-4 py-1.5 bg-slate-100 text-slate-600 text-xs font-black rounded-full">{{ $total }} signals</span>
             </div>
+
+            {{-- AGGREGATE INTEL SUMMARY 📡 --}}
+            @if($total > 0)
+            <div class="glass p-8 rounded-[2.5rem] border-primary/10 shadow-sm relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <svg class="w-24 h-24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                
+                <h3 class="text-xs font-black text-primary uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                    </span>
+                    Aggregate Verse Intel
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{-- Common Tags --}}
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Interaction Style</p>
+                        <div class="flex flex-wrap gap-2">
+                            @php
+                                $allTags = [];
+                                foreach($professor->reviews as $r) { if($r->tags) $allTags = array_merge($allTags, $r->tags); }
+                                $tagCounts = array_count_values($allTags);
+                                arsort($tagCounts);
+                                $topTags = array_slice($tagCounts, 0, 4);
+                            @endphp
+                            @forelse($topTags as $tag => $count)
+                                <span class="px-3 py-1.5 bg-white border border-slate-100 rounded-xl text-[10px] font-black text-secondary shadow-sm">#{{ $tag }}</span>
+                            @empty
+                                <span class="text-[10px] italic text-slate-300">No tags synchronized yet.</span>
+                            @endforelse
+                        </div>
+                    </div>
+
+                    {{-- Avg Internal Difficulty --}}
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Internal Difficulty</p>
+                        @php $avgDiff = $professor->reviews->avg('internal_difficulty') ?? 0; @endphp
+                        <div class="flex items-end gap-2">
+                            <span class="text-3xl font-black text-slate-900 leading-none">{{ number_format($avgDiff, 1) }}</span>
+                            <span class="text-[10px] font-bold text-slate-400 mb-1">/ 5.0</span>
+                        </div>
+                        <div class="mt-3 h-1.5 bg-slate-100 rounded-full overflow-hidden w-32">
+                            <div class="bg-indigo-500 h-full rounded-full" style="width: {{ $avgDiff * 20 }}%"></div>
+                        </div>
+                    </div>
+
+                    {{-- Most Cited Units --}}
+                    <div>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Exam Emphasis</p>
+                        @php
+                            $units = $professor->reviews->pluck('unit_focus')->filter()->unique()->take(2);
+                        @endphp
+                        <div class="space-y-2">
+                            @forelse($units as $u)
+                                <div class="flex items-center gap-2">
+                                    <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                                    <span class="text-[10px] font-black text-slate-700 uppercase">{{ $u }}</span>
+                                </div>
+                            @empty
+                                <span class="text-[10px] italic text-slate-300">Scanning exam patterns...</span>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
 
             {{-- Review Cards --}}
             @forelse($professor->reviews->sortByDesc('created_at') as $review)
@@ -131,15 +206,23 @@
 
                 {{-- Review Metadata chips --}}
                 <div class="flex flex-wrap gap-2 mt-4 pt-4 border-t border-slate-50">
-                    @if($review->course ?? null)
-                        <span class="px-2.5 py-1 bg-blue-50 text-blue-700 text-[10px] font-black rounded-lg">📚 {{ $review->course }}</span>
-                    @endif
-                    @if($review->semester ?? null)
-                        <span class="px-2.5 py-1 bg-violet-50 text-violet-700 text-[10px] font-black rounded-lg">📅 {{ $review->semester }}</span>
-                    @endif
                     <span class="px-2.5 py-1 {{ $review->rating >= 4 ? 'bg-green-50 text-green-700' : ($review->rating >= 3 ? 'bg-amber-50 text-amber-700' : 'bg-red-50 text-red-700') }} text-[10px] font-black rounded-lg">
-                        {{ $review->rating >= 4 ? '👍 Recommended' : ($review->rating >= 3 ? '😐 Neutral' : '👎 Not Recommended') }}
+                        {{ $review->rating >= 4 ? '👍 High Fidelity' : ($review->rating >= 3 ? '😐 Neutral' : '👎 Low Fidelity') }}
                     </span>
+                    
+                    @if($review->unit_focus)
+                        <span class="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-lg">🎯 Unit: {{ $review->unit_focus }}</span>
+                    @endif
+
+                    @if($review->internal_difficulty)
+                        <span class="px-2.5 py-1 bg-slate-100 text-slate-600 text-[10px] font-black rounded-lg">📈 Diff: {{ $review->internal_difficulty }}/5</span>
+                    @endif
+
+                    @if($review->tags)
+                        @foreach($review->tags as $tag)
+                            <span class="px-2.5 py-1 bg-white border border-slate-100 text-secondary text-[10px] font-black rounded-lg shadow-sm">#{{ $tag }}</span>
+                        @endforeach
+                    @endif
                 </div>
             </div>
             @endif
@@ -223,56 +306,88 @@
                 </h3>
 
                 @auth
-                <form action="{{ route('professors.rate', $professor->id) }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @if(Auth::user()->college_id === $professor->college_id)
+                <form action="{{ route('professors.rate', $professor->id) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                     @csrf
 
                     {{-- Star Rating Selector --}}
-                    <div x-data="{ rating: 0 }" class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Rating</label>
-                        <div class="flex gap-1">
+                    <div x-data="{ rating: 0 }" class="space-y-4">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Global Fidelity Rating</label>
+                        <div class="flex gap-2">
                             @for($s = 1; $s <= 5; $s++)
                             <button type="button" @click="rating = {{ $s }}"
-                                    class="text-2xl transition-transform hover:scale-110 active:scale-95"
-                                    :class="rating >= {{ $s }} ? 'filter-none' : 'grayscale opacity-40'">⭐</button>
+                                    class="text-3xl transition-transform hover:scale-110 active:scale-95"
+                                    :class="rating >= {{ $s }} ? 'filter-none' : 'grayscale opacity-30'">⭐</button>
                             @endfor
                         </div>
-                        <select name="rating" required class="w-full h-11 bg-white border border-slate-100 rounded-xl px-4 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 appearance-none">
-                            <option value="">Select rating...</option>
-                            <option value="5">⭐⭐⭐⭐⭐ Exceptional</option>
-                            <option value="4">⭐⭐⭐⭐ Very Good</option>
-                            <option value="3">⭐⭐⭐ Average</option>
-                            <option value="2">⭐⭐ Below Average</option>
-                            <option value="1">⭐ Poor</option>
-                        </select>
+                        <input type="hidden" name="rating" x-model="rating" required />
+                    </div>
+
+                    {{-- Interaction Tags --}}
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Interaction Tags (Multiple Required)</label>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach(['Practical Oriented', 'Strict Attendance', 'Fair Evaluator', 'Research Depth', 'Digital Native', 'Project Focus', 'Notes Heavy', 'Industry Context'] as $tag)
+                                <label class="cursor-pointer group">
+                                    <input type="checkbox" name="tags[]" value="{{ $tag }}" class="hidden peer">
+                                    <span class="px-3 py-2 border border-slate-100 rounded-xl text-[10px] font-black text-slate-400 peer-checked:bg-primary peer-checked:text-white peer-checked:border-primary transition-all inline-block group-hover:bg-slate-50">#{{ $tag }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    {{-- Internal Intel --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Internal Difficulty</label>
+                            <select name="internal_difficulty" class="w-full h-11 bg-white border border-slate-100 rounded-xl px-4 text-[10px] font-black text-slate-600 appearance-none">
+                                <option value="1">1 (Easy)</option>
+                                <option value="2">2 (Moderate)</option>
+                                <option value="3">3 (Average)</option>
+                                <option value="4">4 (Hard)</option>
+                                <option value="5">5 (Extreme)</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Exam Unit Focus</label>
+                            <input type="text" name="unit_focus" placeholder="e.g. Unit 3 & 4" class="w-full h-11 bg-white border border-slate-100 rounded-xl px-4 text-[10px] font-black text-slate-600 placeholder-slate-300" />
+                        </div>
                     </div>
 
                     <div class="space-y-1.5">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Your Experience</label>
-                        <textarea name="comment" required rows="5"
-                                  placeholder="Share your experience with this professor — teaching style, grading, accessibility..."
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Observations</label>
+                        <textarea name="comment" required rows="4"
+                                  placeholder="Observations on teaching style, research depth, or internal patterns..."
                                   class="w-full bg-white border border-slate-100 rounded-xl p-4 text-sm font-medium text-slate-700 focus:ring-2 focus:ring-primary/20 focus:border-primary/30 resize-none placeholder-slate-300"></textarea>
                     </div>
 
                     @if(!Auth::user()->id_card_url)
-                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-3">
+                    <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-3">
                         <div class="flex items-center gap-2">
-                            <span class="text-lg">🆔</span>
-                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Optional Verification</p>
+                            <span class="text-xl">🆔</span>
+                            <p class="text-[9px] font-black text-slate-500 uppercase tracking-widest">Identity Manifestation</p>
                         </div>
-                        <p class="text-[9px] text-slate-400 leading-tight font-medium">Verify your identity once to increase review weight. This stays private on your profile.</p>
+                        <p class="text-[9px] text-slate-400 leading-tight font-medium">Verify your ID once to synchronize your academic signals at a higher priority.</p>
                         <input type="file" name="id_card_image" class="w-full text-[9px] text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-[9px] file:font-black file:bg-slate-200 file:text-slate-600 hover:file:bg-slate-300" />
                     </div>
                     @endif
 
                     <button type="submit"
-                            class="w-full bg-primary text-white h-12 rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] transition-all">
-                        {{ Auth::user()->id_card_url ? 'Submit Verified Review' : 'Submit Review' }}
+                            class="w-full bg-primary text-white h-12 rounded-xl font-black text-sm shadow-xl shadow-primary/20 hover:bg-primary/90 hover:scale-[1.01] active:scale-[0.99] transition-all">
+                        Transmit Intel to Council
                     </button>
                 </form>
                 @else
-                <div class="text-center py-6">
-                    <p class="text-slate-500 font-medium mb-4 text-sm">Sign in to evaluate faculty and help fellow students.</p>
-                    <a href="{{ route('login') }}" class="inline-block bg-primary text-white px-8 py-3 rounded-xl font-black text-xs shadow-lg shadow-primary/20 hover:scale-105 transition-all">Sign In to Review</a>
+                <div class="text-center py-10 bg-slate-50 rounded-[2rem] border border-dashed border-slate-200">
+                    <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center text-xl mx-auto mb-4 border border-slate-100 shadow-sm">🔒</div>
+                    <h4 class="text-xs font-black text-slate-900 uppercase tracking-widest mb-2">Institutional Lock</h4>
+                    <p class="text-[10px] text-slate-500 font-medium px-4">You are currently in the <b>{{ Auth::user()->college->name ?? 'External' }}</b> Hub. You can only record signals for faculty within your own institutional node.</p>
+                </div>
+                @endif
+                @else
+                <div class="text-center py-10">
+                    <p class="text-slate-500 font-medium mb-6 text-sm italic">Join the Multiverse to synchronize faculty intel.</p>
+                    <a href="{{ route('login') }}" class="inline-block bg-primary text-white px-8 py-3 rounded-2xl font-black text-xs shadow-xl shadow-primary/20 hover:scale-110 transition-all italic">Launch Identity</a>
                 </div>
                 @endauth
             </div>

@@ -17,7 +17,9 @@ class ProfessorController extends Controller
         
         // Defensive Registry Sync: Only show professors with an institutional anchor 🏢
         // This prevents 500 errors when rendering orphaned nodes.
-        $query = Professor::whereHas('college')->with(['reviews', 'college']);
+        $query = Professor::whereHas('college')->with(['reviews' => function($q) {
+            $q->where('status', 'approved');
+        }, 'college']);
 
         if ($user && $user->college_id) {
             $query->orderByRaw('college_id = ? DESC', [$user->college_id]);
@@ -34,7 +36,9 @@ class ProfessorController extends Controller
 
     public function show(Professor $professor)
     {
-        $professor->load(['reviews.user', 'college']);
+        $professor->load(['reviews' => function($q) {
+            $q->where('status', 'approved');
+        }, 'reviews.user', 'college']);
 
         // SEO Expert Injection 🔍
         $seoTitle = "{$professor->name} Reviews - {$professor->department} Faculty at {$professor->college->name}";
@@ -60,9 +64,17 @@ class ProfessorController extends Controller
     {
         $user = Auth::user();
 
+        // Citizen Validation: Identity must match Institutional Hub 🏢
+        if ($user->college_id !== $professor->college_id) {
+            return back()->with('error', 'You can only provide intel for professors within your own Institutional Hub.');
+        }
+
         $rules = [
             'rating' => 'required|integer|min:1|max:5',
             'comment' => 'required|string',
+            'tags' => 'nullable|array',
+            'unit_focus' => 'nullable|string|max:100',
+            'internal_difficulty' => 'nullable|integer|min:1|max:5',
         ];
 
         // Optional ID card for professor reviews (for anonymity/safety)
@@ -90,9 +102,13 @@ class ProfessorController extends Controller
             'professor_id' => $professor->id,
             'rating' => $request->rating,
             'comment' => $request->comment,
+            'tags' => $request->tags,
+            'unit_focus' => $request->unit_focus,
+            'internal_difficulty' => $request->internal_difficulty,
+            'status' => 'pending', // Faculty Intel Hub always requires verification 🛡️
         ]);
 
-        return back()->with('success', 'Observations recorded in the faculty ledger.');
+        return back()->with('success', 'Intel transmission successful. Observations recorded for Council verification.');
     }
 
     public function requestProfessor(Request $request, \App\Services\ImageKitService $imageKit)
