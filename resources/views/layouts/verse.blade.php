@@ -108,5 +108,41 @@
                 @endforeach
             </div>
         </div>
+
+        @if(session('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="fixed top-8 right-8 z-[100] bg-white border border-green-100 shadow-2xl p-6 rounded-3xl flex items-center gap-4 animate-bounce-subtle">
+            <div class="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-green-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Success</p>
+                <p class="text-xs font-bold text-slate-700">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)" class="fixed top-8 right-8 z-[100] bg-white border border-red-100 shadow-2xl p-6 rounded-3xl flex items-center gap-4">
+            <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-red-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Denied</p>
+                <p class="text-xs font-bold text-slate-700">{{ session('error') }}</p>
+            </div>
+        </div>
+        @endif
+
+        @if(session('info'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 8000)" class="fixed top-8 right-8 z-[100] bg-white border border-blue-100 shadow-2xl p-6 rounded-3xl flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Observation Log</p>
+                <p class="text-xs font-bold text-slate-700">{{ session('info') }}</p>
+            </div>
+        </div>
+        @endif
     </body>
 </html>

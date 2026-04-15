@@ -13,7 +13,7 @@ class ContentFilterService
         
         // 🔴 ABUSIVE / GAALI
         'idiot', 'stupid', 'dumb', 'bastard', 'asshole', 'shit', 'shitty', 'fuck', 'fucking',
-        'chutiya', 'madarchod', 'bhenchod', 'harami', 'kutta', 'kamina', 'mc', 'bc',
+        'chutiya', 'madarchod', 'bhenchod', 'harami', 'kutta', 'kamina', 'mc', 'bc', 'gandu',
         
         // 🔴 PERSONAL ATTACKS
         'useless person', 'worst human', 'disgusting person', 'pathetic teacher',

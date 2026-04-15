@@ -99,7 +99,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/professors', [App\Http\Controllers\ProfessorController::class, 'index'])->name('professors.index');
         Route::get('/professors/{professor:slug}', [App\Http\Controllers\ProfessorController::class, 'show'])->name('professors.show');
         Route::post('/professors/request', [App\Http\Controllers\ProfessorController::class, 'requestProfessor'])->name('professors.request');
-        Route::post('/professors/{professor:slug}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
+        Route::post('/professors/{professor}/rate', [App\Http\Controllers\ProfessorController::class, 'rate'])->name('professors.rate');
         Route::post('/colleges/{college:slug}/rate', [App\Http\Controllers\CollegeController::class, 'rate'])->name('colleges.rate');
         Route::post('/colleges/request', [App\Http\Controllers\CollegeController::class, 'requestCollege'])->name('colleges.request');
 
