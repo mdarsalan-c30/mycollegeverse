@@ -51,6 +51,8 @@ class ProfileController extends Controller
             // Log the error but don't crash the entire platform
             \Illuminate\Support\Facades\Log::error("Portfolio Render Error: " . $e->getMessage());
             
+            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
+
             // Re-throw if in debug mode or return a safe view
             if (config('app.debug')) {
                  return response()->json(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()], 500);
@@ -60,7 +62,8 @@ class ProfileController extends Controller
                 'user' => $user,
                 'projects' => collect(),
                 'experiences' => collect(),
-                'educations' => collect()
+                'educations' => collect(),
+                'layout' => $layout
             ]);
         }
     }
