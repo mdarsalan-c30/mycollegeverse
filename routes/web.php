@@ -19,20 +19,6 @@ Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
 Route::get('/notes/generate', [App\Http\Controllers\NoteController::class, 'generateForm'])->name('notes.generate')->middleware('auth');
 Route::post('/notes/generate', [App\Http\Controllers\NoteController::class, 'generate'])->name('notes.generate.store')->middleware('auth');
-
-// Debug Route for AI Models
-Route::get('/debug-ai', function() {
-    $apiKey = env('GEMINI_API_KEY');
-    if (!$apiKey) return "API Key missing in .env";
-    
-    $response = \Illuminate\Support\Facades\Http::get("https://generativelanguage.googleapis.com/v1beta/models?key={$apiKey}");
-    return response()->json([
-        'status' => $response->status(),
-        'body' => $response->json(),
-        'masking_key' => substr($apiKey, 0, 8) . '...'
-    ]);
-});
-
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
 // Editorial Discovery 🚀

@@ -47,7 +47,7 @@ trait GeneratesAiContent
                 return ['error' => 'Invalid API Key format. Please use a key from Google AI Studio (starts with AIza).'];
             }
 
-            $model = "gemini-1.5-flash"; 
+            $model = "gemini-2.0-flash"; // Confirmed available in user debug report
             
             $response = Http::timeout(120)->post(
                 "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
@@ -58,9 +58,9 @@ trait GeneratesAiContent
                 ]
             );
 
-            // Fallback to gemini-pro if flash is 404ing
+            // Fallback to gemini-flash-latest if 2.0 is 404ing (even though it's in the list)
             if ($response->status() === 404) {
-                $model = "gemini-pro";
+                $model = "gemini-flash-latest";
                 $response = Http::timeout(120)->post(
                     "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
                     [
