@@ -24,23 +24,42 @@ class ProfileController extends Controller
                 abort(404);
             }
 
-            // Fetch PoW Vault & Professional History
-            $projects = $user->projects()
-                ->with(['endorsements.recruiter'])
-                ->latest()
-                ->get();
+            // Fetch PoW Vault & Professional History with Fallback Safety
+            $projects = collect();
+            $experiences = collect();
+            $educations = collect();
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('projects')) {
+                $projects = $user->projects()
+                    ->with(['endorsements.recruiter'])
+                    ->latest()
+                    ->get();
+            }
             
-            $experiences = $user->experiences()->latest()->get();
-            $educations = $user->educations()->latest()->get();
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_experiences')) {
+                $experiences = $user->experiences()->latest()->get();
+            }
+
+            if (\Illuminate\Support\Facades\Schema::hasTable('user_educations')) {
+                $educations = $user->educations()->latest()->get();
+            }
 
             return view('profile.show', compact('user', 'projects', 'experiences', 'educations'));
         } catch (\Exception $e) {
-            return response()->json([
-                'msg' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'stack' => collect($e->getTrace())->take(3)
-            ], 500);
+            // Log the error but don't crash the entire platform
+            \Illuminate\Support\Facades\Log::error("Portfolio Render Error: " . $e->getMessage());
+            
+            // Re-throw if in debug mode or return a safe view
+            if (config('app.debug')) {
+                 return response()->json(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()], 500);
+            }
+
+            return view('profile.show', [
+                'user' => $user,
+                'projects' => collect(),
+                'experiences' => collect(),
+                'educations' => collect()
+            ]);
         }
     }
 

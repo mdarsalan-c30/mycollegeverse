@@ -30,7 +30,8 @@ Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])
 Route::get('/multiverse-portfolio-sync', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "💼 Verse Portfolio Protocol Manifested! The PoW Vault and Academic Records are now live. Visit <a href='/profile/".(auth()->user()->username ?? '')."'>Personal Showcase</a>.";
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return "💼 Verse Portfolio Protocol Manifested! Cache cleared and PoW Vault is live. Visit <a href='/profile/".(auth()->user()->username ?? '')."'>Personal Showcase</a>.";
     } catch (\Exception $e) {
         return "Sync Error: " . $e->getMessage();
     }
