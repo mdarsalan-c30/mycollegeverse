@@ -17,7 +17,7 @@ class SeedAiNotes extends Command
      *
      * @var string
      */
-    protected $signature = 'notes:ai-seed {--subject_id= : Seed a specific subject} {--force : Re-generate existing AI notes}';
+    protected $signature = 'notes:ai-seed {--subject_id= : Seed a specific subject} {--force : Re-generate existing AI notes} {--limit=5 : Limit number of subjects to process to avoid timeouts}';
 
     /**
      * The description of the console command.
@@ -42,6 +42,8 @@ class SeedAiNotes extends Command
         $this->info('🚀 Starting MCV AI Scholar Seeding Engine...');
 
         // 1. Ensure the MCV AI Scholar identity exists
+        $college = College::first() ?? College::create(['name' => 'Global Hub', 'slug' => 'global-hub']);
+        
         $aiUser = User::updateOrCreate(
             ['email' => 'ai.scholar@mycollegeverse.com'],
             [
@@ -49,7 +51,7 @@ class SeedAiNotes extends Command
                 'password' => bcrypt(Str::random(16)),
                 'role' => 'admin',
                 'username' => 'mcv_ai_scholar',
-                'college_id' => 1, // Assume Global Hub or MCV HQ
+                'college_id' => $college->id,
             ]
         );
 
@@ -59,6 +61,22 @@ class SeedAiNotes extends Command
         }
 
         $allSubjects = $subjects->get();
+        if (!$this->option('subject_id') && !$this->option('force')) {
+            // If just regular seeding, only pick subjects that don't have AI notes
+            $subjectsWithoutAi = [];
+            foreach($allSubjects as $s) {
+                if (!Note::where('subject_id', $s->id)->where('note_type', 'ai')->exists()) {
+                    $subjectsWithoutAi[] = $s;
+                }
+            }
+            $allSubjects = collect($subjectsWithoutAi)->take((int)$this->option('limit'));
+        }
+
+        if ($allSubjects->isEmpty()) {
+            $this->info("No subjects need AI generation.");
+            return;
+        }
+
         $bar = $this->output->createProgressBar($allSubjects->count());
         $bar->start();
 
