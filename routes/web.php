@@ -196,6 +196,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/notes', [App\Http\Controllers\Admin\NoteController::class, 'index'])->name('notes');
     Route::get('/notes/bulk-generate', [App\Http\Controllers\Admin\NoteController::class, 'bulkGenerateForm'])->name('notes.bulk');
     Route::post('/notes/bulk-generate', [App\Http\Controllers\Admin\NoteController::class, 'bulkGenerate'])->name('notes.bulk.store');
+    Route::post('/notes/generate-single', [App\Http\Controllers\Admin\NoteController::class, 'generateSingle'])->name('notes.generate.single');
     Route::post('/notes/{note}/verify', [App\Http\Controllers\Admin\NoteController::class, 'verify'])->name('notes.verify');
     Route::delete('/notes/{note}', [App\Http\Controllers\Admin\NoteController::class, 'destroy'])->name('notes.destroy');
 

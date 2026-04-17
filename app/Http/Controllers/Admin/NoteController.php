@@ -65,6 +65,7 @@ class NoteController extends Controller
 
     public function bulkGenerate(Request $request)
     {
+        set_time_limit(0);
         $request->validate([
             'topics' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
@@ -83,18 +84,84 @@ class NoteController extends Controller
         $userId = Auth::id();
 
         foreach ($topics as $topic) {
-            $result = $this->performAiGeneration($topic, $subject->name, $request->detail_level);
+            try {
+                $result = $this->performAiGeneration($topic, $subject->name, $request->detail_level);
+
+                if (isset($result['error'])) {
+                    $errors[] = "Failed for topic '{$topic}': " . $result['error'];
+                    continue;
+                }
+
+                $model = $result['model'] ?? 'unknown';
+                $usage = $result['usage'] ?? [];
+
+                Note::create([
+                    'title' => $topic,
+                    'note_type' => 'ai',
+                    'ai_content' => $result['content'],
+                    'user_id' => $userId,
+                    'college_id' => Auth::user()->college_id ?? 1,
+                    'subject_id' => $subject->id,
+                    'is_verified' => true,
+                ]);
+
+                // 📊 Log Usage Metadata
+                AiUsage::create([
+                    'user_id' => $userId,
+                    'model' => $model,
+                    'type' => 'bulk',
+                    'topic' => $topic,
+                    'prompt_tokens' => $usage['promptTokenCount'] ?? 0,
+                    'candidates_tokens' => $usage['candidatesTokenCount'] ?? 0,
+                    'total_tokens' => $usage['totalTokenCount'] ?? 0,
+                    'metadata' => [
+                        'detail_level' => $request->detail_level,
+                        'subject' => $subject->name
+                    ]
+                ]);
+
+                $successCount++;
+            } catch (\Exception $e) {
+                $errors[] = "Crash for '{$topic}': " . $e->getMessage();
+            }
+        }
+
+        if ($successCount > 0) {
+            $msg = "Successfully generated {$successCount} AI notes for {$subject->name}.";
+            if (!empty($errors)) {
+                $msg .= " However, some failed: " . implode(', ', $errors);
+            }
+            return redirect()->route('admin.notes')->with('success', $msg);
+        }
+
+        return back()->with('error', 'Generation failed for all topics. Errors: ' . implode(', ', $errors));
+    }
+
+    /**
+     * AJAX-based Atomic Generation for Staging Area
+     */
+    public function generateSingle(Request $request)
+    {
+        $request->validate([
+            'topic' => 'required|string',
+            'subject_id' => 'required|exists:subjects,id',
+            'detail_level' => 'required|in:quick,detailed',
+        ]);
+
+        try {
+            $subject = Subject::findOrFail($request->subject_id);
+            $result = $this->performAiGeneration($request->topic, $subject->name, $request->detail_level);
 
             if (isset($result['error'])) {
-                $errors[] = "Failed for topic '{$topic}': " . $result['error'];
-                continue;
+                return response()->json(['success' => false, 'error' => $result['error']], 422);
             }
 
+            $userId = Auth::id();
             $model = $result['model'] ?? 'unknown';
             $usage = $result['usage'] ?? [];
 
-            Note::create([
-                'title' => $topic,
+            $note = Note::create([
+                'title' => $request->topic,
                 'note_type' => 'ai',
                 'ai_content' => $result['content'],
                 'user_id' => $userId,
@@ -103,12 +170,12 @@ class NoteController extends Controller
                 'is_verified' => true,
             ]);
 
-            // 📊 Log Usage Metadata for Bulk
-            \App\Models\AiUsage::create([
+            // 📊 Log Usage Metadata
+            AiUsage::create([
                 'user_id' => $userId,
                 'model' => $model,
-                'type' => 'bulk',
-                'topic' => $topic,
+                'type' => 'staging',
+                'topic' => $request->topic,
                 'prompt_tokens' => $usage['promptTokenCount'] ?? 0,
                 'candidates_tokens' => $usage['candidatesTokenCount'] ?? 0,
                 'total_tokens' => $usage['totalTokenCount'] ?? 0,
@@ -118,18 +185,15 @@ class NoteController extends Controller
                 ]
             ]);
 
-            $successCount++;
-        }
+            return response()->json([
+                'success' => true, 
+                'note_id' => $note->id,
+                'msg' => "'{$request->topic}' manifested successfully!"
+            ]);
 
-        if ($successCount > 0) {
-            $msg = "Successfully generated {$successCount} AI notes for {$subject->name}. Control panel stats updated.";
-            if (!empty($errors)) {
-                $msg .= " However, some failed: " . implode(', ', $errors);
-            }
-            return redirect()->route('admin.notes')->with('success', $msg);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
         }
-
-        return back()->with('error', 'Generation failed for all topics. Errors: ' . implode(', ', $errors));
     }
 
     /**
