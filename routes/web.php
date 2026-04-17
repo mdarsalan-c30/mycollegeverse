@@ -4,6 +4,27 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
+| 🛡️ EMERGENCY RESCUE HUB (Top Priority)
+|--------------------------------------------------------------------------
+*/
+Route::get('/rescue-test', function() {
+    return "✅ [MCV RESCUE] Core App Boot Successful. Time: " . date('Y-m-d H:i:s');
+});
+
+Route::get('/rescue-cache-clear', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        return "🌌 [MCV RESCUE] All caches purged on Hostinger. Visit <a href='/'>Home Page</a> to test.";
+    } catch (\Exception $e) {
+        return "❌ [MCV RESCUE] Cache Purge Failed: " . $e->getMessage();
+    }
+});
+
+/*
+|--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
