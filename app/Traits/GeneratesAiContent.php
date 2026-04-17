@@ -42,26 +42,18 @@ trait GeneratesAiContent
                 return ['error' => 'API Key missing in .env (GEMINI_API_KEY)'];
             }
 
-            // Simple validation to help the user
-            if (!str_starts_with($apiKey, 'AIza') && !str_starts_with($apiKey, 'AQ.')) {
-                return ['error' => 'Invalid API Key format. Please use a key from Google AI Studio (starts with AIza).'];
-            }
+            // Supported models to try in order of stability/free-tier likelihood
+            $models = array_filter([
+                env('GEMINI_MODEL'), 
+                'gemini-flash-latest', 
+                'gemini-1.5-flash', 
+                'gemini-2.0-flash', 
+                'gemini-pro-latest'
+            ]);
 
-            // Allow model override via .env, default to gemini-flash-latest (most stable free tier)
-            $model = env('GEMINI_MODEL', 'gemini-flash-latest'); 
+            $lastError = 'Unknown Exception';
             
-            $response = Http::timeout(120)->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
-                [
-                    'contents' => [
-                        ['parts' => [['text' => $prompt]]]
-                    ]
-                ]
-            );
-
-            // Fallback to gemini-2.0-flash if latest is not found
-            if ($response->status() === 404) {
-                $model = "gemini-2.0-flash";
+            foreach ($models as $model) {
                 $response = Http::timeout(120)->post(
                     "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
                     [
@@ -70,31 +62,33 @@ trait GeneratesAiContent
                         ]
                     ]
                 );
-            }
 
-            if (!$response->successful()) {
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $aiContent = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                    if ($aiContent) {
+                        return ['content' => trim($aiContent), 'model' => $model];
+                    }
+                }
+
                 $errorBody = $response->json();
-                $errorMessage = $errorBody['error']['message'] ?? 'Unknown API Error';
-                \Log::error('Gemini API Error (' . $model . '): ' . $response->body());
-                return ['error' => "API Error: {$errorMessage} (Status: {$response->status()})"];
+                $lastError = $errorBody['error']['message'] ?? 'Status ' . $response->status();
+                
+                // If it's a quota or 404 issue, try the next model
+                if ($response->status() === 429 || $response->status() === 404) {
+                    \Log::warning("Gemini model {$model} failed (Status {$response->status()}). Trying next...");
+                    continue;
+                }
+
+                // For other errors (unauthorized, etc.), don't bother retrying with other models
+                break;
             }
 
-            $data = $response->json();
-            $aiContent = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
-
-            if (!$aiContent) {
-                return ['error' => 'AI returned empty content.'];
-            }
-
-            // Clean up markdown code fences if Gemini wraps in ```html
-            $aiContent = preg_replace('/^```html\s*/i', '', $aiContent);
-            $aiContent = preg_replace('/```\s*$/', '', $aiContent);
-
-            return ['content' => trim($aiContent)];
+            return ['error' => "All AI models failed. Last error ({$model}): {$lastError}"];
 
         } catch (\Exception $e) {
             \Log::error('AI Generation Exception: ' . $e->getMessage());
-            return ['error' => $e->getMessage()];
+            return ['error' => 'System Exception: ' . $e->getMessage()];
         }
     }
 }
