@@ -21,19 +21,22 @@ trait GeneratesAiContent
 
         $detailInstruction = $detailLabels[$detailLevel] ?? $detailLabels['detailed'];
 
-        $prompt = "You are an expert academic professor. Generate high-quality study notes.\n\n"
+        $prompt = "You are an expert academic professor. Generate premium, exam-oriented study notes.\n\n"
             . "Topic: {$topic}\n"
             . "Subject: {$subjectName}\n"
             . "Detail Level: {$detailInstruction}\n\n"
             . "Requirements:\n"
-            . "- Use clear HTML formatting with h2, h3, p, ul, ol, li, strong, em tags\n"
-            . "- Include key definitions, concepts, and explanations\n"
-            . "- Add practical examples where relevant\n"
-            . "- Include important formulas or mnemonics if applicable\n"
-            . "- End with 'Key Takeaways' section\n"
-            . "- Do NOT include html, head, body tags. Only content HTML.\n"
-            . "- Make it student-friendly and easy to understand\n"
-            . "- Use proper academic language";
+            . "- Use HTML5 semantic tags.\n"
+            . "- Use <h2> for major sections and <h3> for sub-sections.\n"
+            . "- Use <ul> and <li> for lists with clear pointers.\n"
+            . "- Use <table> for comparisons or technical data where applicable.\n"
+            . "- Use <div class='info-box'>...</div> for important definitions.\n"
+            . "- Use <div class='exam-tip'>...</div> for exam-oriented tips and mnemonics.\n"
+            . "- Use <div class='diagram-box'>[Diagram Concept: Describe what a diagram here would show]</div> to indicate where a visual should be.\n"
+            . "- Include a 'Quick Revision Table' at the beginning.\n"
+            . "- Use <strong> for high-importance keywords.\n"
+            . "- Structure the content to be highly engaging with proper spacing.\n"
+            . "- Do NOT include html, head, body tags. Only content HTML.";
 
         try {
             $apiKey = env('GEMINI_API_KEY');

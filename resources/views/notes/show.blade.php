@@ -31,14 +31,113 @@
                         </div>
                         <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Gemini</span>
                     </div>
-                    <article class="prose prose-lg prose-slate max-w-none
-                        prose-headings:font-black prose-headings:text-secondary
-                        prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100
-                        prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
-                        prose-p:text-slate-600 prose-p:leading-relaxed prose-p:font-medium
-                        prose-li:text-slate-600 prose-li:font-medium
-                        prose-strong:text-slate-800 prose-strong:font-black
-                        prose-ul:space-y-1 prose-ol:space-y-1">
+                    <article class="prose prose-lg prose-slate max-w-none ai-notes-display">
+                        <style>
+                            .ai-notes-display {
+                                font-family: 'Inter', sans-serif;
+                                line-height: 1.8;
+                                color: #334155;
+                            }
+                            .ai-notes-display h2 {
+                                color: #1e293b !important;
+                                font-weight: 900 !important;
+                                font-size: 1.875rem !important;
+                                border-left: 6px solid #6366f1;
+                                padding-left: 1.25rem;
+                                margin-top: 3.5rem !important;
+                                margin-bottom: 1.5rem !important;
+                                background: linear-gradient(to right, #f8fafc, transparent);
+                                padding-top: 0.5rem;
+                                padding-bottom: 0.5rem;
+                            }
+                            .ai-notes-display h3 {
+                                color: #475569 !important;
+                                font-weight: 800 !important;
+                                font-size: 1.5rem !important;
+                                margin-top: 2.5rem !important;
+                                margin-bottom: 1.25rem !important;
+                            }
+                            .ai-notes-display .info-box {
+                                background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%);
+                                border: 1px solid #bae6fd;
+                                border-radius: 2rem;
+                                padding: 2.5rem;
+                                margin: 3rem 0;
+                                position: relative;
+                            }
+                            .ai-notes-display .info-box::before {
+                                content: '📖 DEFINITION';
+                                position: absolute;
+                                top: -0.75rem;
+                                left: 2rem;
+                                background: #0369a1;
+                                color: white;
+                                padding: 0.25rem 1.25rem;
+                                border-radius: 1rem;
+                                font-size: 0.65rem;
+                                font-weight: 900;
+                            }
+                            .ai-notes-display .exam-tip {
+                                background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+                                border: 2px dashed #f59e0b;
+                                border-radius: 2rem;
+                                padding: 2.5rem;
+                                margin: 3rem 0;
+                                color: #92400e;
+                                position: relative;
+                            }
+                            .ai-notes-display .exam-tip::before {
+                                content: '🎓 EXAM FOCUS';
+                                position: absolute;
+                                top: -0.75rem;
+                                left: 2rem;
+                                background: #d97706;
+                                color: white;
+                                padding: 0.25rem 1.25rem;
+                                border-radius: 1rem;
+                                font-size: 0.65rem;
+                                font-weight: 900;
+                            }
+                            .ai-notes-display .diagram-box {
+                                background: #f8fafc;
+                                border: 2px solid #e2e8f0;
+                                border-radius: 2.5rem;
+                                padding: 4rem 2rem;
+                                margin: 4rem 0;
+                                text-align: center;
+                                font-style: italic;
+                                color: #64748b;
+                                position: relative;
+                                border-style: dashed;
+                            }
+                            .ai-notes-display .diagram-box::after {
+                                content: '📸 CONCEPTUAL ILLUSTRATION';
+                                position: absolute;
+                                bottom: 1.5rem;
+                                left: 50%;
+                                transform: translateX(-50%);
+                                font-size: 0.6rem;
+                                font-weight: 800;
+                                letter-spacing: 0.2em;
+                                opacity: 0.4;
+                            }
+                            .ai-notes-display table {
+                                border-radius: 1.5rem;
+                                overflow: hidden;
+                                border: 1px solid #e2e8f0;
+                                background: white;
+                            }
+                            .ai-notes-display th {
+                                background: #f1f5f9;
+                                color: #475569 !important;
+                                font-weight: 900 !important;
+                                text-transform: uppercase;
+                                letter-spacing: 0.05em;
+                            }
+                            .ai-notes-display td {
+                                border-bottom: 1px solid #f1f5f9;
+                            }
+                        </style>
                         {!! $note->ai_content !!}
                     </article>
                 </div>
