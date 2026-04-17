@@ -88,19 +88,13 @@
                         <label class="flex-1 cursor-pointer group">
                             <input type="radio" name="detail_level" value="quick" class="peer hidden">
                             <div class="h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-2 font-bold text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 transition-all">
-                                <span>⚡</span> Quick
+                                <span>⚡</span> Quick (500w)
                             </div>
                         </label>
                         <label class="flex-1 cursor-pointer group">
                             <input type="radio" name="detail_level" value="detailed" class="peer hidden" checked>
                             <div class="h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-2 font-bold text-slate-400 peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-600 transition-all">
-                                <span>📚</span> Detailed
-                            </div>
-                        </label>
-                        <label class="flex-1 cursor-pointer group">
-                            <input type="radio" name="detail_level" value="exam" class="peer hidden">
-                            <div class="h-14 border-2 border-slate-100 rounded-2xl flex items-center justify-center gap-2 font-bold text-slate-400 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-600 transition-all">
-                                <span>🎯</span> Exam
+                                <span>📚</span> Detailed (800w)
                             </div>
                         </label>
                     </div>

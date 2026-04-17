@@ -14,9 +14,9 @@ trait GeneratesAiContent
     public function performAiGeneration($topic, $subjectName, $detailLevel)
     {
         $detailLabels = [
-            'quick' => 'Quick summary with key points (500-800 words)',
-            'detailed' => 'Comprehensive detailed notes with examples (1500-2500 words)',
-            'exam' => 'Exam-ready revision notes with important questions, formulas, and mnemonics (2000-3000 words)',
+            'quick' => 'roughly 300 words for a quick overview',
+            'detailed' => 'roughly 500 words with deep explanations',
+            'exam' => 'roughly 800 words, highly structured with exam highlights'
         ];
 
         $detailInstruction = $detailLabels[$detailLevel] ?? $detailLabels['detailed'];
@@ -69,8 +69,14 @@ trait GeneratesAiContent
                 if ($response->successful()) {
                     $data = $response->json();
                     $aiContent = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+                    $usage = $data['usageMetadata'] ?? null;
+
                     if ($aiContent) {
-                        return ['content' => trim($aiContent), 'model' => $model];
+                        return [
+                            'content' => trim($aiContent), 
+                            'model' => $model,
+                            'usage' => $usage
+                        ];
                     }
                 }
 

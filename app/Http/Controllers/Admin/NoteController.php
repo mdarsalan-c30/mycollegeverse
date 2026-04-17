@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use App\Models\Course;
 use App\Models\Note;
+use App\Models\ApprovalLog;
 use App\Traits\GeneratesAiContent;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class NoteController extends Controller
 {
@@ -38,11 +40,19 @@ class NoteController extends Controller
 
         $notes = $query->with(['user', 'college'])->latest()->paginate(15);
         
+        // 📊 AI Intelligence Stats for Dashboard
+        $stats = [
+            'total_tokens' => \App\Models\AiUsage::sum('total_tokens'),
+            'today_tokens' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->sum('total_tokens'),
+            'total_generations' => \App\Models\AiUsage::count(),
+            'today_generations' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->count(),
+        ];
+
         if ($notes->isEmpty() && $request->has('search')) {
             session()->flash('warning', "Knowledge Archive blank for query: '{$request->search}'");
         }
 
-        return view('admin.notes.index', compact('notes'));
+        return view('admin.notes.index', compact('notes', 'stats'));
     }
 
     public function bulkGenerateForm()
@@ -57,7 +67,7 @@ class NoteController extends Controller
         $request->validate([
             'topics' => 'required|string',
             'subject_id' => 'required|exists:subjects,id',
-            'detail_level' => 'required|in:quick,detailed,exam',
+            'detail_level' => 'required|in:quick,detailed',
         ]);
 
         $topics = array_filter(array_map('trim', explode("\n", $request->topics)));
@@ -69,6 +79,7 @@ class NoteController extends Controller
 
         $successCount = 0;
         $errors = [];
+        $userId = Auth::id();
 
         foreach ($topics as $topic) {
             $result = $this->performAiGeneration($topic, $subject->name, $request->detail_level);
@@ -78,20 +89,39 @@ class NoteController extends Controller
                 continue;
             }
 
+            $model = $result['model'] ?? 'unknown';
+            $usage = $result['usage'] ?? [];
+
             Note::create([
                 'title' => $topic,
                 'note_type' => 'ai',
                 'ai_content' => $result['content'],
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'college_id' => Auth::user()->college_id ?? 1,
                 'subject_id' => $subject->id,
                 'is_verified' => true,
             ]);
+
+            // 📊 Log Usage Metadata for Bulk
+            \App\Models\AiUsage::create([
+                'user_id' => $userId,
+                'model' => $model,
+                'type' => 'bulk',
+                'topic' => $topic,
+                'prompt_tokens' => $usage['promptTokenCount'] ?? 0,
+                'candidates_tokens' => $usage['candidatesTokenCount'] ?? 0,
+                'total_tokens' => $usage['totalTokenCount'] ?? 0,
+                'metadata' => [
+                    'detail_level' => $request->detail_level,
+                    'subject' => $subject->name
+                ]
+            ]);
+
             $successCount++;
         }
 
         if ($successCount > 0) {
-            $msg = "Successfully generated {$successCount} AI notes for {$subject->name}.";
+            $msg = "Successfully generated {$successCount} AI notes for {$subject->name}. Control panel stats updated.";
             if (!empty($errors)) {
                 $msg .= " However, some failed: " . implode(', ', $errors);
             }

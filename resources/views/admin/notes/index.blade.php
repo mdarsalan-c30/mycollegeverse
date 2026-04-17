@@ -32,6 +32,41 @@
             </div>
         </div>
 
+        <!-- 🚀 Gemini Intelligence Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="glass p-6 rounded-[2rem] border-white/60 bg-gradient-to-br from-violet-500 to-indigo-600 text-white">
+                <p class="text-[8px] font-black uppercase tracking-[0.2em] opacity-80">Today's Token Flow</p>
+                <h4 class="text-3xl font-black mt-1">{{ number_format($stats['today_tokens']) }}</h4>
+                <div class="flex items-center gap-2 mt-4 text-[10px] bg-white/10 w-fit px-3 py-1 rounded-full font-bold">
+                    <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
+                    Real-time Sync
+                </div>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/60">
+                <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Career Total Tokens</p>
+                <h4 class="text-3xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_tokens']) }}</h4>
+                <p class="text-[9px] font-bold text-slate-400 mt-2 italic">~{{ number_format($stats['total_tokens'] / 1500) }} Full Articles</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/60">
+                <p class="text-[8px] font-black text-slate-400 uppercase tracking-[0.2em]">Intelligence Volume</p>
+                <h4 class="text-3xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_generations']) }}</h4>
+                <p class="text-[9px] font-bold text-green-500 mt-2">+{{ $stats['today_generations'] }} Deployments today</p>
+            </div>
+            <div class="glass p-6 rounded-[2rem] border-white/60 border-indigo-100 bg-indigo-50/30">
+                <p class="text-[8px] font-black text-indigo-400 uppercase tracking-[0.2em]">Quota Monitor</p>
+                <div class="mt-2 space-y-1">
+                    <div class="flex justify-between items-center text-[10px] font-black text-indigo-900">
+                        <span>Free Tier</span>
+                        <span>ACTIVE</span>
+                    </div>
+                    <div class="w-full bg-indigo-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-indigo-500 h-full w-[15%]"></div>
+                    </div>
+                    <p class="text-[7px] font-bold text-indigo-400 italic">250,000 TPM Capacity</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Filter Tabs -->
         <div class="flex items-center gap-2 border-b border-slate-100 pb-px">
             <a href="{{ route('admin.notes', ['status' => 'pending']) }}" class="px-6 py-3 text-[10px] font-black uppercase tracking-widest transition-all {{ request('status', 'pending') == 'pending' ? 'text-admin-primary border-b-2 border-admin-primary' : 'text-slate-400 hover:text-slate-600' }}">Pending Verification</a>

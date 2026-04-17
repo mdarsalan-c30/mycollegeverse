@@ -231,14 +231,20 @@ class NoteController extends Controller
             'topic' => 'required|string|max:500',
             'subject_id' => 'required',
             'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
-            'detail_level' => 'required|in:quick,detailed,exam',
+            'detail_level' => 'required|in:quick,detailed',
         ]);
 
-        $detailLabels = [
-            'quick' => 'Quick summary with key points (500-800 words)',
-            'detailed' => 'Comprehensive detailed notes with examples (1500-2500 words)',
-            'exam' => 'Exam-ready revision notes with important questions, formulas, and mnemonics (2000-3000 words)',
-        ];
+        $user = Auth::user();
+
+        // 🛡️ Enforcement: 1 AI Generation per Day
+        $lastAiNote = \App\Models\AiUsage::where('user_id', $user->id)
+            ->where('type', 'note')
+            ->where('created_at', '>', now()->subDay())
+            ->first();
+
+        if ($lastAiNote && $user->role !== 'admin') {
+            return back()->withInput()->with('error', "Bhai, energy-saving mode on hai! You can generate only 1 AI note per day. Check back tomorrow! 🔋");
+        }
 
         // Resolve subject name
         $subjectName = 'General';
@@ -249,8 +255,6 @@ class NoteController extends Controller
             $subjectName = $request->custom_subject;
         }
 
-        $detailInstruction = $detailLabels[$request->detail_level] ?? $detailLabels['detailed'];
-
         $result = $this->performAiGeneration($request->topic, $subjectName, $request->detail_level);
 
         if (isset($result['error'])) {
@@ -258,19 +262,36 @@ class NoteController extends Controller
         }
 
         $aiContent = $result['content'];
+        $model = $result['model'] ?? 'unknown';
+        $usage = $result['usage'] ?? [];
 
         $note = Note::create([
             'title' => $request->topic,
             'note_type' => 'ai',
             'ai_content' => trim($aiContent),
             'file_path' => null,
-            'user_id' => Auth::id(),
-            'college_id' => Auth::user()->college_id ?? 1,
+            'user_id' => $user->id,
+            'college_id' => $user->college_id ?? 1,
             'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
             'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
             'is_verified' => true,
         ]);
 
-        return redirect()->route('notes.show', $note->slug)->with('success', '🤖 AI Notes generated successfully!');
+        // 📊 Log Usage Metadata
+        \App\Models\AiUsage::create([
+            'user_id' => $user->id,
+            'model' => $model,
+            'type' => 'note',
+            'topic' => $request->topic,
+            'prompt_tokens' => $usage['promptTokenCount'] ?? 0,
+            'candidates_tokens' => $usage['candidatesTokenCount'] ?? 0,
+            'total_tokens' => $usage['totalTokenCount'] ?? 0,
+            'metadata' => [
+                'detail_level' => $request->detail_level,
+                'subject' => $subjectName
+            ]
+        ]);
+
+        return redirect()->route('notes.show', $note->slug)->with('success', '🤖 AI Notes generated successfully! Today\'s quota used.');
     }
 }

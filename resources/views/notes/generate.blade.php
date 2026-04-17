@@ -89,30 +89,25 @@
 
             {{-- Detail Level --}}
             <div class="space-y-3">
-                <label class="block text-xs font-black text-slate-400 uppercase tracking-widest px-1">Detail Level</label>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="flex justify-between items-center px-1">
+                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest">Detail Level</label>
+                    <span class="text-[9px] font-black text-amber-500 uppercase tracking-widest bg-amber-50 px-2 py-0.5 rounded-md">Limit: 1 Note / Day</span>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
                     <label class="cursor-pointer group">
-                        <input type="radio" name="detail_level" value="quick" class="peer hidden">
+                        <input type="radio" name="detail_level" value="quick" class="peer hidden" checked>
                         <div class="h-24 border-2 border-slate-100 rounded-2xl flex flex-col items-center justify-center gap-1 font-bold text-slate-400 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600 group-hover:bg-slate-50 transition-all">
                             <span class="text-2xl">⚡</span>
-                            <span class="text-xs">Quick</span>
-                            <span class="text-[9px] text-slate-400">~800 words</span>
+                            <span class="text-xs">Quick Overview</span>
+                            <span class="text-[9px] text-slate-400">~500 words</span>
                         </div>
                     </label>
                     <label class="cursor-pointer group">
-                        <input type="radio" name="detail_level" value="detailed" class="peer hidden" checked>
+                        <input type="radio" name="detail_level" value="detailed" class="peer hidden">
                         <div class="h-24 border-2 border-slate-100 rounded-2xl flex flex-col items-center justify-center gap-1 font-bold text-slate-400 peer-checked:border-violet-500 peer-checked:bg-violet-50 peer-checked:text-violet-600 group-hover:bg-slate-50 transition-all">
                             <span class="text-2xl">📚</span>
-                            <span class="text-xs">Detailed</span>
-                            <span class="text-[9px] text-slate-400">~2000 words</span>
-                        </div>
-                    </label>
-                    <label class="cursor-pointer group">
-                        <input type="radio" name="detail_level" value="exam" class="peer hidden">
-                        <div class="h-24 border-2 border-slate-100 rounded-2xl flex flex-col items-center justify-center gap-1 font-bold text-slate-400 peer-checked:border-amber-500 peer-checked:bg-amber-50 peer-checked:text-amber-600 group-hover:bg-slate-50 transition-all">
-                            <span class="text-2xl">🎯</span>
-                            <span class="text-xs">Exam Ready</span>
-                            <span class="text-[9px] text-slate-400">~3000 words</span>
+                            <span class="text-xs">Deep Concept</span>
+                            <span class="text-[9px] text-slate-400">~800 words</span>
                         </div>
                     </label>
                 </div>
