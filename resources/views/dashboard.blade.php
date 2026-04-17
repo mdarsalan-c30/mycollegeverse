@@ -70,7 +70,7 @@
                         @if(!Auth::user()->career_role)
                         <form action="{{ route('dashboard') }}" method="POST" class="flex gap-2">
                             @csrf
-                            <select name="career_role" onchange="this.form.submit()" class="bg-primary-600/50 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-white">
+                            <select name="career_role" onchange="this.form.submit()" class="bg-white border border-slate-200 text-primary px-6 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest outline-none focus:ring-4 focus:ring-primary/10 shadow-sm">
                                 <option value="">Set Career Goal 🎯</option>
                                 <option value="Software Engineer">Software Engineer</option>
                                 <option value="Data Scientist">Data Scientist</option>
@@ -239,7 +239,7 @@
                             <p class="text-sm font-black text-slate-400 uppercase tracking-widest italic">All pulses stable</p>
                             <p class="text-[10px] font-bold text-slate-300 uppercase tracking-tighter mt-1">No upcoming assessments or personal tasks detected in the Verse</p>
                         </div>
-                        <button @click="$dispatch('open-pulse-modal')" class="text-xs font-black text-primary hover:underline uppercase tracking-widest mt-4">Manual Manifestation →</button>
+                        <button @click="showPulseModal = true" class="text-xs font-black text-primary hover:underline uppercase tracking-widest mt-4">Manual Manifestation →</button>
                     </div>
                 @endforelse
             </div>
@@ -423,7 +423,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- 🤖 Academic Pulse: Manifestation Modal (Phase 1) -->
     <div x-show="showPulseModal" 
