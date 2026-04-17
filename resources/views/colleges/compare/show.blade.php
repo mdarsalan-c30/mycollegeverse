@@ -1,9 +1,9 @@
 <x-verse-layout>
     @section('title', $colleges->pluck('name')->implode(' vs ') . ' | College Battle - MyCollegeVerse')
 
-    <div class="space-y-12 pb-24">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 space-y-12 pb-24 pt-8 md:pt-12">
         <!-- Battle Header -->
-        <div class="relative bg-slate-900 rounded-[3.5rem] p-10 md:p-20 overflow-hidden shadow-2xl">
+        <div class="relative bg-slate-900 rounded-[3.5rem] p-8 md:p-20 overflow-hidden shadow-2xl">
             <div class="relative z-10 text-center space-y-6">
                 <p class="text-[10px] font-black text-primary uppercase tracking-[0.4em]">The Institutional Showdown</p>
                 <h1 class="text-3xl md:text-6xl font-black text-white leading-tight">

@@ -1,9 +1,9 @@
 <x-verse-layout>
     @section('title', 'Class of ' . $year . ' | ' . $college->name . ' - MyCollegeVerse')
 
-    <div class="space-y-12 pb-24">
+    <div class="max-w-7xl mx-auto px-4 md:px-8 space-y-12 pb-24 pt-8 md:pt-12">
         <!-- Explorer Header -->
-        <div class="relative bg-slate-900 rounded-[3rem] p-10 md:p-16 overflow-hidden shadow-2xl">
+        <div class="relative bg-slate-900 rounded-[3rem] p-8 md:p-16 overflow-hidden shadow-2xl">
             <div class="relative z-10 max-w-4xl space-y-6">
                 <nav class="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-white/40">
                     <a href="{{ route('colleges.index') }}" class="hover:text-white transition-colors">Nexus</a>

@@ -84,13 +84,15 @@
         <!-- Alpine.js Engineering ⚙️ -->
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="font-sans antialiased text-slate-900 bg-slate-50">
+    <body class="font-sans antialiased text-slate-900 bg-slate-50 lg:h-screen lg:overflow-hidden">
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
-        <div class="flex min-h-screen w-full relative">
-            {{ $slot }}
+        <div class="flex h-screen w-full relative overflow-hidden">
+            <main class="flex-1 h-full overflow-y-auto">
+                {{ $slot }}
+            </main>
 
             <!-- Mobile Bottom Nav -->
             <div class="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around px-2 z-50">
