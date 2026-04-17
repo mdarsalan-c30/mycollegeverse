@@ -93,6 +93,8 @@ class User extends Authenticatable
         $reviewCount = DB::table('reviews')->where('user_id', $this->id)->count();
         $noteReviewCount = $this->noteReviews()->count();
 
+        $projectCount = $this->projects()->where('is_official', true)->count();
+
         return (
             ($noteCount * 50) + 
             ($downloadSum * 10) + 
@@ -100,7 +102,8 @@ class User extends Authenticatable
             ($likesReceived * 5) + 
             ($commentCount * 10) + 
             ($reviewCount * 15) +
-            ($noteReviewCount * 5) -
+            ($noteReviewCount * 5) +
+            ($projectCount * 250) -
             $this->karma_spent
         );
     }
@@ -273,5 +276,25 @@ class User extends Authenticatable
     public function claimedRewards()
     {
         return $this->belongsToMany(Reward::class, 'reward_claims')->withPivot('claimed_at')->withTimestamps();
+    }
+
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    public function experiences()
+    {
+        return $this->hasMany(UserExperience::class);
+    }
+
+    public function educations()
+    {
+        return $this->hasMany(UserEducation::class);
+    }
+
+    public function projectEndorsements()
+    {
+        return $this->hasMany(ProjectEndorsement::class, 'recruiter_id');
     }
 }

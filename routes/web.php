@@ -147,7 +147,23 @@ Route::middleware(['auth'])->group(function () {
         // Batch mates Discovery 🧬
         Route::get('/college/{college:slug}/batch/{year}', [App\Http\Controllers\BatchFinderController::class, 'index'])->name('colleges.batchmates');
         Route::post('/profile/batch-visibility', [App\Http\Controllers\BatchFinderController::class, 'toggleVisibility'])->name('profile.batch.toggle');
+
+        // 💼 Verse Portfolio Protocol: Proof of Work (Phase 9)
+        Route::prefix('showcase')->name('showcase.')->group(function () {
+            Route::post('/manifest', [App\Http\Controllers\ProjectController::class, 'store'])->name('store');
+            Route::post('/{project}/verify', [App\Http\Controllers\ProjectController::class, 'verify'])->name('verify');
+            Route::post('/{project}/endorse', [App\Http\Controllers\ProjectController::class, 'endorse'])->name('endorse');
+        });
+
+        Route::prefix('portfolio')->name('portfolio.')->group(function () {
+            Route::post('/experience', [App\Http\Controllers\PortfolioController::class, 'storeExperience'])->name('experience.store');
+            Route::delete('/experience/{experience}', [App\Http\Controllers\PortfolioController::class, 'destroyExperience'])->name('experience.destroy');
+            Route::post('/education', [App\Http\Controllers\PortfolioController::class, 'storeEducation'])->name('education.store');
+            Route::delete('/education/{education}', [App\Http\Controllers\PortfolioController::class, 'destroyEducation'])->name('education.destroy');
+        });
     });
+
+    Route::get('/showcase', [App\Http\Controllers\ProjectController::class, 'showcase'])->name('showcase.index');
 
     // Comparison Engine ⚖️ (Public)
     Route::prefix('compare')->group(function() {

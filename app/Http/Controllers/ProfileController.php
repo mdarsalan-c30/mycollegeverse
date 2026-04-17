@@ -23,7 +23,16 @@ class ProfileController extends Controller
             abort(404);
         }
 
-        return view('profile.show', compact('user'));
+        // Fetch PoW Vault & Professional History
+        $projects = $user->projects()
+            ->with(['endorsements.recruiter'])
+            ->latest()
+            ->get();
+        
+        $experiences = $user->experiences()->latest()->get();
+        $educations = $user->educations()->latest()->get();
+
+        return view('profile.show', compact('user', 'projects', 'experiences', 'educations'));
     }
 
     public function updatePhoto(Request $request)
