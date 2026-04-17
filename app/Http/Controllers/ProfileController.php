@@ -9,63 +9,7 @@ class ProfileController extends Controller
 {
     public function show($user = null)
     {
-        try {
-            // Explicitly look up by username if a string is provided
-            if (is_string($user)) {
-                $user = User::where('username', $user)->firstOrFail();
-            }
-
-            // Default to Auth user if no username provided
-            if (!$user && auth()->check()) {
-                $user = auth()->user();
-            }
-
-            if (!$user) {
-                abort(404);
-            }
-
-            // Fetch PoW Vault & Professional History with Fallback Safety
-            $projects = collect();
-            $experiences = collect();
-            $educations = collect();
-
-            if (\Illuminate\Support\Facades\Schema::hasTable('projects')) {
-                $projects = $user->projects()
-                    ->with(['endorsements.recruiter'])
-                    ->latest()
-                    ->get();
-            }
-            
-            if (\Illuminate\Support\Facades\Schema::hasTable('user_experiences')) {
-                $experiences = $user->experiences()->latest()->get();
-            }
-
-            if (\Illuminate\Support\Facades\Schema::hasTable('user_educations')) {
-                $educations = $user->educations()->latest()->get();
-            }
-
-            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
-
-            return view('profile.show', compact('user', 'projects', 'experiences', 'educations', 'layout'));
-        } catch (\Exception $e) {
-            // Log the error but don't crash the entire platform
-            \Illuminate\Support\Facades\Log::error("Portfolio Render Error: " . $e->getMessage());
-            
-            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
-
-            // Re-throw if in debug mode or return a safe view
-            if (config('app.debug')) {
-                 return response()->json(['error' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()], 500);
-            }
-
-            return view('profile.show', [
-                'user' => $user,
-                'projects' => collect(),
-                'experiences' => collect(),
-                'educations' => collect(),
-                'layout' => $layout
-            ]);
-        }
+        return "Profile reach test: " . (is_string($user) ? $user : 'no-user');
     }
 
     public function updatePhoto(Request $request)
