@@ -151,6 +151,7 @@ Route::middleware(['auth'])->group(function () {
         // 💼 Verse Portfolio Protocol: Proof of Work (Phase 9)
         Route::prefix('showcase')->name('showcase.')->group(function () {
             Route::post('/manifest', [App\Http\Controllers\ProjectController::class, 'store'])->name('store');
+            Route::delete('/manifest/{project}', [App\Http\Controllers\ProjectController::class, 'destroy'])->name('destroy');
             Route::post('/{project}/verify', [App\Http\Controllers\ProjectController::class, 'verify'])->name('verify');
             Route::post('/{project}/endorse', [App\Http\Controllers\ProjectController::class, 'endorse'])->name('endorse');
         });

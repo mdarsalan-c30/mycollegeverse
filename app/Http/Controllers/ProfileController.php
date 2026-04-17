@@ -9,39 +9,30 @@ class ProfileController extends Controller
 {
     public function show($user = null)
     {
-        try {
-            // Explicitly look up by username if a string is provided
-            if (is_string($user)) {
-                $user = User::where('username', $user)->firstOrFail();
-            }
-
-            // Default to Auth user if no username provided
-            if (!$user && auth()->check()) {
-                $user = auth()->user();
-            }
-
-            if (!$user) {
-                abort(404);
-            }
-
-            // Fetch PoW Vault & Professional History
-            $projects = $user->projects()
-                ->with(['endorsements.recruiter'])
-                ->latest()
-                ->get();
-            
-            $experiences = $user->experiences()->latest()->get();
-            $educations = $user->educations()->latest()->get();
-
-            return view('profile.show', compact('user', 'projects', 'experiences', 'educations'));
-        } catch (\Exception $e) {
-            return response()->json([
-                'error_message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'trace' => collect($e->getTrace())->take(5)
-            ], 500);
+        // Explicitly look up by username if a string is provided
+        if (is_string($user)) {
+            $user = User::where('username', $user)->firstOrFail();
         }
+
+        // Default to Auth user if no username provided
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+
+        if (!$user) {
+            abort(404);
+        }
+
+        // Fetch PoW Vault & Professional History
+        $projects = $user->projects()
+            ->with(['endorsements.recruiter'])
+            ->latest()
+            ->get();
+        
+        $experiences = $user->experiences()->latest()->get();
+        $educations = $user->educations()->latest()->get();
+
+        return view('profile.show', compact('user', 'projects', 'experiences', 'educations'));
     }
 
     public function updatePhoto(Request $request)
