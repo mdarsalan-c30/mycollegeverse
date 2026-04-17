@@ -42,9 +42,6 @@
         
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Alpine.js -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        
         <script>
             tailwind.config = {
                 theme: {
@@ -82,14 +79,17 @@
             ::-webkit-scrollbar { width: 5px; height: 5px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
+            [x-cloak] { display: none !important; }
         </style>
+        <!-- Alpine.js Engineering ⚙️ -->
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="font-sans antialiased text-slate-900 bg-slate-50 lg:overflow-hidden">
+    <body class="font-sans antialiased text-slate-900 bg-slate-50">
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
-        <div class="flex h-screen w-full relative">
+        <div class="flex min-h-screen w-full relative">
             {{ $slot }}
 
             <!-- Mobile Bottom Nav -->

@@ -1,5 +1,51 @@
-<x-app-layout>
-    <div class="space-y-10 pb-20">
+    <div class="space-y-10 pb-20" x-data="{ 
+        showPulseModal: false,
+        isScanning: false,
+        scanInput: '',
+        pulseFormData: {
+            title: '',
+            type: 'assignment',
+            due_date: '',
+            subject_id: '',
+            priority: 'medium',
+            description: ''
+        },
+        async manifestPulse() {
+            try {
+                const response = await fetch('{{ route('academic-pulse.store') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: JSON.stringify(this.pulseFormData)
+                });
+                const data = await response.json();
+                if (data.status === 'success') {
+                    window.location.reload();
+                }
+            } catch (e) { console.error('Manifestation Failed', e); }
+        },
+        async scanNotice() {
+            if (!this.scanInput.trim()) return;
+            this.isScanning = true;
+            try {
+                const response = await fetch('{{ route('academic-pulse.scan') }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                    body: JSON.stringify({ text_data: this.scanInput })
+                });
+                const result = await response.json();
+                if (result.status === 'success' && result.data.length > 0) {
+                    const first = result.data[0];
+                    this.pulseFormData.title = first.title;
+                    this.pulseFormData.type = first.type;
+                    this.pulseFormData.due_date = first.due_date.split('T')[0];
+                    this.pulseFormData.priority = first.priority;
+                    this.pulseFormData.description = first.description;
+                    this.scanInput = '';
+                }
+            } catch (e) { console.error('Scan Failed', e); }
+            this.isScanning = false;
+        }
+    }">
         <!-- Dashboard Hero -->
         <div class="relative overflow-hidden bg-primary rounded-[2.5rem] p-10 shadow-2xl shadow-primary/20">
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-center gap-8">
@@ -125,7 +171,7 @@
                     </h3>
                     <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic leading-none">Live manifestation of upcoming academic hurdles</p>
                 </div>
-                <button @click="$dispatch('open-pulse-modal')" class="group flex items-center gap-2 bg-slate-50 hover:bg-white px-5 py-2.5 rounded-2xl border border-slate-100 transition-all">
+                <button @click="showPulseModal = true" class="group flex items-center gap-2 bg-slate-50 hover:bg-white px-5 py-2.5 rounded-2xl border border-slate-100 transition-all">
                     <span class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-xs group-hover:rotate-12 transition-transform">➕</span>
                     <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Manifest Task</span>
                 </button>
@@ -379,63 +425,14 @@
     </div>
 
     <!-- 🤖 Academic Pulse: Manifestation Modal (Phase 1) -->
-    <div x-data="{ 
-            open: false,
-            isScanning: false,
-            scanInput: '',
-            formData: {
-                title: '',
-                type: 'assignment',
-                due_date: '',
-                subject_id: '',
-                priority: 'medium',
-                description: ''
-            },
-            async manifestPulse() {
-                try {
-                    const response = await fetch('{{ route('academic-pulse.store') }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify(this.formData)
-                    });
-                    const data = await response.json();
-                    if (data.status === 'success') {
-                        window.location.reload();
-                    }
-                } catch (e) { console.error('Manifestation Failed', e); }
-            },
-            async scanNotice() {
-                if (!this.scanInput.trim()) return;
-                this.isScanning = true;
-                try {
-                    const response = await fetch('{{ route('academic-pulse.scan') }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ text_data: this.scanInput })
-                    });
-                    const result = await response.json();
-                    if (result.status === 'success' && result.data.length > 0) {
-                        const first = result.data[0];
-                        this.formData.title = first.title;
-                        this.formData.type = first.type;
-                        this.formData.due_date = first.due_date.split('T')[0];
-                        this.formData.priority = first.priority;
-                        this.formData.description = first.description;
-                        this.scanInput = '';
-                    }
-                } catch (e) { console.error('Scan Failed', e); }
-                this.isScanning = false;
-            }
-         }" 
-         @open-pulse-modal.window="open = true"
-         x-show="open" 
+    <div x-show="showPulseModal" 
          class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-cloak>
         
-        <div @click.away="open = false" 
+        <div @click.away="showPulseModal = false" 
              class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
             
             <div class="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
@@ -446,7 +443,7 @@
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 italic">Synchronizing assessment hurdles with the Multiverse</p>
                     </div>
                 </div>
-                <button @click="open = false" class="text-slate-400 hover:text-slate-600 font-bold p-2">✕</button>
+                <button @click="showPulseModal = false" class="text-slate-400 hover:text-slate-600 font-bold p-2">✕</button>
             </div>
 
             <div class="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
@@ -471,11 +468,11 @@
                 <div class="grid grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Manifest Title</label>
-                        <input type="text" x-model="formData.title" placeholder="e.g. MST 1 Submission" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                        <input type="text" x-model="pulseFormData.title" placeholder="e.g. MST 1 Submission" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Event Type</label>
-                        <select x-model="formData.type" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                        <select x-model="pulseFormData.type" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
                             <option value="assignment">Assignment</option>
                             <option value="mst">MST / Mid-Term</option>
                             <option value="exam">Final Exam</option>
@@ -489,11 +486,11 @@
                 <div class="grid grid-cols-2 gap-6">
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Due Date</label>
-                        <input type="date" x-model="formData.due_date" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                        <input type="date" x-model="pulseFormData.due_date" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
                     </div>
                     <div class="space-y-2">
                         <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject Node</label>
-                        <select x-model="formData.subject_id" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                        <select x-model="pulseFormData.subject_id" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
                             <option value="">Select Subject (Optional)</option>
                             @foreach($subjects as $sub)
                                 <option value="{{ $sub->id }}">{{ $sub->name }}</option>
@@ -506,8 +503,8 @@
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Priority Protocol</label>
                     <div class="flex gap-4">
                         @foreach(['low' => 'bg-emerald-100 text-emerald-600', 'medium' => 'bg-amber-100 text-amber-600', 'high' => 'bg-rose-100 text-rose-600'] as $prio => $cls)
-                            <button @click="formData.priority = '{{ $prio }}'" 
-                                    :class="formData.priority === '{{ $prio }}' ? '{{ $cls }} ring-2 ring-current' : 'bg-slate-50 text-slate-400'"
+                            <button @click="pulseFormData.priority = '{{ $prio }}'" 
+                                    :class="pulseFormData.priority === '{{ $prio }}' ? '{{ $cls }} ring-2 ring-current' : 'bg-slate-50 text-slate-400'"
                                     class="flex-1 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
                                 {{ $prio }}
                             </button>
