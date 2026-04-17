@@ -1,3 +1,4 @@
+<x-app-layout>
     <div class="space-y-10 pb-20" x-data="{ 
         showPulseModal: false,
         isScanning: false,
