@@ -37,10 +37,10 @@ trait GeneratesAiContent
 
         try {
             $apiKey = env('GEMINI_API_KEY');
-            $model = "gemini-1.5-flash"; // More stable/widely available than 2.0-flash
+            $model = "gemini-1.5-flash"; // Primary stable model
 
             $response = Http::timeout(120)->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
+                "https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}",
                 [
                     'contents' => [
                         ['parts' => [['text' => $prompt]]]
