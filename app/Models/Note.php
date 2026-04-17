@@ -18,8 +18,6 @@ class Note extends Model
         'subject_id',
         'custom_subject',
         'is_verified',
-        'ai_content',
-        'note_type',
     ];
 
     protected static function boot()

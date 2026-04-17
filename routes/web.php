@@ -348,6 +348,7 @@ Route::get('/multiverse-init', function() {
         return "Initialization Error: " . $e->getMessage();
     }
 });
+/*
 Route::get('/multiverse-ai-scholar-deploy', function() {
     try {
         $step = request('step', 1);
@@ -392,3 +393,4 @@ Route::get('/multiverse-ai-scholar-deploy', function() {
         </div>";
     }
 });
+*/
