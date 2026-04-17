@@ -1,5 +1,6 @@
-@php $layout = (Auth::check() && Auth::user()->role === 'recruiter') ? 'recruiter' : 'app'; @endphp
-<x-dynamic-component :component="$layout.'-layout'">
+@extends($layout)
+@section('title', $user->name . ' - Portfolio')
+@section('content')
     <div class="space-y-10 pb-20" x-data="{ activeTab: 'portfolio' }">
         <!-- Profile Header -->
         <div class="glass p-10 rounded-[3rem] shadow-glass border-white/60 relative overflow-hidden">

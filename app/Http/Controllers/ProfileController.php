@@ -44,7 +44,9 @@ class ProfileController extends Controller
                 $educations = $user->educations()->latest()->get();
             }
 
-            return view('profile.show', compact('user', 'projects', 'experiences', 'educations'));
+            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
+
+            return view('profile.show', compact('user', 'projects', 'experiences', 'educations', 'layout'));
         } catch (\Exception $e) {
             // Log the error but don't crash the entire platform
             \Illuminate\Support\Facades\Log::error("Portfolio Render Error: " . $e->getMessage());
