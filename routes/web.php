@@ -11,6 +11,29 @@ Route::get('/rescue-test', function() {
     return "✅ [MCV RESCUE] Core App Boot Successful. Time: " . date('Y-m-d H:i:s');
 });
 
+Route::get('/rescue-db-test', function() {
+    try {
+        \DB::connection()->getPdo();
+        $userCount = \App\Models\User::count();
+        return "✅ [MCV RESCUE] DB Connected. User count: $userCount";
+    } catch (\Exception $e) {
+        return "❌ [MCV RESCUE] DB Connection Failed: " . $e->getMessage();
+    }
+});
+
+Route::get('/rescue-landing-test', function() {
+    try {
+        $stats = [
+            'users' => \App\Models\User::count(),
+            'notes' => \App\Models\Note::count(),
+            'colleges' => \App\Models\College::count(),
+        ];
+        return "✅ [MCV RESCUE] Landing Logic Test Passed. Stats: " . json_encode($stats);
+    } catch (\Exception $e) {
+        return "❌ [MCV RESCUE] Landing Logic Crashed: " . $e->getMessage();
+    }
+});
+
 Route::get('/rescue-cache-clear', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
