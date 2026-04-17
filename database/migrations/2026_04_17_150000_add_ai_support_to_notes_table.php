@@ -17,11 +17,9 @@ class AddAiSupportToNotesTable extends Migration
             }
         });
 
-        // Make file_path nullable for AI notes
+        // Make file_path nullable for AI notes (Raw SQL used to avoid Doctrine DBAL dependency)
         if (Schema::hasColumn('notes', 'file_path')) {
-            Schema::table('notes', function (Blueprint $table) {
-                $table->string('file_path')->nullable()->change();
-            });
+            \Illuminate\Support\Facades\DB::statement('ALTER TABLE notes MODIFY file_path VARCHAR(255) NULL');
         }
     }
 
