@@ -13,12 +13,19 @@ class Note extends Model
         'title',
         'slug',
         'file_path',
+        'note_type',
+        'ai_content',
         'user_id',
         'college_id',
         'subject_id',
         'custom_subject',
         'is_verified',
     ];
+
+    public function isAiGenerated()
+    {
+        return $this->note_type === 'ai';
+    }
 
     protected static function boot()
     {

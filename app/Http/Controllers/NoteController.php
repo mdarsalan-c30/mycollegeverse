@@ -214,4 +214,100 @@ class NoteController extends Controller
 
         return Storage::disk('public')->download($note->file_path);
     }
+
+    public function generateForm()
+    {
+        $subjects = Subject::all();
+        $courses = \App\Models\Course::orderBy('name')->get();
+
+        return view('notes.generate', compact('subjects', 'courses'));
+    }
+
+    public function generate(Request $request)
+    {
+        $request->validate([
+            'topic' => 'required|string|max:500',
+            'subject_id' => 'required',
+            'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
+            'detail_level' => 'required|in:quick,detailed,exam',
+        ]);
+
+        $detailLabels = [
+            'quick' => 'Quick summary with key points (500-800 words)',
+            'detailed' => 'Comprehensive detailed notes with examples (1500-2500 words)',
+            'exam' => 'Exam-ready revision notes with important questions, formulas, and mnemonics (2000-3000 words)',
+        ];
+
+        // Resolve subject name
+        $subjectName = 'General';
+        if ($request->subject_id !== 'other') {
+            $subject = Subject::find($request->subject_id);
+            $subjectName = $subject ? $subject->name : 'General';
+        } else {
+            $subjectName = $request->custom_subject;
+        }
+
+        $detailInstruction = $detailLabels[$request->detail_level] ?? $detailLabels['detailed'];
+
+        $prompt = "You are an expert academic professor. Generate high-quality study notes.\n\n"
+            . "Topic: {$request->topic}\n"
+            . "Subject: {$subjectName}\n"
+            . "Detail Level: {$detailInstruction}\n\n"
+            . "Requirements:\n"
+            . "- Use clear HTML formatting with h2, h3, p, ul, ol, li, strong, em tags\n"
+            . "- Include key definitions, concepts, and explanations\n"
+            . "- Add practical examples where relevant\n"
+            . "- Include important formulas or mnemonics if applicable\n"
+            . "- End with 'Key Takeaways' section\n"
+            . "- Do NOT include html, head, body tags. Only content HTML.\n"
+            . "- Make it student-friendly and easy to understand\n"
+            . "- Use proper academic language";
+
+        try {
+            $apiKey = env('GEMINI_API_KEY', 'AIzaSyCezi2i9eAreTivaji9GFS15DM4HNhTRQo');
+
+            $response = Http::timeout(60)->post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
+                [
+                    'contents' => [
+                        ['parts' => [['text' => $prompt]]]
+                    ]
+                ]
+            );
+
+            if (!$response->successful()) {
+                \Log::error('Gemini API Error: ' . $response->body());
+                return back()->withInput()->with('error', 'AI generation failed. Please try again.');
+            }
+
+            $data = $response->json();
+            $aiContent = $data['candidates'][0]['content']['parts'][0]['text'] ?? null;
+
+            if (!$aiContent) {
+                return back()->withInput()->with('error', 'AI returned empty content. Try a different topic.');
+            }
+
+            // Clean up markdown code fences if Gemini wraps in ```html
+            $aiContent = preg_replace('/^```html\s*/i', '', $aiContent);
+            $aiContent = preg_replace('/```\s*$/', '', $aiContent);
+
+            $note = Note::create([
+                'title' => $request->topic,
+                'note_type' => 'ai',
+                'ai_content' => trim($aiContent),
+                'file_path' => null,
+                'user_id' => Auth::id(),
+                'college_id' => Auth::user()->college_id ?? 1,
+                'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
+                'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
+                'is_verified' => true,
+            ]);
+
+            return redirect()->route('notes.show', $note->slug)->with('success', '🤖 AI Notes generated successfully!');
+
+        } catch (\Exception $e) {
+            \Log::error('AI Generation Failed: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Generation failed: ' . $e->getMessage());
+        }
+    }
 }

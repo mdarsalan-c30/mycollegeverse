@@ -22,8 +22,29 @@
 
             <!-- Note Viewer -->
             <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
+                @if($note->isAiGenerated())
+                {{-- AI Content Renderer --}}
+                <div class="p-8 md:p-12 bg-white/60">
+                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                        <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                            🤖 AI Generated
+                        </div>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Gemini</span>
+                    </div>
+                    <article class="prose prose-lg prose-slate max-w-none
+                        prose-headings:font-black prose-headings:text-secondary
+                        prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:pb-2 prose-h2:border-b prose-h2:border-slate-100
+                        prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                        prose-p:text-slate-600 prose-p:leading-relaxed prose-p:font-medium
+                        prose-li:text-slate-600 prose-li:font-medium
+                        prose-strong:text-slate-800 prose-strong:font-black
+                        prose-ul:space-y-1 prose-ol:space-y-1">
+                        {!! $note->ai_content !!}
+                    </article>
+                </div>
+                @else
+                {{-- PDF Viewer --}}
                 <div class="aspect-[3/4] bg-slate-100 relative">
-                    <!-- PDF Viewer -->
                     <embed src="{{ filter_var($note->file_path, FILTER_VALIDATE_URL) ? $note->file_path : asset('storage/' . $note->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
                     
                     <!-- Fallback for browsers that don't support embed -->
@@ -43,6 +64,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
             </div>
 
             <!-- Notes Meta & Discussion -->

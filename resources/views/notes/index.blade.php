@@ -34,12 +34,17 @@
             </div>
             
             @auth
-            <button @click="showUploadModal = true; uploadStep = 1" class="bg-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                </svg>
-                Upload New Note
-            </button>
+            <div class="flex gap-3">
+                <a href="{{ route('notes.generate') }}" class="bg-gradient-to-r from-violet-600 to-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-violet-500/20 hover:scale-105 transition-all flex items-center gap-2">
+                    🤖 Generate AI Notes
+                </a>
+                <button @click="showUploadModal = true; uploadStep = 1" class="bg-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Upload PDF
+                </button>
+            </div>
             @else
             <a href="{{ route('login') }}" class="bg-slate-100 text-slate-600 px-8 py-4 rounded-[1.5rem] font-bold hover:bg-primary hover:text-white transition-all flex items-center gap-2 group">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -123,6 +128,14 @@
                 <div class="absolute top-0 left-0 z-10">
                     <div class="bg-amber-400 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-br-2xl shadow-lg shadow-amber-400/20 tracking-widest flex items-center gap-1 group-hover:scale-105 transition-transform">
                         <span class="animate-pulse">🚀</span> {{ $note->exam_help_rate }}% Exam Trusted
+                    </div>
+                </div>
+                @endif
+
+                @if($note->note_type === 'ai')
+                <div class="absolute top-0 {{ (Auth::check() && $note->college_id == Auth::user()->college_id) ? '' : 'right-0' }} z-10">
+                    <div class="bg-violet-500 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-bl-2xl {{ (Auth::check() && $note->college_id == Auth::user()->college_id) ? 'rounded-br-2xl' : '' }} shadow-sm tracking-widest flex items-center gap-1">
+                        🤖 AI Generated
                     </div>
                 </div>
                 @endif

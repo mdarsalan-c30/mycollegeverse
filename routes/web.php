@@ -17,6 +17,8 @@ Route::get('/', [\App\Http\Controllers\LandingController::class, 'index']);
 
 // Public Knowledge Routes (SEO Friendly)
 Route::get('/notes', [App\Http\Controllers\NoteController::class, 'index'])->name('notes.index');
+Route::get('/notes/generate', [App\Http\Controllers\NoteController::class, 'generateForm'])->name('notes.generate')->middleware('auth');
+Route::post('/notes/generate', [App\Http\Controllers\NoteController::class, 'generate'])->name('notes.generate.store')->middleware('auth');
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
 // Editorial Discovery 🚀
