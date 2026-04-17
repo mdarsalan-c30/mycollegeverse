@@ -57,13 +57,18 @@ class AcademicEvent extends Model
     public function scopeForStudent($query, User $user)
     {
         return $query->where(function ($q) use ($user) {
-            // Official Batch Events
-            $q->where('college_id', $user->college_id)
-              ->where('course_id', $user->course_id)
-              ->where('semester', $user->semester)
-              ->where('is_official', true);
+            // Official Batch Events (Only if student has targeting data)
+            if ($user->college_id && $user->course_id && $user->semester) {
+                $q->where('college_id', $user->college_id)
+                  ->where('course_id', $user->course_id)
+                  ->where('semester', $user->semester)
+                  ->where('is_official', true);
+            } else {
+                // Return nothing for batch if targeting is incomplete
+                $q->whereRaw('1 = 0');
+            }
         })->orWhere(function ($q) use ($user) {
-            // Personal Events
+            // Personal Events (Always show)
             $q->where('user_id', $user->id);
         });
     }
