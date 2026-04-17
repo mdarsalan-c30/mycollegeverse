@@ -27,6 +27,15 @@ Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])
 
 // Master Browser Nexus (For Hostinger/Terminal-less Sync)
 
+Route::get('/multiverse-academic-sync', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "🛡️ Academic targeting manifested! Database synchronized with the Pulse Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-note-slug-sync', function() {
     try {
         $notes = \App\Models\Note::whereNull('slug')->get();
