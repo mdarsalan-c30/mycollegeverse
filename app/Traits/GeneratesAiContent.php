@@ -36,7 +36,7 @@ trait GeneratesAiContent
             . "- Use proper academic language";
 
         try {
-            $apiKey = env('GEMINI_API_KEY', 'AIzaSyCezi2i9eAreTivaji9GFS15DM4HNhTRQo');
+            $apiKey = env('GEMINI_API_KEY');
             $model = "gemini-1.5-flash"; // More stable/widely available than 2.0-flash
 
             $response = Http::timeout(120)->post(
