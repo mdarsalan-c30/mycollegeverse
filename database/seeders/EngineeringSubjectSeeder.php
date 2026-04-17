@@ -74,7 +74,7 @@ class EngineeringSubjectSeeder extends Seeder
         foreach ($subjects as $s) {
             Subject::updateOrCreate(
                 ['name' => $s['name'], 'course_id' => $course->id],
-                ['semester' => $s['semester'], 'course' => 'Engineering']
+                ['semester' => $s['semester']]
             );
         }
     }
