@@ -28,6 +28,8 @@ class User extends Authenticatable
         'college_id',
         'username',
         'profile_photo_path',
+        'course_id',
+        'semester',
         'college_email',
         'mobile',
         'year',
@@ -44,6 +46,16 @@ class User extends Authenticatable
         'mentor_bio',
         'mentor_topics',
     ];
+
+    public function course()
+    {
+        return $this->belongsTo(\App\Models\Course::class);
+    }
+
+    public function academicEvents()
+    {
+        return $this->hasMany(\App\Models\AcademicEvent::class);
+    }
 
     protected $casts = [
         'email_verified_at' => 'datetime',

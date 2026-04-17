@@ -100,4 +100,47 @@ trait GeneratesAiContent
             return ['error' => 'System Exception: ' . $e->getMessage()];
         }
     }
+
+    /**
+     * Specialized Intelligence for extracting academic deadlines from notices.
+     */
+    public function extractDeadlinesFromNotice($rawInput)
+    {
+        $prompt = "You are a highly capable academic assistant. Extract assessment/project/exam details from the following raw notice or text.\n\n"
+            . "Input Target: {$rawInput}\n\n"
+            . "Requirements:\n"
+            . "- Return ONLY a valid JSON array of objects.\n"
+            . "- Each object must have: 'title', 'type' (one of: exam, mst, project, assignment, quiz, lab, other), 'due_date' (ISO format), 'priority' (low, medium, high), and 'description'.\n"
+            . "- If due_date is unclear, estimate based on 'today's date' which is " . now()->toDateString() . ".\n"
+            . "- Focus on accuracy. If no academic deadlines are found, return an empty array [].\n"
+            . "- Do NOT include markdown blocks or extra text. ONLY the JSON array.";
+
+        try {
+            $apiKey = env('GEMINI_API_KEY');
+            if (!$apiKey) return ['error' => 'API Configuration Locked.'];
+
+            $response = Http::timeout(60)->post(
+                "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key={$apiKey}",
+                [
+                    'contents' => [
+                        ['parts' => [['text' => $prompt]]]
+                    ]
+                ]
+            );
+
+            if ($response->successful()) {
+                $data = $response->json();
+                $textResult = $data['candidates'][0]['content']['parts'][0]['text'] ?? '[]';
+                
+                // Sanitization of AI output
+                $cleanJson = preg_replace('/```json|```/', '', $textResult);
+                return json_decode(trim($cleanJson), true) ?: [];
+            }
+
+            return ['error' => 'AI Manifestation Timed Out.'];
+
+        } catch (\Exception $e) {
+            return ['error' => 'Neural Sync Error: ' . $e->getMessage()];
+        }
+    }
 }

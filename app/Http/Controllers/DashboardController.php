@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\Professor;
 use App\Models\Subject;
 use App\Models\User;
+use App\Models\AcademicEvent;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -24,6 +25,14 @@ class DashboardController extends Controller
             return redirect()->route('recruiter.dashboard');
         }
         
+        // 🥁 THE ACADEMIC PULSE: Personalized Deadline Stream 🛡️
+        $academicPulse = AcademicEvent::forStudent($user)
+            ->where('due_date', '>=', now())
+            ->with('subject')
+            ->orderBy('due_date', 'asc')
+            ->take(5)
+            ->get();
+
         // Personalized Campus Notes
         $myNotes = collect();
         if ($user->college_id) {
@@ -41,7 +50,7 @@ class DashboardController extends Controller
             ->get();
 
         // Real Subjects (Resilient Check)
-        $subjects = \Schema::hasTable('subjects') ? Subject::take(6)->get() : collect();
+        $subjects = \Schema::hasTable('subjects') ? Subject::with('course')->take(6)->get() : collect();
 
         // Matched Job Opportunities (Global + Targeted) 
         $matchedJobs = \App\Models\JobPosting::where('is_approved', true)
@@ -60,6 +69,13 @@ class DashboardController extends Controller
         $weeklyNotes = $user->notes()->where('created_at', '>=', now()->subDays(7))->count();
         $weeklyCredits = $weeklyNotes * 50;
 
-        return view('dashboard', compact('myNotes', 'topPerformers', 'subjects', 'matchedJobs', 'weeklyCredits'));
+        return view('dashboard', compact(
+            'myNotes', 
+            'topPerformers', 
+            'subjects', 
+            'matchedJobs', 
+            'weeklyCredits',
+            'academicPulse'
+        ));
     }
 }

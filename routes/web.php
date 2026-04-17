@@ -88,6 +88,13 @@ Route::middleware(['auth'])->group(function () {
         }
         return redirect()->route('dashboard')->with('success', 'Career goal updated!');
     });
+
+    // 🥁 Academic Pulse: Personalized Deadline Stream 🛡️
+    Route::prefix('academic-pulse')->name('academic-pulse.')->group(function () {
+        Route::post('/manifest', [App\Http\Controllers\AcademicEventController::class, 'store'])->name('store');
+        Route::post('/scan-notice', [App\Http\Controllers\AcademicEventController::class, 'scan'])->name('scan');
+        Route::post('/verify/{event}', [App\Http\Controllers\AcademicEventController::class, 'verify'])->name('verify');
+    });
     Route::get('/chat/{user?}', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
     Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');

@@ -112,7 +112,95 @@
             </div>
         </div>
 
-    <!-- Subjects Grid -->
+        </div>
+
+        <!-- 🥁 THE ACADEMIC PULSE: Personalized Deadline Stream 🛡️ -->
+        <div class="space-y-6">
+            <div class="flex justify-between items-center px-2">
+                <div class="space-y-1">
+                    <h3 class="text-2xl font-extrabold text-secondary flex items-center gap-2">
+                        Academic Pulse
+                        <span class="relative flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-rose-500"></span>
+                        </span>
+                    </h3>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest italic leading-none">Live manifestation of upcoming academic hurdles</p>
+                </div>
+                <button @click="$dispatch('open-pulse-modal')" class="group flex items-center gap-2 bg-slate-50 hover:bg-white px-5 py-2.5 rounded-2xl border border-slate-100 transition-all">
+                    <span class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-xs group-hover:rotate-12 transition-transform">➕</span>
+                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-500">Manifest Task</span>
+                </button>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                @forelse($academicPulse as $event)
+                    <div class="glass p-8 rounded-[2.5rem] shadow-glass border-white/40 group hover:scale-[1.01] transition-all relative overflow-hidden">
+                        {{-- Priority Indicator --}}
+                        <div class="absolute top-0 right-0 p-6">
+                            @if($event->priority === 'high')
+                                <span class="px-3 py-1 bg-rose-500 text-white text-[8px] font-black uppercase tracking-widest rounded-lg shadow-lg shadow-rose-500/20">Critical</span>
+                            @elseif($event->priority === 'medium')
+                                <span class="px-3 py-1 bg-amber-500 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Imminent</span>
+                            @else
+                                <span class="px-3 py-1 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-widest rounded-lg">Steady</span>
+                            @endif
+                        </div>
+
+                        <div class="flex items-center gap-8 relative z-10">
+                            {{-- Event Type Icon --}}
+                            <div class="w-20 h-20 rounded-[1.5rem] bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center text-4xl shadow-sm border border-white">
+                                @php
+                                    $icons = ['exam' => '📁', 'mst' => '📑', 'project' => '🏗️', 'assignment' => '📝', 'quiz' => '⏱️', 'lab' => '🧪', 'other' => '🗓️'];
+                                @endphp
+                                {{ $icons[$event->type] ?? '🗓️' }}
+                            </div>
+
+                            <div class="flex-1 space-y-3">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="text-[9px] font-black text-primary uppercase tracking-widest">{{ $event->subject->name ?? 'Global' }}</span>
+                                        @if($event->is_official)
+                                            <span class="w-1 h-1 bg-slate-300 rounded-full"></span>
+                                            <span class="text-[9px] font-black text-rose-500 uppercase tracking-widest flex items-center gap-1 italic">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                                Institutional Broadcast
+                                            </span>
+                                        @endif
+                                    </div>
+                                    <h4 class="text-xl font-black text-slate-900 group-hover:text-primary transition-colors leading-tight">{{ $event->title }}</h4>
+                                </div>
+
+                                <div class="flex items-center gap-6">
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-slate-400 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ $event->due_date_label }}</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <svg class="w-4 h-4 text-slate-400 font-bold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                        <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest">{{ $event->due_date->format('d M, Y') }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Hover Effect Glow --}}
+                        <div class="absolute -bottom-20 -right-20 w-40 h-40 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors"></div>
+                    </div>
+                @empty
+                    <div class="lg:col-span-2 border-2 border-dashed border-slate-100 rounded-[2.5rem] py-16 flex flex-col items-center justify-center text-center space-y-4">
+                        <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-3xl opacity-50">🧘‍♂️</div>
+                        <div>
+                            <p class="text-sm font-black text-slate-400 uppercase tracking-widest italic">All pulses stable</p>
+                            <p class="text-[10px] font-bold text-slate-300 uppercase tracking-tighter mt-1">No upcoming assessments or personal tasks detected in the Verse</p>
+                        </div>
+                        <button @click="$dispatch('open-pulse-modal')" class="text-xs font-black text-primary hover:underline uppercase tracking-widest mt-4">Manual Manifestation →</button>
+                    </div>
+                @endforelse
+            </div>
+        </div>
+
+        <!-- Subjects Grid -->
         <div class="space-y-6">
             <div class="flex justify-between items-center px-2">
                 <h3 class="text-2xl font-extrabold text-secondary">Broaden your knowledge</h3>
@@ -288,6 +376,154 @@
                         @endforelse
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- 🤖 Academic Pulse: Manifestation Modal (Phase 1) -->
+    <div x-data="{ 
+            open: false,
+            isScanning: false,
+            scanInput: '',
+            formData: {
+                title: '',
+                type: 'assignment',
+                due_date: '',
+                subject_id: '',
+                priority: 'medium',
+                description: ''
+            },
+            async manifestPulse() {
+                try {
+                    const response = await fetch('{{ route('academic-pulse.store') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify(this.formData)
+                    });
+                    const data = await response.json();
+                    if (data.status === 'success') {
+                        window.location.reload();
+                    }
+                } catch (e) { console.error('Manifestation Failed', e); }
+            },
+            async scanNotice() {
+                if (!this.scanInput.trim()) return;
+                this.isScanning = true;
+                try {
+                    const response = await fetch('{{ route('academic-pulse.scan') }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: JSON.stringify({ text_data: this.scanInput })
+                    });
+                    const result = await response.json();
+                    if (result.status === 'success' && result.data.length > 0) {
+                        const first = result.data[0];
+                        this.formData.title = first.title;
+                        this.formData.type = first.type;
+                        this.formData.due_date = first.due_date.split('T')[0];
+                        this.formData.priority = first.priority;
+                        this.formData.description = first.description;
+                        this.scanInput = '';
+                    }
+                } catch (e) { console.error('Scan Failed', e); }
+                this.isScanning = false;
+            }
+         }" 
+         @open-pulse-modal.window="open = true"
+         x-show="open" 
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-cloak>
+        
+        <div @click.away="open = false" 
+             class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
+            
+            <div class="px-10 py-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center text-xl shadow-lg shadow-indigo-500/20">🥁</div>
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900">Manifest Academic Pulse</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5 italic">Synchronizing assessment hurdles with the Multiverse</p>
+                    </div>
+                </div>
+                <button @click="open = false" class="text-slate-400 hover:text-slate-600 font-bold p-2">✕</button>
+            </div>
+
+            <div class="flex-1 overflow-y-auto p-10 space-y-8 custom-scrollbar">
+                <!-- AI NOTICE SCANNER (The "Zero Mehnat" Hack) ⚡ -->
+                <div class="p-6 bg-violet-50 rounded-3xl border border-violet-100 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-black text-violet-600 uppercase tracking-widest flex items-center gap-2">
+                             <span class="animate-pulse">🤖</span> AI Notice Scanner
+                        </h4>
+                        <span class="text-[9px] font-black text-violet-400 uppercase tracking-widest italic">Zero Labor Protocol</span>
+                    </div>
+                    <div class="flex gap-3">
+                        <textarea x-model="scanInput" 
+                                  placeholder="Paste notice board text or deadline announcement here..."
+                                  class="flex-1 bg-white border-violet-100 rounded-2xl p-4 text-xs font-bold focus:ring-4 focus:ring-violet-500/10 placeholder:text-violet-200 h-20 outline-none"></textarea>
+                        <button @click="scanNotice()" :disabled="isScanning" class="bg-violet-600 text-white px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-violet-500/20 hover:scale-105 transition-all disabled:opacity-50">
+                            <span x-text="isScanning ? 'Syncing...' : 'Scan'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Manifest Title</label>
+                        <input type="text" x-model="formData.title" placeholder="e.g. MST 1 Submission" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Event Type</label>
+                        <select x-model="formData.type" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                            <option value="assignment">Assignment</option>
+                            <option value="mst">MST / Mid-Term</option>
+                            <option value="exam">Final Exam</option>
+                            <option value="project">Project Work</option>
+                            <option value="quiz">Quiz / MCQ</option>
+                            <option value="lab">Lab / Practical</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Due Date</label>
+                        <input type="date" x-model="formData.due_date" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject Node</label>
+                        <select x-model="formData.subject_id" class="w-full bg-slate-50 border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:ring-4 focus:ring-indigo-500/5 outline-none">
+                            <option value="">Select Subject (Optional)</option>
+                            @foreach($subjects as $sub)
+                                <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Priority Protocol</label>
+                    <div class="flex gap-4">
+                        @foreach(['low' => 'bg-emerald-100 text-emerald-600', 'medium' => 'bg-amber-100 text-amber-600', 'high' => 'bg-rose-100 text-rose-600'] as $prio => $cls)
+                            <button @click="formData.priority = '{{ $prio }}'" 
+                                    :class="formData.priority === '{{ $prio }}' ? '{{ $cls }} ring-2 ring-current' : 'bg-slate-50 text-slate-400'"
+                                    class="flex-1 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                {{ $prio }}
+                            </button>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-10 bg-slate-50 border-t border-slate-100">
+                <button @click="manifestPulse()" class="w-full h-16 bg-slate-900 text-white rounded-[1.5rem] font-black uppercase tracking-widest text-xs shadow-xl shadow-slate-900/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Initialize Manifestation ($Reward+10)
+                </button>
+                <p class="text-[9px] text-center text-slate-400 font-bold uppercase tracking-widest mt-6">Contributing official data fuels your ARS Visibility Score</p>
             </div>
         </div>
     </div>
