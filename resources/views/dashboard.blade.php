@@ -21,9 +21,8 @@
                         </a>
 
                         @if(!Auth::user()->career_role)
-                        <form action="{{ route('profile.update', Auth::user()->username) }}" method="POST" class="flex gap-2">
+                        <form action="{{ route('dashboard') }}" method="POST" class="flex gap-2">
                             @csrf
-                            @method('PUT')
                             <select name="career_role" onchange="this.form.submit()" class="bg-primary-600/50 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-white">
                                 <option value="">Set Career Goal 🎯</option>
                                 <option value="Software Engineer">Software Engineer</option>

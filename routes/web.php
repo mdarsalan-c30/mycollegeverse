@@ -80,6 +80,12 @@ Route::get('/faq', [App\Http\Controllers\PageController::class, 'show'])->defaul
 Route::middleware(['auth'])->group(function () {
     // Shared Routes (Dynamic Layouts)
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard', function(\Illuminate\Http\Request $request) {
+        if ($request->career_role) {
+            \Illuminate\Support\Facades\Auth::user()->update(['career_role' => $request->career_role]);
+        }
+        return redirect()->route('dashboard')->with('success', 'Career goal updated!');
+    });
     Route::get('/chat/{user?}', [App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/fetch/{user}', [App\Http\Controllers\ChatController::class, 'fetch'])->name('chat.fetch');
     Route::post('/chat/send', [App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
