@@ -432,7 +432,8 @@
          class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-xl"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100">
+         x-transition:enter-end="opacity-100"
+         x-cloak>
         
         <div @click.away="open = false" 
              class="bg-white w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">

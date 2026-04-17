@@ -76,8 +76,6 @@
 
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Alpine.js -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script>
             tailwind.config = {
                 theme: {
@@ -113,12 +111,15 @@
                 color: #3B82F6;
                 border-right: 4px solid #3B82F6;
             }
+            [x-cloak] { display: none !important; }
             /* Custom Scrollbar */
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
             ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
         </style>
+        <!-- Alpine.js Engineering ⚙️ -->
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
     <body class="font-sans antialiased text-slate-900 bg-surface">
         <!-- Google Tag Manager (noscript) -->
