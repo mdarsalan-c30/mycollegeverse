@@ -11,6 +11,7 @@ use App\Models\ApprovalLog;
 use App\Traits\GeneratesAiContent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class NoteController extends Controller
 {
@@ -40,20 +41,30 @@ class NoteController extends Controller
         }
 
         $notes = $query->with(['user', 'college'])->latest()->paginate(15);
-        
-        // 🚀 Emergency Optimization: Stats disabled to prevent DB connection refusal (Phase 4)
-        $stats = [
-            'total_tokens' => 0,
-            'today_tokens' => 0,
-            'total_generations' => 0,
-            'today_generations' => 0,
-        ];
+        $subjects = Subject::with('course')->orderBy('name')->get();
+
+        // 📊 AI Intelligence Stats (Cached Mode for Stability) 🛡️
+        $stats = Cache::remember('admin_ai_stats', 3600 * 6, function() {
+            try {
+                return [
+                    'total_tokens' => \App\Models\AiUsage::sum('total_tokens') ?? 0,
+                    'today_tokens' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->sum('total_tokens') ?? 0,
+                    'total_generations' => \App\Models\AiUsage::count(),
+                    'today_generations' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->count(),
+                ];
+            } catch (\Exception $e) {
+                return [
+                    'total_tokens' => 0, 'today_tokens' => 0,
+                    'total_generations' => 0, 'today_generations' => 0,
+                ];
+            }
+        });
 
         if ($notes->isEmpty() && $request->has('search')) {
             session()->flash('warning', "Knowledge Archive blank for query: '{$request->search}'");
         }
 
-        return view('admin.notes.index', compact('notes', 'stats'));
+        return view('admin.notes.index', compact('notes', 'stats', 'subjects'));
     }
 
     public function bulkGenerateForm()
