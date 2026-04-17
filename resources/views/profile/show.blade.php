@@ -1,3 +1,4 @@
+@php $layout = (Auth::check() && Auth::user()->role === 'recruiter') ? 'recruiter' : 'app'; @endphp
 <x-dynamic-component :component="$layout.'-layout'">
     <div class="space-y-10 pb-20" x-data="{ activeTab: 'portfolio' }">
         <!-- Profile Header -->
