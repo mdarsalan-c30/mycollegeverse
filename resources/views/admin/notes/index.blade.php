@@ -19,6 +19,10 @@
                     </a>
                 </div>
 
+                <a href="{{ route('admin.notes.bulk') }}" class="h-12 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-6 rounded-2xl flex items-center gap-2 text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 hover:scale-105 transition-all">
+                    <span>🤖 Bulk Generate AI</span>
+                </a>
+
                 <form action="{{ route('admin.notes') }}" method="GET" class="relative group">
                     <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by title or citizen..." class="w-72 h-12 bg-white border border-admin-border rounded-2xl px-6 pl-12 text-xs font-bold focus:ring-4 focus:ring-admin-primary/5 focus:border-admin-primary transition-all">
                     <div class="absolute left-4 top-3.5 text-slate-300 group-focus-within:text-admin-primary transition-colors">

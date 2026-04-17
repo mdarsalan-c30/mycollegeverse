@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
-use App\Models\Note;
-use App\Models\ApprovalLog;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Subject;
+use App\Models\Course;
+use App\Traits\GeneratesAiContent;
 
 class NoteController extends Controller
 {
+    use GeneratesAiContent;
+
     /**
      * Display the Knowledge Moderation Queue.
      */
@@ -40,6 +40,62 @@ class NoteController extends Controller
         }
 
         return view('admin.notes.index', compact('notes'));
+    }
+
+    public function bulkGenerateForm()
+    {
+        $subjects = Subject::all();
+        $courses = Course::orderBy('name')->get();
+        return view('admin.notes.bulk', compact('subjects', 'courses'));
+    }
+
+    public function bulkGenerate(Request $request)
+    {
+        $request->validate([
+            'topics' => 'required|string',
+            'subject_id' => 'required|exists:subjects,id',
+            'detail_level' => 'required|in:quick,detailed,exam',
+        ]);
+
+        $topics = array_filter(array_map('trim', explode("\n", $request->topics)));
+        $subject = Subject::findOrFail($request->subject_id);
+        
+        if (count($topics) > 10) {
+            return back()->with('error', 'Please limit bulk generation to 10 topics at a time to avoid timeouts.');
+        }
+
+        $successCount = 0;
+        $errors = [];
+
+        foreach ($topics as $topic) {
+            $result = $this->performAiGeneration($topic, $subject->name, $request->detail_level);
+
+            if (isset($result['error'])) {
+                $errors[] = "Failed for topic '{$topic}': " . $result['error'];
+                continue;
+            }
+
+            Note::create([
+                'title' => $topic,
+                'note_type' => 'ai',
+                'ai_content' => $result['content'],
+                'user_id' => Auth::id(),
+                'college_id' => Auth::user()->college_id ?? 1,
+                'subject_id' => $subject->id,
+                'is_verified' => true,
+            ]);
+            $successCount++;
+        }
+
+        if ($successCount > 0) {
+            $msg = "Successfully generated {$successCount} AI notes for {$subject->name}.";
+            if (!empty($errors)) {
+                $msg .= " However, some failed: " . implode(', ', $errors);
+            }
+            return redirect()->route('admin.notes')->with('success', $msg);
+        }
+
+        return back()->with('error', 'Generation failed for all topics. Errors: ' . implode(', ', $errors));
     }
 
     /**
