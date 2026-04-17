@@ -30,10 +30,17 @@ Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])
 Route::get('/multiverse-academic-sync', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "🛡️ Academic targeting manifested! Database synchronized with the Pulse Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
+        return "🛡️ Academic targeting & Signal Hub manifested! Database synchronized with the Pulse Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
     } catch (\Exception $e) {
         return "Sync Error: " . $e->getMessage();
     }
+});
+
+// Signal Protocol: Core Notification Endpoints
+Route::middleware('auth')->group(function() {
+    Route::get('/api/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/api/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 });
 
 Route::get('/multiverse-note-slug-sync', function() {

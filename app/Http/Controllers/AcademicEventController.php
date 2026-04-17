@@ -70,12 +70,22 @@ class AcademicEventController extends Controller
         if ($event->verification_count >= 5 && !$event->is_official) {
             $event->update(['is_official' => true, 'is_verified' => true]);
             
-            // 💰 Reward the Creator with 100 Karma
+            // 💰 Reward the Creator & Notify them
             if ($event->user_id) {
                 $creator = User::find($event->user_id);
-                // Note: Karma is calculated dynamically in User model based on contributions,
-                // but we could log it or add to a specific rewards table.
-                // For now, it's just a verification marker.
+                // Notification for creator
+                $creator->notify(new \App\Notifications\AcademicSignal($event));
+            }
+
+            // 🏮 BATCH BROADCAST: Notify all classmates matching targeting node
+            $batchmates = User::where('college_id', $event->college_id)
+                ->where('course_id', $event->course_id)
+                ->where('semester', $event->semester)
+                ->where('id', '!=', $event->user_id) // Avoid double notifying creator
+                ->get();
+
+            if ($batchmates->isNotEmpty()) {
+                \Illuminate\Support\Facades\Notification::send($batchmates, new \App\Notifications\AcademicSignal($event));
             }
         }
 
