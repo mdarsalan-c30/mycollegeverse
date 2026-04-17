@@ -10,7 +10,8 @@
     topicsInput: '',
     topicsList: [],
     showStaging: false,
-    allSubjects: {{ App\Models\Subject::all()->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'course_id' => $s->course_id, 'semester' => $s->semester])->toJson() }},
+    {{-- Robust variable initialization --}}
+    allSubjects: {{ $subjects->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'course_id' => $s->course_id, 'semester' => $s->semester])->toJson() }},
 
     get filteredSubjects() {
         if (!this.selectedCourse || !this.selectedSemester) return [];
@@ -86,7 +87,7 @@
             <p class="text-slate-500 font-medium" x-show="showStaging">Review your topics and generate them individually or in bulk.</p>
         </div>
         <div class="flex items-center gap-3">
-             <button x-show="showStaging" @click="resetStaging()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all">
+             <button type="button" x-show="showStaging" @click="resetStaging()" class="bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all">
                 Back to Edit
             </button>
             <a href="{{ route('admin.notes') }}" x-show="!showStaging" class="inline-flex items-center gap-2 bg-slate-100 text-slate-600 px-6 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all">
@@ -139,7 +140,7 @@
                     </div>
                     <div class="space-y-3">
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Subject Node</label>
-                        <select name="subject_id" x-model="selectedSubject" required
+                        <select x-model="selectedSubject" required
                                 class="w-full h-14 bg-slate-50 border-slate-100 rounded-2xl px-4 text-sm font-bold text-slate-800">
                             <option value="">Select Subject</option>
                             <template x-for="subject in filteredSubjects" :key="subject.id">
@@ -168,7 +169,7 @@
                     </div>
                 </div>
 
-                <button @click="prepareStaging()" :disabled="!topicsInput.trim() || !selectedSubject" 
+                <button type="button" @click="prepareStaging()" :disabled="!topicsInput.trim() || !selectedSubject" 
                         class="w-full h-16 bg-slate-900 text-white rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl hover:scale-[1.01] active:scale-95 transition-all disabled:opacity-50">
                     🔬 Preview & Process Topics
                 </button>
@@ -185,7 +186,7 @@
                             Target Subject: <span class="text-primary" x-text="allSubjects.find(s => s.id == selectedSubject)?.name"></span>
                         </p>
                     </div>
-                    <button @click="generateSelected()" 
+                    <button type="button" @click="generateSelected()" 
                             :disabled="topicsList.filter(i => i.selected && i.status === 'pending').length === 0"
                             class="bg-primary text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-primary/20 hover:scale-105 transition-all disabled:opacity-50">
                         Launch Selected
@@ -232,12 +233,12 @@
 
                                 {{-- Error --}}
                                 <template x-if="item.status === 'error'">
-                                    <button @click="generateItem(item)" class="text-rose-600 hover:text-rose-700 font-black text-[10px] uppercase underline">Retry</button>
+                                    <button type="button" @click="generateItem(item)" class="text-rose-600 hover:text-rose-700 font-black text-[10px] uppercase underline">Retry</button>
                                 </template>
 
                                 {{-- Pending Action --}}
                                 <template x-if="item.status === 'pending'">
-                                    <button @click="generateItem(item)" class="bg-white text-slate-600 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-200 hover:bg-primary hover:text-white hover:border-primary transition-all">
+                                    <button type="button" @click="generateItem(item)" class="bg-white text-slate-600 px-4 py-1.5 rounded-lg text-[10px] font-black uppercase border border-slate-200 hover:bg-primary hover:text-white hover:border-primary transition-all">
                                         Generate
                                     </button>
                                 </template>

@@ -41,13 +41,23 @@ class NoteController extends Controller
 
         $notes = $query->with(['user', 'college'])->latest()->paginate(15);
         
-        // 📊 AI Intelligence Stats for Dashboard
-        $stats = [
-            'total_tokens' => \App\Models\AiUsage::sum('total_tokens'),
-            'today_tokens' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->sum('total_tokens'),
-            'total_generations' => \App\Models\AiUsage::count(),
-            'today_generations' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->count(),
-        ];
+        // 📊 AI Intelligence Stats (Robust Mode) 🛡️
+        try {
+            $stats = [
+                'total_tokens' => \App\Models\AiUsage::sum('total_tokens') ?? 0,
+                'today_tokens' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->sum('total_tokens') ?? 0,
+                'total_generations' => \App\Models\AiUsage::count(),
+                'today_generations' => \App\Models\AiUsage::where('created_at', '>=', now()->startOfDay())->count(),
+            ];
+        } catch (\Exception $e) {
+            // Fallback to zero stats to prevent dashboard crash
+            $stats = [
+                'total_tokens' => 0,
+                'today_tokens' => 0,
+                'total_generations' => 0,
+                'today_generations' => 0,
+            ];
+        }
 
         if ($notes->isEmpty() && $request->has('search')) {
             session()->flash('warning', "Knowledge Archive blank for query: '{$request->search}'");
@@ -106,7 +116,7 @@ class NoteController extends Controller
                 ]);
 
                 // 📊 Log Usage Metadata
-                AiUsage::create([
+                \App\Models\AiUsage::create([
                     'user_id' => $userId,
                     'model' => $model,
                     'type' => 'bulk',
@@ -171,7 +181,7 @@ class NoteController extends Controller
             ]);
 
             // 📊 Log Usage Metadata
-            AiUsage::create([
+            \App\Models\AiUsage::create([
                 'user_id' => $userId,
                 'model' => $model,
                 'type' => 'staging',
