@@ -37,10 +37,20 @@ trait GeneratesAiContent
 
         try {
             $apiKey = env('GEMINI_API_KEY');
-            $model = "gemini-1.5-flash"; // Primary stable model
+            
+            if (!$apiKey) {
+                return ['error' => 'API Key missing in .env (GEMINI_API_KEY)'];
+            }
 
+            // Simple validation to help the user
+            if (!str_starts_with($apiKey, 'AIza') && !str_starts_with($apiKey, 'AQ.')) {
+                return ['error' => 'Invalid API Key format. Please use a key from Google AI Studio (starts with AIza).'];
+            }
+
+            $model = "gemini-1.5-flash"; 
+            
             $response = Http::timeout(120)->post(
-                "https://generativelanguage.googleapis.com/v1/models/{$model}:generateContent?key={$apiKey}",
+                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
                 [
                     'contents' => [
                         ['parts' => [['text' => $prompt]]]
@@ -48,10 +58,23 @@ trait GeneratesAiContent
                 ]
             );
 
+            // Fallback to gemini-pro if flash is 404ing
+            if ($response->status() === 404) {
+                $model = "gemini-pro";
+                $response = Http::timeout(120)->post(
+                    "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
+                    [
+                        'contents' => [
+                            ['parts' => [['text' => $prompt]]]
+                        ]
+                    ]
+                );
+            }
+
             if (!$response->successful()) {
                 $errorBody = $response->json();
                 $errorMessage = $errorBody['error']['message'] ?? 'Unknown API Error';
-                \Log::error('Gemini API Error: ' . $response->body());
+                \Log::error('Gemini API Error (' . $model . '): ' . $response->body());
                 return ['error' => "API Error: {$errorMessage} (Status: {$response->status()})"];
             }
 
