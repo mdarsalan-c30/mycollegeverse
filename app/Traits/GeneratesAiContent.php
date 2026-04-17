@@ -37,9 +37,10 @@ trait GeneratesAiContent
 
         try {
             $apiKey = env('GEMINI_API_KEY', 'AIzaSyCezi2i9eAreTivaji9GFS15DM4HNhTRQo');
+            $model = "gemini-1.5-flash"; // More stable/widely available than 2.0-flash
 
             $response = Http::timeout(120)->post(
-                "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={$apiKey}",
+                "https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent?key={$apiKey}",
                 [
                     'contents' => [
                         ['parts' => [['text' => $prompt]]]
@@ -48,8 +49,10 @@ trait GeneratesAiContent
             );
 
             if (!$response->successful()) {
+                $errorBody = $response->json();
+                $errorMessage = $errorBody['error']['message'] ?? 'Unknown API Error';
                 \Log::error('Gemini API Error: ' . $response->body());
-                return ['error' => 'AI generation failed.'];
+                return ['error' => "API Error: {$errorMessage} (Status: {$response->status()})"];
             }
 
             $data = $response->json();
