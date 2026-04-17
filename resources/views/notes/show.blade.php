@@ -137,8 +137,32 @@
                             .ai-notes-display td {
                                 border-bottom: 1px solid #f1f5f9;
                             }
+                            /* Mermaid Diagram Styling */
+                            .ai-notes-display .mermaid {
+                                background: white;
+                                padding: 2rem;
+                                border-radius: 2.5rem;
+                                border: 1px solid #e2e8f0;
+                                margin: 3rem 0;
+                                display: flex;
+                                justify-content: center;
+                                overflow-x: auto;
+                            }
                         </style>
+
                         {!! $note->ai_content !!}
+
+                        @if($note->note_type === 'ai')
+                            <script type="module">
+                                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                                mermaid.initialize({ 
+                                    startOnLoad: true,
+                                    theme: 'neutral',
+                                    fontFamily: 'Inter',
+                                    securityLevel: 'loose'
+                                });
+                            </script>
+                        @endif
                     </article>
                 </div>
                 @else

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Note;
+use App\Models\AiUsage;
 use App\Models\Subject;
 use App\Models\NoteReview;
 use Illuminate\Support\Facades\Auth;
@@ -210,11 +211,23 @@ class NoteController extends Controller
     {
         $note = Note::findOrFail($id);
 
+        // 🛡️ Handle AI Notes (Print to PDF)
+        if ($note->note_type === 'ai') {
+            return redirect()->route('notes.print', $note->slug);
+        }
+
         if (filter_var($note->file_path, FILTER_VALIDATE_URL)) {
             return redirect()->away($note->file_path);
         }
 
         return Storage::disk('public')->download($note->file_path);
+    }
+
+    public function print($slug)
+    {
+        $note = Note::where('slug', $slug)->firstOrFail();
+        $note->load(['subject', 'user']);
+        return view('notes.print', compact('note'));
     }
 
     public function generateForm()

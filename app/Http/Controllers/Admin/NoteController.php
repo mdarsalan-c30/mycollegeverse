@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Subject;
 use App\Models\Course;
 use App\Models\Note;
+use App\Models\AiUsage;
 use App\Models\ApprovalLog;
 use App\Traits\GeneratesAiContent;
 use Illuminate\Http\Request;

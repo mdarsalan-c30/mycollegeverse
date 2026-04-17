@@ -101,6 +101,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/notes', [App\Http\Controllers\NoteController::class, 'store'])->name('notes.store');
         Route::post('/notes/{note}/review', [App\Http\Controllers\NoteController::class, 'addReview'])->name('notes.review');
         Route::get('/notes/{slug}/download', [App\Http\Controllers\NoteController::class, 'download'])->name('notes.download');
+        Route::get('/notes/{slug}/print', [App\Http\Controllers\NoteController::class, 'print'])->name('notes.print');
         Route::post('/community/store', [App\Http\Controllers\CommunityController::class, 'store'])->name('community.store');
         Route::post('/community/comment', [App\Http\Controllers\CommunityController::class, 'comment'])->name('community.comment');
         Route::post('/community/vote/{postId}', [App\Http\Controllers\CommunityController::class, 'vote'])->name('community.vote');

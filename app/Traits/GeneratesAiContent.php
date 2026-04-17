@@ -32,7 +32,7 @@ trait GeneratesAiContent
             . "- Use <table> for comparisons or technical data where applicable.\n"
             . "- Use <div class='info-box'>...</div> for important definitions.\n"
             . "- Use <div class='exam-tip'>...</div> for exam-oriented tips and mnemonics.\n"
-            . "- Use <div class='diagram-box'>[Diagram Concept: Describe what a diagram here would show]</div> to indicate where a visual should be.\n"
+            . "- VERY IMPORTANT: For all scientific diagrams, flowcharts, or processes, generate a Mermaid.js code block wrapped in <pre class='mermaid'>...</pre> tags. For example: <pre class='mermaid'>graph TD; A-->B;</pre>. Do NOT just describe the diagram, actually WRITE the Mermaid code.\n"
             . "- Include a 'Quick Revision Table' at the beginning.\n"
             . "- Use <strong> for high-importance keywords.\n"
             . "- Structure the content to be highly engaging with proper spacing.\n"
