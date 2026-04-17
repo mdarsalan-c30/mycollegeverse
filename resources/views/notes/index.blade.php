@@ -118,6 +118,15 @@
                     </div>
                 </div>
                 @endif
+
+                @if($note->note_type === 'ai')
+                <div class="absolute top-0 right-0 z-10">
+                    <div class="bg-gradient-to-r from-indigo-600 to-primary text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-bl-2xl shadow-lg shadow-indigo-500/20 tracking-widest flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        AI Scholar
+                    </div>
+                </div>
+                @endif
                 
                 @if($note->exam_help_rate >= 80 && $note->reviews()->count() > 0)
                 <div class="absolute top-0 left-0 z-10">
@@ -128,10 +137,16 @@
                 @endif
                 
                 <div class="flex justify-between items-start mb-6">
-                    <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                        </svg>
+                    <div class="w-14 h-14 rounded-2xl {{ $note->note_type === 'ai' ? 'bg-indigo-50 text-indigo-600' : 'bg-primary/10 text-primary' }} flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
+                        @if($note->note_type === 'ai')
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        @else
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                            </svg>
+                        @endif
                     </div>
                     @php 
                         $rating = $note->avg_rating; 

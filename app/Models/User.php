@@ -38,7 +38,34 @@ class User extends Authenticatable
         'ban_reason',
         'id_card_url',
         'karma_spent',
+        'is_batch_visible',
+        'career_role',
+        'is_mentor',
+        'mentor_bio',
+        'mentor_topics',
     ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'mentor_topics' => 'array',
+        'is_mentor' => 'boolean',
+    ];
+
+    public function getIsMentorEligibleAttribute()
+    {
+        $yearInt = (int)$this->year;
+        
+        // Rule: Final Year (4) OR (3rd Year AND Karma >= 500)
+        if ($yearInt >= 4) {
+            return true;
+        }
+
+        if ($yearInt === 3 && $this->karma >= 500) {
+            return true;
+        }
+
+        return false;
+    }
 
     public function getKarmaAttribute()
     {

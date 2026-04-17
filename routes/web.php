@@ -110,7 +110,24 @@ Route::middleware(['auth'])->group(function () {
         // Perks & Rewards Hub 🎁
         Route::get('/perks', [App\Http\Controllers\RewardController::class, 'index'])->name('rewards.index');
         Route::post('/perks/{reward}/claim', [App\Http\Controllers\RewardController::class, 'claim'])->name('rewards.claim');
+
+        // Batch mates Discovery 🧬
+        Route::get('/college/{college:slug}/batch/{year}', [App\Http\Controllers\BatchFinderController::class, 'index'])->name('colleges.batchmates');
+        Route::post('/profile/batch-visibility', [App\Http\Controllers\BatchFinderController::class, 'toggleVisibility'])->name('profile.batch.toggle');
     });
+
+    // Comparison Engine ⚖️ (Public)
+    Route::prefix('compare')->group(function() {
+        Route::get('/', [App\Http\Controllers\ComparisonController::class, 'index'])->name('compare.index');
+        Route::get('/{slugs}', [App\Http\Controllers\ComparisonController::class, 'compare'])->name('compare.show');
+        Route::post('/redirect', [App\Http\Controllers\ComparisonController::class, 'redirect'])->name('compare.redirect');
+    });
+
+    // Mentorship Hub 🤝
+    Route::post('/mentorship/toggle', [App\Http\Controllers\MentorshipController::class, 'toggleMode'])->name('mentorship.toggle');
+    Route::post('/mentorship/request/{mentor}', [App\Http\Controllers\MentorshipController::class, 'requestStore'])->name('mentorship.request');
+    Route::post('/mentorship/respond/{mRequest}', [App\Http\Controllers\MentorshipController::class, 'respond'])->name('mentorship.respond');
+    Route::post('/mentorship/complete/{mRequest}', [App\Http\Controllers\MentorshipController::class, 'complete'])->name('mentorship.complete');
 
     // Recruiter Only Routes
     Route::middleware(['role:recruiter'])->group(function () {
@@ -329,5 +346,29 @@ Route::get('/multiverse-init', function() {
         return "🌌 Multiverse Synchronized! All caches cleared. You can now visit the <a href='/'>Home Page</a>.";
     } catch (\Exception $e) {
         return "Initialization Error: " . $e->getMessage();
+    }
+});
+Route::get('/multiverse-ai-scholar-deploy', function() {
+    try {
+        // 1. Run Migrations
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        
+        // 2. Seed Engineering Subjects
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'EngineeringSubjectSeeder', '--force' => true]);
+        
+        // 3. Trigger AI Note Generation
+        \Illuminate\Support\Facades\Artisan::call('notes:ai-seed');
+        
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        
+        return "
+        <div style='font-family: sans-serif; padding: 40px; line-height: 1.6;'>
+            <h1 style='color: #3B82F6;'>🌌 AI Scholar Deployed Successfully!</h1>
+            <p>The academic multiverse has been updated with the following logs:</p>
+            <pre style='background: #f1f5f9; padding: 20px; border-radius: 12px; overflow-x: auto;'>$output</pre>
+            <a href='/notes' style='display: inline-block; background: #3B82F6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;'>Visit Notes Library</a>
+        </div>";
+    } catch (\Exception $e) {
+        return "Deployment Error: " . $e->getMessage();
     }
 });

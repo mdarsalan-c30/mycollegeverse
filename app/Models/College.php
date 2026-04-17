@@ -167,4 +167,28 @@ class College extends Model
             ]
         ];
     }
+
+    public function getCareerDestinationsAttribute()
+    {
+        $totalWithRole = $this->users()->whereNotNull('career_role')->count();
+        
+        if ($totalWithRole === 0) {
+            return collect([]);
+        }
+
+        return $this->users()
+            ->whereNotNull('career_role')
+            ->select('career_role', \DB::raw('count(*) as count'))
+            ->groupBy('career_role')
+            ->orderByDesc('count')
+            ->limit(4)
+            ->get()
+            ->map(function($item) use ($totalWithRole) {
+                return [
+                    'label' => $item->career_role,
+                    'count' => $item->count,
+                    'percent' => round(($item->count / $totalWithRole) * 100)
+                ];
+            });
+    }
 }

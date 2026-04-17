@@ -97,6 +97,7 @@ class CollegeController extends Controller
             'lowest_package' => 'nullable|numeric|min:0',
             'highest_package' => 'nullable|numeric|min:0',
             'verification_id' => 'required|string|max:50',
+            'reality_tags' => 'nullable|array',
         ];
 
         // Require ID card ONLY if user hasn't verified yet
@@ -133,6 +134,7 @@ class CollegeController extends Controller
                 'lowest_package' => $request->lowest_package,
                 'highest_package' => $request->highest_package,
                 'verification_id' => $request->verification_id,
+                'reality_tags' => $request->reality_tags,
                 'status' => 'pending' // Always reset to pending for verification
             ]
         );

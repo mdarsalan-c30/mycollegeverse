@@ -14,11 +14,28 @@
                             Start sharing your academy insights today! You can earn **50 credits** for every high-quality note verified in the Multiverse.
                         @endif
                     </p>
-                    <div class="pt-4 flex gap-4">
+                    <div class="pt-4 flex flex-wrap gap-4">
                         @php $resumeRoute = $myNotes->isNotEmpty() ? route('notes.show', $myNotes->first()->id) : route('notes.index'); @endphp
                         <a href="{{ $resumeRoute }}" class="bg-white text-primary px-8 py-3.5 rounded-2xl font-bold shadow-lg shadow-black/10 hover:scale-105 transition-transform">
                             Resume Learning
                         </a>
+
+                        @if(!Auth::user()->career_role)
+                        <form action="{{ route('profile.update', Auth::user()->username) }}" method="POST" class="flex gap-2">
+                            @csrf
+                            @method('PUT')
+                            <select name="career_role" onchange="this.form.submit()" class="bg-primary-600/50 backdrop-blur-md border border-white/20 text-white px-6 py-3.5 rounded-2xl font-bold text-sm outline-none focus:ring-2 focus:ring-white">
+                                <option value="">Set Career Goal 🎯</option>
+                                <option value="Software Engineer">Software Engineer</option>
+                                <option value="Data Scientist">Data Scientist</option>
+                                <option value="Product Manager">Product Manager</option>
+                                <option value="UI/UX Designer">UI/UX Designer</option>
+                                <option value="MBA Aspirant">MBA Aspirant</option>
+                                <option value="Startup Founder">Startup Founder</option>
+                                <option value="Civil Services">Civil Services</option>
+                            </select>
+                        </form>
+                        @endif
                     </div>
                 </div>
                 <div class="hidden md:block">
@@ -36,7 +53,7 @@
         </div>
 
         <!-- Metric Grid -->
-        <div class="grid md:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-4 gap-8">
             <div class="glass p-8 rounded-[2rem] shadow-glass border-white/40 flex items-center gap-6">
                 <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-600 shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
@@ -61,36 +78,37 @@
                 </div>
             </div>
 
-            @php
-                $karma = Auth::user()->karma ?? 0;
-                $rank = 'Verse Novice';
-                $rankColor = 'text-slate-500';
-                $rankBg = 'bg-slate-100';
-                
-                if ($karma >= 1000) {
-                    $rank = 'Verse Legend';
-                    $rankColor = 'text-amber-600';
-                    $rankBg = 'bg-amber-100';
-                } elseif ($karma >= 500) {
-                    $rank = 'Knowledge Vanguard';
-                    $rankColor = 'text-violet-600';
-                    $rankBg = 'bg-violet-100';
-                } elseif ($karma >= 100) {
-                    $rank = 'Academic Scholar';
-                    $rankColor = 'text-primary';
-                    $rankBg = 'bg-blue-100';
-                }
-            @endphp
+            <div class="glass p-8 rounded-[2rem] shadow-glass border-white/40 flex items-center gap-6 group">
+                <div class="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm transition-transform group-hover:scale-110">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Discovery</h4>
+                    <form action="{{ route('profile.batch.toggle') }}" method="POST">
+                        @csrf
+                        <button type="submit" name="visible" value="{{ Auth::user()->is_batch_visible ? 0 : 1 }}" class="flex items-center gap-2">
+                            <span class="text-lg font-black {{ Auth::user()->is_batch_visible ? 'text-emerald-500' : 'text-slate-400' }}">
+                                {{ Auth::user()->is_batch_visible ? 'Public' : 'Hidden' }}
+                            </span>
+                            <div class="w-8 h-4 bg-slate-200 rounded-full relative">
+                                <div class="absolute top-0.5 w-3 h-3 bg-white rounded-full transition-all {{ Auth::user()->is_batch_visible ? 'left-4.5 bg-emerald-500' : 'left-0.5 shadow-sm' }}"></div>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             <div class="glass p-8 rounded-[2rem] shadow-glass border-white/40 flex items-center gap-6 group">
-                <div class="w-16 h-16 {{ $rankBg }} rounded-2xl flex items-center justify-center {{ $rankColor }} shadow-sm group-hover:rotate-12 transition-transform">
+                <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-primary shadow-sm group-hover:rotate-12 transition-transform">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
                 </div>
                 <div>
-                    <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Reputation</h4>
-                    <p class="text-xl font-black {{ $rankColor }}">{{ $rank }}</p>
+                    <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Rank</h4>
+                    <p class="text-xl font-black text-primary truncate max-w-[100px]">Explorer</p>
                 </div>
             </div>
         </div>
@@ -116,6 +134,74 @@
                         <span class="font-bold text-slate-700 text-center text-sm truncate w-full px-2">{{ $sub->name }}</span>
                     </a>
                 @endforeach
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-10">
+            <!-- Mentorship Protocol Card 🤝 -->
+            <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6 lg:col-span-1">
+                <div class="flex justify-between items-start">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Guide Protocol</p>
+                        <h4 class="text-xl font-black text-slate-900">Guide Mode</h4>
+                    </div>
+                    <div @class([
+                        'px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest border',
+                        'bg-emerald-50 text-emerald-600 border-emerald-100' => Auth::user()->is_mentor,
+                        'bg-slate-100 text-slate-400 border-slate-200' => !Auth::user()->is_mentor,
+                    ])>
+                        {{ Auth::user()->is_mentor ? 'Active' : 'Offline' }}
+                    </div>
+                </div>
+                
+                <p class="text-[10px] text-slate-500 font-bold leading-relaxed italic">
+                    @if(Auth::user()->is_mentor_eligible)
+                        Share your institutional wisdom and earn **100 Karma** for every helpful session.
+                    @else
+                        Unlock Guide Status by reaching **Final Year** or earning **500+ Karma**.
+                    @endif
+                </p>
+
+                @if(Auth::user()->is_mentor_eligible)
+                <form action="{{ route('mentorship.toggle') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-slate-900/10">
+                        {{ Auth::user()->is_mentor ? 'Deactivate Guide Status' : 'Activate Guide Mode' }}
+                    </button>
+                </form>
+                @endif
+            </div>
+
+            <!-- Discovery Protocol (Existing) -->
+            <div class="bg-slate-900 p-10 rounded-[2.5rem] shadow-2xl space-y-6 lg:col-span-2 relative overflow-hidden">
+                <div class="relative z-10 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div class="space-y-1">
+                            <p class="text-[10px] font-black text-white/40 uppercase tracking-widest">Peer Discovery</p>
+                            <h4 class="text-xl font-black text-white uppercase italic tracking-tighter">Batch Visibility</h4>
+                        </div>
+                        {{-- Toggle Component --}}
+                        <form action="{{ route('profile.batch.toggle') }}" method="POST">
+                            @csrf
+                            <button type="submit" @class([
+                                'w-12 h-6 rounded-full relative transition-colors duration-300',
+                                'bg-primary' => Auth::user()->is_batch_visible,
+                                'bg-white/20' => !Auth::user()->is_batch_visible
+                            ])>
+                                <div @class([
+                                    'absolute top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300',
+                                    'translate-x-7' => Auth::user()->is_batch_visible,
+                                    'translate-x-1' => !Auth::user()->is_batch_visible
+                                ])></div>
+                            </button>
+                        </form>
+                    </div>
+                    <p class="text-[10px] text-white/50 font-bold leading-relaxed pr-10">
+                        When active, students joining **{{ Auth::user()->college->name ?? 'your college' }}** in your year can find and message you.
+                    </p>
+                </div>
+                <!-- Decorative astral shape -->
+                <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-[60px]"></div>
             </div>
         </div>
 

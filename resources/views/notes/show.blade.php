@@ -21,6 +21,53 @@
             </nav>
 
             <!-- Note Viewer -->
+            @if($note->note_type === 'ai')
+            <div class="glass rounded-[3rem] p-10 lg:p-16 border-white/60 shadow-glass relative bg-gradient-to-br from-white/40 to-white/10">
+                <!-- AI Scholar Header -->
+                <div class="flex items-center gap-4 mb-10 pb-8 border-b border-white/40">
+                    <div class="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-800">MCV AI Scholar Insight</h3>
+                        <p class="text-xs font-black text-primary uppercase tracking-widest mt-1">Certified Academic Multiverse Intel</p>
+                    </div>
+                </div>
+
+                <!-- Markdown Content -->
+                <div id="ai-content-reader" class="prose prose-slate prose-lg max-w-none text-slate-700 font-medium leading-relaxed
+                    prose-headings:text-secondary prose-headings:font-black prose-headings:tracking-tight
+                    prose-strong:text-primary prose-strong:font-black
+                    prose-li:marker:text-primary
+                    prose-table:glass prose-table:rounded-3xl prose-table:overflow-hidden 
+                    prose-img:rounded-[2rem] prose-img:shadow-2xl">
+                    <div class="animate-pulse space-y-4">
+                        <div class="h-4 bg-slate-200 rounded w-3/4"></div>
+                        <div class="h-4 bg-slate-200 rounded w-full"></div>
+                        <div class="h-4 bg-slate-200 rounded w-5/6"></div>
+                    </div>
+                </div>
+
+                <!-- AI Disclaimer -->
+                <div class="mt-16 p-8 rounded-[2rem] bg-slate-900 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
+                    <div class="relative z-10 flex gap-6 items-center">
+                        <div class="text-3xl grayscale group-hover:grayscale-0 transition-all duration-500">🛡️</div>
+                        <p class="text-[10px] font-bold leading-relaxed tracking-wider text-slate-300 uppercase">
+                            Insights provided by MCV AI Scholar are generated using advanced artificial intelligence to assist your studies. While designed for high-yield exam readiness, please verify critical formulas and data with your primary academic resources as AI may occasionally present inaccuracies.
+                        </p>
+                    </div>
+                    <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/40 transition-all"></div>
+                </div>
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const rawContent = `{!! addslashes($note->ai_content) !!}`;
+                    document.getElementById('ai-content-reader').innerHTML = marked.parse(rawContent);
+                });
+            </script>
+            @else
             <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
                 <div class="aspect-[3/4] bg-slate-100 relative">
                     <!-- PDF Viewer -->
@@ -44,6 +91,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- Notes Meta & Discussion -->
             <div class="glass p-10 rounded-[3rem] border-white/60">

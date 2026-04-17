@@ -15,6 +15,11 @@
                 <p class="text-slate-400 text-lg font-medium leading-relaxed">
                     Connect with {{ number_format($colleges->count()) }} institutions, access shared lecture notes, and join regional academic communities.
                 </p>
+                <div class="flex gap-4">
+                    <a href="{{ route('compare.index') }}" class="bg-indigo-500 text-white px-8 py-3.5 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-indigo-500/20 hover:scale-105 transition-all">
+                        ⚔️ Dual-Battle Mode
+                    </a>
+                </div>
                 
                 <form action="{{ route('colleges.index') }}" method="GET" class="pt-4 space-y-6">
                     <div class="relative max-w-md group">
@@ -143,9 +148,14 @@
                                     <span class="text-sm font-bold text-primary">{{ $college->type ?? 'General' }}</span>
                                 </div>
                             </div>
-                            <a href="{{ route('colleges.show', $college) }}" class="block w-full text-center bg-secondary text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-primary transition-all active:scale-95">
-                                Enter Verse
-                            </a>
+                            <div class="flex gap-4">
+                                <a href="{{ route('colleges.show', $college) }}" class="flex-1 text-center bg-secondary text-white px-6 py-2.5 rounded-xl font-bold text-xs hover:bg-primary transition-all active:scale-95">
+                                    Enter Verse
+                                </a>
+                                <a href="{{ route('compare.index', ['c1' => $college->slug]) }}" title="Compare this node" class="bg-slate-50 text-slate-400 px-4 py-2.5 rounded-xl border border-slate-100 hover:bg-slate-100 transition-all flex items-center justify-center">
+                                    ⚔️
+                                </a>
+                            </div>
                         </div>
                     </div>
                     @empty

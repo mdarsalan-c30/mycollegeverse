@@ -240,7 +240,7 @@
                             </div>
 
                             <!-- Institutional Pillars: Student Community 🛡️ -->
-                            <div class="grid md:grid-cols-2 gap-8 md:gap-10">
+                            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
                                 <div class="bg-primary rounded-3xl p-8 md:p-10 text-white relative overflow-hidden shadow-xl group">
                                     <div class="relative z-10 space-y-4">
                                         <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">🤝</div>
@@ -259,11 +259,63 @@
                                         </p>
                                     </div>
                                 </div>
+                                <a href="{{ route('colleges.batchmates', ['college' => $college->slug, 'year' => Auth::user()->year ?? 2024]) }}" class="bg-white border-2 border-primary/20 rounded-3xl p-8 md:p-10 text-primary relative overflow-hidden shadow-xl group hover:bg-primary hover:text-white transition-all duration-500">
+                                    <div class="relative z-10 space-y-4">
+                                        <div class="w-12 h-12 rounded-xl bg-primary/5 group-hover:bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">🧬</div>
+                                        <h5 class="text-xl font-bold leading-tight uppercase tracking-tighter italic">Batch Explorer</h5>
+                                        <p class="text-sm font-medium opacity-70 leading-relaxed">
+                                            See who else is in the Class of {{ Auth::user()->year ?? 2024 }}. Connect early!
+                                        </p>
+                                    </div>
+                                    <div class="absolute -right-4 -bottom-4 text-primary/5 group-hover:text-white/10 text-8xl font-black transition-colors italic">2024</div>
+                                </a>
                             </div>
+
+                            <!-- Guide Spotlight: Institutional Seniors 🤝 -->
+                            @php 
+                                $mentors = $college->users()->where('is_mentor', true)->latest()->take(3)->get();
+                            @endphp
+                            @if($mentors->isNotEmpty())
+                            <div class="space-y-8">
+                                <div class="flex justify-between items-end px-2">
+                                    <div class="space-y-1">
+                                        <h4 class="text-xl font-black text-slate-900 leading-none">Multiverse Guides</h4>
+                                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">Connect with verified seniors</p>
+                                    </div>
+                                    <a href="#" class="text-[9px] font-black text-primary uppercase tracking-widest hover:underline transition-all">View All Seniors</a>
+                                </div>
+
+                                <div class="grid md:grid-cols-3 gap-6">
+                                    @foreach($mentors as $mentor)
+                                    <div class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm space-y-4 hover:shadow-xl transition-all group">
+                                        <div class="flex items-center gap-4">
+                                            <img src="{{ $mentor->profile_photo_url }}" class="w-12 h-12 rounded-xl object-cover ring-2 ring-slate-50" alt="{{ $mentor->name }}">
+                                            <div class="space-y-0.5">
+                                                <h5 class="text-sm font-black text-slate-900 line-clamp-1">{{ $mentor->name }}</h5>
+                                                <p class="text-[8px] font-black text-primary uppercase">{{ $mentor->year }} Year • {{ $mentor->career_role }}</p>
+                                            </div>
+                                        </div>
+                                        <p class="text-[10px] text-slate-500 font-medium line-clamp-2 italic leading-relaxed">
+                                            "{{ $mentor->mentor_bio ?? 'Helping juniors navigate our campus multiverse.' }}"
+                                        </p>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach($mentor->mentor_topics ?? ['Placements', 'Hostel', 'Academics'] as $topic)
+                                                <span class="bg-slate-50 text-slate-400 px-2 py-0.5 rounded-lg text-[7px] font-black uppercase tracking-widest">{{ $topic }}</span>
+                                            @endforeach
+                                        </div>
+                                        <button @click="$dispatch('open-mentorship-modal', { mentorId: {{ $mentor->id }}, mentorName: '{{ $mentor->name }}' })" class="w-full bg-slate-900 text-white py-2.5 rounded-xl font-black text-[8px] uppercase tracking-widest hover:bg-primary transition-all shadow-lg shadow-slate-900/10">
+                                            Request Guidance
+                                        </button>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            @endif
                         </div>
 
-                        <!-- Side Metrics: College Ratings 🛡️ -->
+                        <!-- Side Metrics: College Ratings & Career Destinations 🛡️ -->
                         <div class="lg:col-span-4 space-y-12">
+                            <!-- Ratings -->
                             <div class="bg-white p-8 md:p-10 rounded-2xl border border-slate-100 shadow-sm space-y-8">
                                 <h4 class="text-xl font-bold text-slate-900">College Ratings</h4>
                                 <div class="space-y-6 md:space-y-8">
@@ -279,6 +331,37 @@
                                     </div>
                                     @endforeach
                                 </div>
+                            </div>
+
+                            <!-- Career Destinations Node 🚀 -->
+                            <div class="bg-slate-900 p-8 md:p-10 rounded-[2rem] shadow-2xl space-y-8 relative overflow-hidden">
+                                <div class="relative z-10">
+                                    <h4 class="text-lg font-black text-white italic tracking-tight mb-6">Career Destinations</h4>
+                                    
+                                    @if($college->career_destinations->isNotEmpty())
+                                        <div class="space-y-6">
+                                            @foreach($college->career_destinations as $dest)
+                                            <div class="space-y-2">
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-[10px] font-black text-white/60 uppercase tracking-widest">{{ $dest['label'] }}</span>
+                                                    <span class="text-[10px] font-black text-primary uppercase">{{ $dest['percent'] }}%</span>
+                                                </div>
+                                                <div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                                    <div class="h-full bg-primary rounded-full transition-all duration-1000" style="width: {{ $dest['percent'] }}%"></div>
+                                                </div>
+                                            </div>
+                                            @endforeach
+                                        </div>
+                                        <p class="text-[9px] text-white/30 font-bold mt-8 italic text-center">Data aggregated from {{ $college->users_count }} verified students</p>
+                                    @else
+                                        <div class="text-center py-8 space-y-4">
+                                            <div class="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center text-2xl mx-auto">🚀</div>
+                                            <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest leading-relaxed">No path data yet. <br>Be the first to set your path!</p>
+                                        </div>
+                                    @endif
+                                </div>
+                                <!-- Decorative -->
+                                <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl"></div>
                             </div>
                         </div>
                     </div>
@@ -353,28 +436,32 @@
                                             @endforeach
                                         </div>
 
-                                        <!-- Placement Intelligence Inputs 💰 -->
+                                        <!-- Reality Check Tags 🧬 -->
                                         <div class="bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 space-y-8">
                                             <div class="flex items-center gap-4 mb-2">
-                                                <span class="text-xl">💰</span>
+                                                <span class="text-xl">🧬</span>
                                                 <div>
-                                                    <h4 class="text-xs font-black text-white uppercase tracking-widest leading-none">Placement Intelligence</h4>
-                                                    <p class="text-[9px] text-white/40 font-bold mt-1 italic">Optional but highly encouraged for peer verification (LPA)</p>
+                                                    <h4 class="text-xs font-black text-white uppercase tracking-widest leading-none">Reality Check</h4>
+                                                    <p class="text-[9px] text-white/40 font-bold mt-1 italic">Expectation vs Reality (Pick what applies)</p>
                                                 </div>
                                             </div>
-                                            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
-                                                <div class="space-y-4">
-                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Avg Package</label>
-                                                    <input type="number" step="0.1" name="average_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 7.5">
+                                            <div class="grid sm:grid-cols-2 gap-4">
+                                                @foreach([
+                                                    'canteen' => ['icon' => '🍲', 'label' => 'Canteen', 'options' => ['Premium Menu', 'Only Maggi Lives Here']],
+                                                    'infra' => ['icon' => '🔬', 'label' => 'Labs', 'options' => ['High-end Tech', 'Windows 98 Vibes']],
+                                                    'attendance' => ['icon' => '👮', 'label' => 'Attendance', 'options' => ['Chill/Liberal', 'Strict as a Jail']],
+                                                    'social' => ['icon' => '🎉', 'label' => 'Social', 'options' => ['Vibrant/Active', 'Dry as a Desert']]
+                                                ] as $key => $card)
+                                                <div class="space-y-3">
+                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">{{ $card['label'] }}</label>
+                                                    <select name="reality_tags[{{ $key }}]" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-[10px] appearance-none focus:border-primary">
+                                                        <option value="" class="bg-slate-900">Select Reality...</option>
+                                                        @foreach($card['options'] as $option)
+                                                        <option value="{{ $option }}" class="bg-slate-900">{{ $option }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 </div>
-                                                <div class="space-y-4">
-                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Lowest Package</label>
-                                                    <input type="number" step="0.1" name="lowest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 3.5">
-                                                </div>
-                                                <div class="space-y-4">
-                                                    <label class="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] ml-2">Highest Package</label>
-                                                    <input type="number" step="0.1" name="highest_package" class="w-full bg-white/5 border border-white/10 rounded-xl py-4 px-6 text-white text-sm" placeholder="e.g. 24.0">
-                                                </div>
+                                                @endforeach
                                             </div>
                                         </div>
 
@@ -459,6 +546,26 @@
                                     </div>
                                 </div>
                                 <p class="text-slate-600 font-medium leading-relaxed italic text-lg max-w-4xl selection:bg-primary/10">"{{ $review->comment }}"</p>
+                                
+                                @if($review->reality_tags)
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-slate-50">
+                                    @php
+                                        $icons = ['canteen' => '🍲', 'infra' => '🔬', 'attendance' => '👮', 'social' => '🎉'];
+                                        $labels = ['canteen' => 'Canteen', 'infra' => 'Labs', 'attendance' => 'Attendance', 'social' => 'Social'];
+                                    @endphp
+                                    @foreach($review->reality_tags as $key => $tag)
+                                        @if($tag)
+                                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col gap-1">
+                                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">{{ $labels[$key] ?? $key }}</span>
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-sm">{{ $icons[$key] ?? '🧬' }}</span>
+                                                <span class="text-[10px] font-black text-slate-900 truncate">{{ $tag }}</span>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                                @endif
                             </div>
                             @empty
                             <div class="text-center py-20 bg-slate-50 rounded-[3rem] border-2 border-dashed border-slate-200">
@@ -556,5 +663,56 @@
                 </div>
             </div>
         </main>
+    </div>
+    <!-- Mentorship Request Modal 🤝 -->
+    <div x-data="{ open: false, mentorId: null, mentorName: '' }" 
+         @open-mentorship-modal.window="open = true; mentorId = $event.detail.mentorId; mentorName = $event.detail.mentorName"
+         x-show="open" 
+         x-transition.opacity
+         class="fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4"
+         style="display: none;">
+        
+        <div @click.away="open = false" 
+             class="bg-white rounded-[3rem] w-full max-w-xl p-10 md:p-12 shadow-2xl relative overflow-hidden">
+            
+            <div class="relative z-10 space-y-8">
+                <div class="flex justify-between items-start">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-black text-primary uppercase tracking-widest">Guidance Protocol</p>
+                        <h3 class="text-2xl font-black text-slate-900 leading-tight">Requesting Help <br>from <span class="text-primary italic" x-text="mentorName"></span></h3>
+                    </div>
+                    <button @click="open = false" class="text-slate-400 hover:text-slate-900 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <form :action="'/mentorship/request/' + mentorId" method="POST" class="space-y-6">
+                    @csrf
+                    <div class="space-y-4">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Subject of Query</label>
+                            <input type="text" name="subject" required placeholder="e.g. Placement Prep, Hostel Life, Best Subjects..." class="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 px-6 text-sm font-bold text-slate-900 focus:ring-2 focus:ring-primary/20 outline-none">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Message for the Guide</label>
+                            <textarea name="message" required rows="4" placeholder="Briefly describe what you need help with. Respect their time! 🚀" class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-6 text-sm font-medium text-slate-900 focus:ring-2 focus:ring-primary/20 outline-none resize-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary/5 p-6 rounded-2xl border border-primary/10">
+                        <p class="text-[10px] text-primary font-bold leading-relaxed">
+                            💡 **Protocol**: Guides are volunteers. Be clear, polite, and specific. In-app chat will open once they accept.
+                        </p>
+                    </div>
+
+                    <button type="submit" class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black text-[10px] uppercase tracking-widest hover:bg-primary transition-all shadow-xl shadow-slate-900/10">
+                        Dispatch Guidance Request ⚔️
+                    </button>
+                </form>
+            </div>
+
+            <!-- Decoration -->
+            <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+        </div>
     </div>
 </x-verse-layout>

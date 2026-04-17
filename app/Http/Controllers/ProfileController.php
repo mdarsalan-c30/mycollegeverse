@@ -51,4 +51,18 @@ class ProfileController extends Controller
 
         return response()->json(['error' => 'Upload failed'], 500);
     }
+
+    public function update(Request $request)
+    {
+        $user = auth()->user();
+
+        $request->validate([
+            'career_role' => 'nullable|string|max:100',
+            'bio' => 'nullable|string|max:500',
+        ]);
+
+        $user->update($request->only(['career_role', 'bio']));
+
+        return back()->with('success', 'Profile Protocol Synchronized! Your data is now fueling the Verse.');
+    }
 }

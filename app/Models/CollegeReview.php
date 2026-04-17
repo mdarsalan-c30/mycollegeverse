@@ -20,7 +20,12 @@ class CollegeReview extends Model
         'lowest_package',
         'highest_package',
         'verification_id',
+        'reality_tags',
         'status',
+    ];
+
+    protected $casts = [
+        'reality_tags' => 'array',
     ];
 
     public function user()
