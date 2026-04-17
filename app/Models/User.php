@@ -93,7 +93,10 @@ class User extends Authenticatable
         $reviewCount = DB::table('reviews')->where('user_id', $this->id)->count();
         $noteReviewCount = $this->noteReviews()->count();
 
-        $projectCount = $this->projects()->where('is_official', true)->count();
+        $projectCount = 0;
+        if (\Illuminate\Support\Facades\Schema::hasTable('projects')) {
+            $projectCount = $this->projects()->where('is_official', true)->count();
+        }
 
         return (
             ($noteCount * 50) + 
