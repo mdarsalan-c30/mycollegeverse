@@ -192,24 +192,69 @@
 
             <!-- Notes Meta & Discussion -->
             <div class="glass p-10 rounded-[3rem] border-white/60">
-                 <div class="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
-                     <div>
-                        <h2 class="text-3xl font-black text-secondary mb-2">{{ $note->title }}</h2>
-                        <p class="text-slate-400 font-bold uppercase tracking-widest text-xs">Uploaded by {{ optional($note->user)->name ?? 'Unknown' }} • {{ $note->created_at->diffForHumans() }}</p>
+                 <div class="flex flex-col sm:flex-row justify-between items-start gap-8 mb-10 pb-10 border-b border-slate-100/50">
+                     <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-2">
+                            <h2 class="text-4xl font-black text-secondary tracking-tight">{{ $note->title }}</h2>
+                            @auth
+                            <form action="{{ route('notes.save', $note->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="p-3 rounded-2xl transition-all {{ $isSaved ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-300 hover:text-rose-400' }}" title="{{ $isSaved ? 'Remove from library' : 'Save to library' }}">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="{{ $isSaved ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+                            </form>
+                            @endauth
+                        </div>
+                        <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] flex items-center gap-2">
+                           <img src="https://ui-avatars.com/api/?name={{ urlencode($note->user->name ?? 'U') }}&background=6366f1&color=fff" class="w-5 h-5 rounded-md" />
+                           Uploaded by <span class="text-slate-600 font-black">{{ optional($note->user)->name ?? 'Unknown Scholar' }}</span> • {{ $note->created_at->diffForHumans() }}
+                        </p>
                      </div>
                      
-                     @auth
-                     <a href="{{ route('notes.download', $note->id) }}" class="bg-primary text-white px-8 py-4 rounded-2xl font-black shadow-lg shadow-primary/20 flex items-center gap-3 hover:scale-105 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
-                        Download PDF
-                     </a>
-                     @else
-                     <a href="{{ route('login') }}" class="w-full sm:w-auto bg-slate-100 text-slate-600 px-8 py-4 rounded-2xl font-black flex items-center justify-center gap-3 hover:bg-primary hover:text-white transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
-                        Sign in to Download
-                     </a>
-                     @endauth
+                     <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                         <!-- Share Actions -->
+                         <div class="flex items-center bg-slate-50 p-1.5 rounded-2xl gap-1">
+                             <a href="https://wa.me/?text={{ urlencode('Check out these study notes: ' . $note->title . ' ' . route('notes.show', $note->slug)) }}" target="_blank" class="p-2.5 text-emerald-500 hover:bg-emerald-50 rounded-xl transition-all" title="Share on WhatsApp">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.588-5.946 0-6.556 5.332-11.891 11.891-11.891 3.181 0 6.167 1.24 8.413 3.488 2.247 2.248 3.488 5.232 3.488 8.412 0 6.557-5.332 11.892-11.891 11.892-1.996 0-3.951-.502-5.69-1.451l-6.31 1.659zm6.273-3.692l.454.269c1.402.83 3.205 1.27 5.116 1.27 5.518 0 10.011-4.493 10.011-10.011 0-2.675-1.042-5.187-2.936-7.078-1.891-1.891-4.404-2.934-7.076-2.934-5.517 0-10.011 4.492-10.011 10.011 0 1.83.479 3.618 1.386 5.201l.298.513-1.112 4.062 4.155-1.091zm11.366-7.398c-.141-.07-.835-.412-.963-.46-.128-.048-.222-.07-.315.071-.093.14-.361.46-.443.553-.082.094-.164.105-.304.035-.14-.07-.591-.218-1.125-.694-.417-.371-.698-.828-.781-.968-.081-.141-.009-.217.06-.287.063-.063.141-.164.212-.246.07-.082.094-.141.141-.235.047-.094.024-.176-.012-.246-.035-.07-.315-.758-.432-1.037-.113-.274-.228-.237-.315-.241l-.269-.004c-.093 0-.245.035-.374.175-.128.141-.491.481-.491 1.173 0 .693.504 1.361.574 1.455.07.094.992 1.514 2.404 2.122.336.144.598.23.803.295.337.107.644.092.886.056.27-.04.835-.341 1.053-.67s.218-.611.152-.67c-.066-.059-.245-.093-.386-.164z"/></svg>
+                             </a>
+                             <a href="https://twitter.com/intent/tweet?text={{ urlencode('Check out these study notes: ' . $note->title . ' ' . route('notes.show', $note->slug)) }}" target="_blank" class="p-2.5 text-slate-800 hover:bg-slate-200 rounded-xl transition-all" title="Share on X">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                             </a>
+                             <button onclick="copyNoteLink()" class="p-2.5 text-primary hover:bg-primary/10 rounded-xl transition-all" title="Copy Link">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                             </button>
+                         </div>
+
+                         @auth
+                         <a href="{{ route('notes.download', $note->id) }}" class="bg-primary text-white px-8 py-4 rounded-3xl font-black shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-105 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                            Download PDF
+                         </a>
+                         @else
+                         <a href="{{ route('login') }}" class="bg-slate-900 text-white px-8 py-4 rounded-3xl font-black flex items-center justify-center gap-3 hover:bg-primary transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                            Log in to Access
+                         </a>
+                         @endauth
+                     </div>
                  </div>
+
+                 <!-- Copy Link Logic & Toast -->
+                 <script>
+                    function copyNoteLink() {
+                        const url = "{{ route('notes.show', $note->slug) }}";
+                        navigator.clipboard.writeText(url).then(() => {
+                            // Professional Toast Notification
+                            const toast = document.createElement('div');
+                            toast.className = 'fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-8 py-4 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl z-50 animate-bounce';
+                            toast.innerHTML = '📋 Link copied to clipboard!';
+                            document.body.appendChild(toast);
+                            setTimeout(() => toast.remove(), 3000);
+                        });
+                    }
+                 </script>
 
                  @if($note->reviews()->count() > 0)
                  <div class="mb-12 space-y-6">

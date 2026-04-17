@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Note;
+use App\Models\SavedNote;
 use App\Models\AiUsage;
 use App\Models\Subject;
 use App\Models\NoteReview;
@@ -123,7 +124,34 @@ class NoteController extends Controller
             ]
         ];
 
-        return view('notes.show', compact('note', 'related', 'seoTitle', 'seoDescription', 'schema'));
+        // 🛡️ Engagement Check: Is saved?
+        $isSaved = Auth::check() 
+            ? SavedNote::where('user_id', Auth::id())->where('note_id', $note->id)->exists() 
+            : false;
+
+        return view('notes.show', compact('note', 'related', 'seoTitle', 'seoDescription', 'schema', 'isSaved'));
+    }
+
+    public function toggleSave(Note $note)
+    {
+        if (!Auth::check()) {
+            return back()->with('error', 'Login required to bookmark knowledge assets.');
+        }
+
+        $userId = Auth::id();
+        $saved = SavedNote::where('user_id', $userId)->where('note_id', $note->id)->first();
+
+        if ($saved) {
+            $saved->delete();
+            return back()->with('success', 'Asset removed from your library.');
+        }
+
+        SavedNote::create([
+            'user_id' => $userId,
+            'note_id' => $note->id,
+        ]);
+
+        return back()->with('success', 'Asset successfully bookmarked to your library! 📚');
     }
 
     public function addReview(Request $request, Note $note)
