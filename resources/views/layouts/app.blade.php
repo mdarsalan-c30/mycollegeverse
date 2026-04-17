@@ -329,11 +329,11 @@
                             </div>
                         </div>
 
-                        <div class="h-10 w-[1px] bg-slate-200 mx-1" x-data="{ open: false }"></div>
+                        <div class="h-10 w-[1px] bg-slate-200 mx-1"></div>
 
                         @auth
                         <!-- Profile Dropdown (Top Nav) -->
-                        <div class="relative">
+                        <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open" class="flex items-center gap-3 p-1 rounded-2xl hover:bg-slate-50 transition-all border-2 border-transparent" :class="open ? 'border-primary/20 bg-slate-50' : ''">
                                 <span class="flex-shrink-0">
                                     <img src="{{ Auth::user()->profile_photo_url }}" class="w-10 h-10 rounded-xl shadow-sm border border-white group-hover:scale-105 transition-transform object-cover"/>
