@@ -4,50 +4,6 @@ use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
-| 🛡️ EMERGENCY RESCUE HUB (Top Priority)
-|--------------------------------------------------------------------------
-*/
-Route::get('/rescue-test', function() {
-    return "✅ [MCV RESCUE] Core App Boot Successful. Time: " . date('Y-m-d H:i:s');
-});
-
-Route::get('/rescue-db-test', function() {
-    try {
-        \DB::connection()->getPdo();
-        $userCount = \App\Models\User::count();
-        return "✅ [MCV RESCUE] DB Connected. User count: $userCount";
-    } catch (\Exception $e) {
-        return "❌ [MCV RESCUE] DB Connection Failed: " . $e->getMessage();
-    }
-});
-
-Route::get('/rescue-landing-test', function() {
-    try {
-        $stats = [
-            'users' => \App\Models\User::count(),
-            'notes' => \App\Models\Note::count(),
-            'colleges' => \App\Models\College::count(),
-        ];
-        return "✅ [MCV RESCUE] Landing Logic Test Passed. Stats: " . json_encode($stats);
-    } catch (\Exception $e) {
-        return "❌ [MCV RESCUE] Landing Logic Crashed: " . $e->getMessage();
-    }
-});
-
-Route::get('/rescue-cache-clear', function() {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
-        \Illuminate\Support\Facades\Artisan::call('config:clear');
-        \Illuminate\Support\Facades\Artisan::call('route:clear');
-        return "🌌 [MCV RESCUE] All caches purged on Hostinger. Visit <a href='/'>Home Page</a> to test.";
-    } catch (\Exception $e) {
-        return "❌ [MCV RESCUE] Cache Purge Failed: " . $e->getMessage();
-    }
-});
-
-/*
-|--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
@@ -392,49 +348,3 @@ Route::get('/multiverse-init', function() {
         return "Initialization Error: " . $e->getMessage();
     }
 });
-/*
-Route::get('/multiverse-ai-scholar-deploy', function() {
-    try {
-        $step = request('step', 1);
-        
-        if ($step == 1) {
-            // Step 1: Migration
-            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-            $msg = "✅ Database Schema Manifested.";
-            $next = url('/multiverse-ai-scholar-deploy?step=2');
-            $btn = "Proceed to Step 2: Seed Subjects";
-        } elseif ($step == 2) {
-            // Step 2: Seed Subjects
-            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--class' => 'EngineeringSubjectSeeder', '--force' => true]);
-            $msg = "✅ Engineering Subjects Seeded.";
-            $next = url('/multiverse-ai-scholar-deploy?step=3');
-            $btn = "Proceed to Step 3: Generate AI Notes (Batch 1)";
-        } else {
-            // Step 3: AI Generation (Batched)
-            \Illuminate\Support\Facades\Artisan::call('notes:ai-seed', ['--limit' => 5]);
-            $output = \Illuminate\Support\Facades\Artisan::output();
-            $msg = "✅ AI Generation Batch Complete.<br><pre style='font-size: 10px; background: #eee; padding: 10px;'>$output</pre>";
-            $next = url('/multiverse-ai-scholar-deploy?step=3&t=' . time());
-            $btn = "Generate Next Batch (5 Subjects)";
-        }
-
-        return "
-        <div style='font-family: sans-serif; padding: 40px; line-height: 1.6; max-width: 600px; margin: auto;'>
-            <h1 style='color: #3B82F6;'>🌌 AI Scholar Deployment Hub</h1>
-            <div style='background: #f1f5f9; padding: 20px; border-radius: 12px; margin-bottom: 20px;'>$msg</div>
-            <a href='$next' style='display: inline-block; background: #3B82F6; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;'>$btn</a>
-            <br><br>
-            <a href='/notes' style='color: #64748b; font-size: 12px;'>Skip to Notes Library</a>
-        </div>";
-        
-    } catch (\Exception $e) {
-        return "
-        <div style='font-family: sans-serif; padding: 40px; color: #e11d48;'>
-            <h1>❌ Deployment Error</h1>
-            <p><strong>Message:</strong> {$e->getMessage()}</p>
-            <p><strong>File:</strong> {$e->getFile()} (Line: {$e->getLine()})</p>
-            <pre style='background: #fff1f2; padding: 20px; border-radius: 12px; font-size: 12px; overflow: auto;'>{$e->getTraceAsString()}</pre>
-        </div>";
-    }
-});
-*/

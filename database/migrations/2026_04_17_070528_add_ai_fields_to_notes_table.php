@@ -14,8 +14,7 @@ class AddAiFieldsToNotesTable extends Migration
     public function up()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->longText('ai_content')->nullable();
-            $table->string('note_type')->default('pdf'); // 'pdf' for uploads, 'ai' for generated
+            //
         });
     }
 
@@ -27,7 +26,7 @@ class AddAiFieldsToNotesTable extends Migration
     public function down()
     {
         Schema::table('notes', function (Blueprint $table) {
-            $table->dropColumn(['ai_content', 'note_type']);
+            //
         });
     }
 }
