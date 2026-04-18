@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <style>html { background-color: #F8FAFC; }</style>
 
         <!-- Multiverse Branding 💎 -->
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('mcv/apple-touch-icon.png') }}">
@@ -117,6 +118,15 @@
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #E2E8F0; border-radius: 10px; }
             ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
+            
+            /* High-Fidelity Page Transitions 🌀 */
+            .page-fade-in {
+                animation: mcvFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes mcvFadeIn {
+                from { opacity: 0; transform: translateY(4px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
         </style>
         <!-- Alpine.js Engineering ⚙️ -->
         <script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
@@ -127,7 +137,7 @@
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
-        <div class="flex h-screen overflow-hidden">
+        <div class="flex h-screen overflow-hidden page-fade-in">
             <!-- Sidebar (Expanded Desktop) -->
             <aside class="hidden lg:flex flex-col bg-white border-r border-slate-200 transition-all duration-500 relative z-40 overflow-hidden" 
                    :class="sidebarOpen ? 'w-72' : 'w-0 border-none shadow-none'">
