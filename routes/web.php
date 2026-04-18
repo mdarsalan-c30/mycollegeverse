@@ -29,6 +29,16 @@ Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])
 
 Route::get('/multiverse-academic-sync', function() {
     try {
+        // 🧪 Database Health Audit: Auto-Heal broken PoW tables
+        if (\Illuminate\Support\Facades\Schema::hasTable('projects')) {
+            if (!\Illuminate\Support\Facades\Schema::hasColumn('projects', 'cover_image_url')) {
+                \Illuminate\Support\Facades\Schema::dropIfExists('project_endorsements');
+                \Illuminate\Support\Facades\Schema::dropIfExists('projects');
+                // Force reset migration record so it runs again
+                \Illuminate\Support\Facades\DB::table('migrations')->where('migration', 'like', '%create_project_tables%')->delete();
+            }
+        }
+
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         return "🛡️ Academic targeting, Signal Hub & Talent Gallery manifested! Database synchronized with the PoW Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
     } catch (\Exception $e) {

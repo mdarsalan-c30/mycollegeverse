@@ -178,7 +178,7 @@ class User extends Authenticatable
      */
     public function projects()
     {
-        return $this->hasMany(Project::class);
+        return $this->hasMany(\App\Models\Project::class);
     }
 
     /**
@@ -186,7 +186,7 @@ class User extends Authenticatable
      */
     public function endorsedProjects()
     {
-        return $this->hasManyThrough(Project::class, ProjectEndorsement::class, 'user_id', 'id', 'id', 'project_id');
+        return $this->hasManyThrough(\App\Models\Project::class, \App\Models\ProjectEndorsement::class, 'user_id', 'id', 'id', 'project_id');
     }
 
     public function posts()

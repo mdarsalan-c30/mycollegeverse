@@ -56,6 +56,6 @@ class Project extends Model
             'Management' => '💼',
             'Science' => '🔬'
         ];
-        return $icons[$this->stream] ?? '🛡️';
+        return isset($this->stream) ? ($icons[$this->stream] ?? '🛡️') : '🛡️';
     }
 }
