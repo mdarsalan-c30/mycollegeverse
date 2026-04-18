@@ -113,6 +113,14 @@
                 border-right: 4px solid #3B82F6;
             }
             [x-cloak] { display: none !important; }
+            
+            /* Turbo Progress Signaling ⚡ */
+            .turbo-progress-bar {
+                height: 4px;
+                background-color: #3B82F6;
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            }
+
             /* Custom Scrollbar */
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: transparent; }
@@ -128,6 +136,15 @@
                 to { opacity: 1; transform: translateY(0); }
             }
         </style>
+        <!-- Hotwire Turbo (Instant Verse Manifestation) 🚀 -->
+        <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es5-umd.js"></script>
+        <script>
+            document.addEventListener("turbo:load", function() {
+                // Alpine handles this automatically, but manually initializing any complex node here if needed
+                window.dispatchEvent(new CustomEvent('mcv:instant-sync'));
+            });
+        </script>
+        
         <!-- Alpine.js Engineering ⚙️ -->
         <script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
@@ -137,9 +154,10 @@
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
-        <div class="flex h-screen overflow-hidden page-fade-in">
+        <div class="flex h-screen overflow-hidden" x-data="{ sidebarOpen: $persist(true) }">
             <!-- Sidebar (Expanded Desktop) -->
-            <aside class="hidden lg:flex flex-col bg-white border-r border-slate-200 transition-all duration-500 relative z-40 overflow-hidden" 
+            <aside id="main-sidebar" data-turbo-permanent 
+                   class="hidden lg:flex flex-col bg-white border-r border-slate-200 transition-all duration-500 relative z-40 overflow-hidden" 
                    :class="sidebarOpen ? 'w-72' : 'w-0 border-none shadow-none'">
                 <div class="w-72 flex flex-col h-full sidebar-bg shrink-0">
                 <div class="px-8 py-8">
@@ -215,7 +233,8 @@
             <!-- Main Content Area -->
             <div class="flex-1 flex flex-col min-w-0 bg-surface overflow-hidden">
                 <!-- Header (Always Visible) -->
-                <header class="h-24 glass flex items-center justify-between px-8 py-4 relative z-30 shadow-sm shrink-0">
+                <header id="top-nav" data-turbo-permanent 
+                        class="h-24 glass flex items-center justify-between px-8 py-4 relative z-30 shadow-sm shrink-0">
                     <div class="flex items-center gap-6 flex-1 max-w-4xl">
                         <!-- Sidebar Toggle -->
                         <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex w-10 h-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-primary/5 hover:text-primary transition-all border border-slate-100">
@@ -406,7 +425,7 @@
                 </header>
 
                 <!-- Page Content -->
-                <main class="flex-1 overflow-y-auto px-8 py-8 md:pb-8 pb-32">
+                <main class="flex-1 overflow-y-auto px-8 py-8 md:pb-8 pb-32 page-fade-in">
                     @if(session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="fixed top-28 right-8 z-[100] glass px-6 py-4 rounded-2xl border-green-500/30 shadow-xl flex items-center gap-4 animate-bounce-subtle">
                         <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
