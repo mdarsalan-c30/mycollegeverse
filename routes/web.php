@@ -404,3 +404,17 @@ Route::get('/multiverse-init', function() {
         return "Initialization Error: " . $e->getMessage();
     }
 });
+
+Route::get('/multiverse-academic-sync', function() {
+    try {
+        // 1. Force Manifest (Git Pull)
+        $pull = shell_exec('git pull origin master 2>&1');
+        
+        // 2. Clear Residual Shadows
+        Artisan::call('optimize:clear');
+        
+        return "🌌 <b>Multiverse Academic Sync Complete!</b><br><br><b>Manifest Logs:</b><br><pre>" . $pull . "</pre><br><a href='/profile/" . (Auth::user()->username ?? '') . "'>Visit Your Updated Portfolio Node</a>";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
