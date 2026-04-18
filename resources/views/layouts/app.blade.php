@@ -119,16 +119,19 @@
             ::-webkit-scrollbar-thumb:hover { background: #CBD5E1; }
         </style>
         <!-- Alpine.js Engineering ⚙️ -->
+        <script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
         <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     </head>
-    <body class="font-sans antialiased text-slate-900 bg-surface">
+    <body class="font-sans antialiased text-slate-900 bg-surface" x-data="{ sidebarOpen: $persist(true) }">
         <!-- Google Tag Manager (noscript) -->
         <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5TTR79WQ"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <!-- End Google Tag Manager (noscript) -->
         <div class="flex h-screen overflow-hidden">
             <!-- Sidebar (Expanded Desktop) -->
-            <aside class="hidden lg:flex flex-col w-72 h-full sidebar-bg border-r border-slate-200 shadow-sm relative z-40 transition-all duration-300">
+            <aside class="hidden lg:flex flex-col bg-white border-r border-slate-200 transition-all duration-500 relative z-40 overflow-hidden" 
+                   :class="sidebarOpen ? 'w-72' : 'w-0 border-none shadow-none'">
+                <div class="w-72 flex flex-col h-full sidebar-bg shrink-0">
                 <div class="px-8 py-8">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="MyCollegeVerse — Student OS">
@@ -203,8 +206,15 @@
             <div class="flex-1 flex flex-col min-w-0 bg-surface overflow-hidden">
                 <!-- Header (Always Visible) -->
                 <header class="h-24 glass flex items-center justify-between px-8 py-4 relative z-30 shadow-sm shrink-0">
-                    <div class="flex-1 max-w-2xl">
-                        <form action="{{ route('notes.index') }}" method="GET" class="relative group">
+                    <div class="flex items-center gap-6 flex-1 max-w-4xl">
+                        <!-- Sidebar Toggle -->
+                        <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex w-10 h-10 items-center justify-center rounded-xl bg-slate-50 text-slate-500 hover:bg-primary/5 hover:text-primary transition-all border border-slate-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transition-transform duration-500" :class="!sidebarOpen ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                            </svg>
+                        </button>
+
+                        <form action="{{ route('notes.index') }}" method="GET" class="flex-1 relative group">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

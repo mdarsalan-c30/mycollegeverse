@@ -23,7 +23,21 @@ class ProfileController extends Controller
             abort(404);
         }
 
-        return view('profile.show', compact('user'));
+        // Fetch Contribution Heatmap Data (Last 365 days)
+        $heatmapData = \Illuminate\Support\Facades\DB::table(\Illuminate\Support\Facades\DB::raw("(
+            SELECT DATE(created_at) as date, COUNT(*) as count FROM notes WHERE user_id = {$user->id} GROUP BY date
+            UNION ALL
+            SELECT DATE(created_at) as date, COUNT(*) as count FROM posts WHERE user_id = {$user->id} GROUP BY date
+            UNION ALL
+            SELECT DATE(created_at) as date, COUNT(*) as count FROM projects WHERE user_id = {$user->id} GROUP BY date
+        ) as contributions"))
+        ->select('date', \Illuminate\Support\Facades\DB::raw('SUM(count) as count'))
+        ->where('date', '>=', now()->subYear())
+        ->groupBy('date')
+        ->pluck('count', 'date')
+        ->toArray();
+
+        return view('profile.show', compact('user', 'heatmapData'));
     }
 
     public function updatePhoto(Request $request)
