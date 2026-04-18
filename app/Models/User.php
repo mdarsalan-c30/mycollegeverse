@@ -45,6 +45,9 @@ class User extends Authenticatable
         'is_mentor',
         'mentor_bio',
         'mentor_topics',
+        'cover_photo_path',
+        'skills',
+        'social_links',
     ];
 
     public function course()
@@ -60,6 +63,8 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'mentor_topics' => 'array',
+        'skills' => 'array',
+        'social_links' => 'array',
         'is_mentor' => 'boolean',
     ];
 
@@ -200,6 +205,14 @@ class User extends Authenticatable
             return app(\App\Services\ImageKitService::class)->getUrl($this->profile_photo_path, ['w' => 160, 'h' => 160, 'fo' => 'auto', 'q' => 80]);
         }
         return "https://ui-avatars.com/api/?name=" . urlencode($this->name) . "&background=2563EB&color=fff";
+    }
+
+    public function getCoverPhotoUrlAttribute()
+    {
+        if ($this->cover_photo_path) {
+            return app(\App\Services\ImageKitService::class)->getUrl($this->cover_photo_path, ['w' => 1200, 'h' => 450, 'fo' => 'auto', 'q' => 70, 'cm' => 'extract']);
+        }
+        return null;
     }
 
     public function getIdCardUrlAttribute($value)

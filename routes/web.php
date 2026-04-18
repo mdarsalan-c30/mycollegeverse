@@ -127,7 +127,9 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/chat/message/{id}', [App\Http\Controllers\ChatController::class, 'deleteMessage'])->name('chat.delete');
 
     Route::get('/profile/{user?}', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
+    Route::post('/profile/update', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/update-photo', [App\Http\Controllers\ProfileController::class, 'updatePhoto'])->name('profile.update-photo');
+    Route::post('/profile/update-cover', [App\Http\Controllers\ProfileController::class, 'updateCover'])->name('profile.update-cover');
 
     // Student Only Routes
     Route::middleware(['role:student'])->group(function () {

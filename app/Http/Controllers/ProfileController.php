@@ -52,17 +52,60 @@ class ProfileController extends Controller
         return response()->json(['error' => 'Upload failed'], 500);
     }
 
+    public function updateCover(Request $request)
+    {
+        $request->validate([
+            'cover' => 'required|image|max:10240', // 10MB max for covers
+        ]);
+
+        $user = auth()->user();
+        $ik = app(\App\Services\ImageKitService::class);
+
+        $upload = $ik->upload($request->file('cover'), 'cover_' . $user->username . '_' . time(), 'covers');
+
+        if ($upload && isset($upload->filePath)) {
+            $user->update([
+                'cover_photo_path' => $upload->filePath
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'url' => $user->cover_photo_url,
+                'path' => $upload->filePath
+            ]);
+        }
+
+        return response()->json(['error' => 'Upload failed'], 500);
+    }
+
     public function update(Request $request)
     {
         $user = auth()->user();
 
         $request->validate([
             'career_role' => 'nullable|string|max:100',
-            'bio' => 'nullable|string|max:500',
+            'bio' => 'nullable|string|max:1000',
+            'skills' => 'nullable|array',
+            'social_links' => 'nullable|array',
+            'social_links.linkedin' => 'nullable|url',
+            'social_links.github' => 'nullable|url',
+            'social_links.behance' => 'nullable|url',
         ]);
 
-        $user->update($request->only(['career_role', 'bio']));
+        $data = $request->only(['career_role', 'bio', 'skills', 'social_links']);
+        
+        // Clean up skills to ensure they are unique and trimmed
+        if ($request->has('skills')) {
+            $data['skills'] = collect($request->skills)
+                ->map(fn($s) => trim($s))
+                ->filter()
+                ->unique()
+                ->values()
+                ->toArray();
+        }
 
-        return back()->with('success', 'Profile Protocol Synchronized! Your data is now fueling the Verse.');
+        $user->update($data);
+
+        return back()->with('success', 'Professional Persona Synchronized! Your portfolio is now fueling the Verse.');
     }
 }
