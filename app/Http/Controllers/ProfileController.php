@@ -14,9 +14,14 @@ class ProfileController extends Controller
                 $user = User::where('username', $user)->firstOrFail();
             }
             if (!$user && auth()->check()) $user = auth()->user();
-            if (!$user) return "User Null";
+            if (!$user) abort(404);
 
-            return "User Found: " . $user->name . " | ID: " . $user->id;
+            $projects = collect();
+            $experiences = collect();
+            $educations = collect();
+            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
+
+            return view('profile.show', compact('user', 'projects', 'experiences', 'educations', 'layout'));
         } catch (\Exception $e) {
             return "CATCH ERROR: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
         }
