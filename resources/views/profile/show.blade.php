@@ -145,7 +145,19 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-8">
-                        @forelse($user->projects()->latest()->get() as $project)
+                        @php
+                            $projects = collect();
+                            try {
+                                if (method_exists($user, 'projects')) {
+                                    $projects = $user->projects()->with('endorsements.user')->latest()->get();
+                                }
+                            } catch (\Exception $e) {
+                                \Log::error("PoW Render Exception: " . $e->getMessage());
+                                $projects = collect();
+                            }
+                        @endphp
+
+                        @forelse($projects as $project)
                         <div class="group relative bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
                             <!-- Premium Cover Image -->
                             <div class="aspect-[16/10] overflow-hidden relative">
