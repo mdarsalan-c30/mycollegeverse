@@ -173,6 +173,22 @@ class User extends Authenticatable
         return $this->hasMany(Note::class);
     }
 
+    /**
+     * The Proof-of-Work projects manifested by the student.
+     */
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
+    /**
+     * Portfolios/Projects the student has endorsed for others.
+     */
+    public function endorsedProjects()
+    {
+        return $this->hasManyThrough(Project::class, ProjectEndorsement::class, 'user_id', 'id', 'id', 'project_id');
+    }
+
     public function posts()
     {
         return $this->hasMany(Post::class);

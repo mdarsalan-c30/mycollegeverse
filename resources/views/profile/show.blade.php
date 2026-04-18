@@ -130,8 +130,75 @@
             <div class="lg:col-span-2 space-y-8">
                  <div class="flex gap-8 border-b border-slate-100 pb-2 overflow-x-auto no-scrollbar whitespace-nowrap">
                     <button @click="activeTab = 'uploads'" :class="activeTab === 'uploads' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">My Uploads</button>
+                    <button @click="activeTab = 'projects'" :class="activeTab === 'projects' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">🗂️ Proof of Work</button>
                     <button @click="activeTab = 'saved'" :class="activeTab === 'saved' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">Saved Notes</button>
                     <button @click="activeTab = 'contributions'" :class="activeTab === 'contributions' ? 'text-primary border-primary' : 'text-slate-400 border-transparent'" class="font-black border-b-2 pb-4 transition-all">Contributions</button>
+                </div>
+
+                <!-- Tab content: Proof of Work (PoW) -->
+                <div x-show="activeTab === 'projects'" x-transition class="space-y-8">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-sm font-black text-slate-400 uppercase tracking-widest">Evidence of Talent Showcase</h4>
+                        @if(Auth::id() == $user->id)
+                        <a href="{{ route('projects.create') }}" class="text-xs font-black text-primary hover:underline uppercase tracking-widest">+ Manifest New Talent</a>
+                        @endif
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-8">
+                        @forelse($user->projects()->latest()->get() as $project)
+                        <div class="group relative bg-white rounded-[2.5rem] shadow-sm border border-slate-100 overflow-hidden hover:shadow-2xl transition-all hover:-translate-y-2">
+                            <!-- Premium Cover Image -->
+                            <div class="aspect-[16/10] overflow-hidden relative">
+                                <img src="{{ $project->cover_image_url }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"/>
+                                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity"></div>
+                                <div class="absolute bottom-6 left-8">
+                                    <span class="bg-white/20 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/20">
+                                        {{ $project->icon }} {{ $project->stream }}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div class="p-8 space-y-3">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-xl font-black text-slate-900 group-hover:text-primary transition-colors">{{ $project->title }}</h4>
+                                    <div class="flex items-center gap-1.5 text-amber-500">
+                                        <span class="text-xs font-black underline">{{ $project->visibility_score }}</span>
+                                        <span class="text-[10px] font-black uppercase tracking-tighter">Signal</span>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 font-bold leading-relaxed line-clamp-2">{{ $project->description }}</p>
+                                
+                                <div class="pt-4 flex items-center justify-between border-t border-slate-50">
+                                    <div class="flex -space-x-2 overflow-hidden">
+                                        @foreach($project->endorsements->take(3) as $end)
+                                            <img class="inline-block h-6 w-6 rounded-full ring-2 ring-white" src="{{ $end->user->profile_photo_url }}" title="{{ $end->user->name }}">
+                                        @endforeach
+                                        @if($project->endorsements->count() > 3)
+                                            <span class="flex items-center justify-center h-6 w-6 rounded-full bg-slate-100 text-[8px] font-black text-slate-400 ring-2 ring-white">+{{ $project->endorsements->count() - 3 }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="flex gap-4">
+                                        <a href="{{ $project->file_url }}" target="_blank" class="text-[9px] font-black text-slate-400 hover:text-primary uppercase tracking-widest transition-colors tracking-tighter">Explore Artifact →</a>
+                                        @if(Auth::id() !== $user->id)
+                                        <form action="{{ route('projects.endorse', $project->id) }}" method="POST">
+                                            @csrf
+                                            <button class="text-[9px] font-black text-primary hover:underline uppercase tracking-widest">Endorse 🤝</button>
+                                        </form>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="md:col-span-2 py-24 text-center glass rounded-[3rem] border border-dashed border-slate-200">
+                            <div class="text-4xl opacity-20 mb-4">🗂️</div>
+                            <p class="text-xs font-black text-slate-400 uppercase tracking-widest italic">The Talent Showcase is empty. <br>Manifest your proof of work and lead the Verse.</p>
+                            @if(Auth::id() == $user->id)
+                            <a href="{{ route('projects.create') }}" class="mt-6 inline-block bg-primary text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">Begin Manifestation</a>
+                            @endif
+                        </div>
+                        @endforelse
+                    </div>
                 </div>
 
                 <!-- Tab content: My Uploads -->

@@ -30,7 +30,7 @@ Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])
 Route::get('/multiverse-academic-sync', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "🛡️ Academic targeting & Signal Hub manifested! Database synchronized with the Pulse Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
+        return "🛡️ Academic targeting, Signal Hub & Talent Gallery manifested! Database synchronized with the PoW Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
     } catch (\Exception $e) {
         return "Sync Error: " . $e->getMessage();
     }
