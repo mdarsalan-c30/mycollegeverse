@@ -60,7 +60,7 @@
                     <p class="text-slate-500 font-bold max-w-lg">{{ $user->college->name ?? 'Campus Node curator' }} • Passionate about Academic Excellence.</p>
                     <div class="flex items-center justify-center md:justify-start gap-6 pt-4">
                         <div>
-                            <p class="text-xl font-black text-slate-800">{{ $user->followers_count ?? 0 }}</p>
+                            <p class="text-xl font-black text-slate-800">{{ $user->followers()->count() }}</p>
                             <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Followers</p>
                         </div>
                         <div>
@@ -82,7 +82,12 @@
                         <span>Message</span>
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" /></svg>
                     </a>
-                    <button class="glass px-8 py-3.5 rounded-2xl text-slate-600 font-bold hover:bg-slate-50 transition-all text-sm">Follow</button>
+                    <form action="{{ route('user.follow', $user->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="{{ Auth::user()->isFollowing($user) ? 'glass text-slate-400' : 'bg-primary text-white shadow-lg shadow-primary/20' }} px-8 py-3.5 rounded-2xl font-bold hover:scale-105 transition-all text-sm">
+                            {{ Auth::user()->isFollowing($user) ? 'Unfollow' : 'Follow' }}
+                        </button>
+                    </form>
                     @endif
                     <button class="glass p-3.5 rounded-2xl text-slate-400 hover:text-primary transition-colors"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg></button>
                 </div>
@@ -238,10 +243,37 @@
                 </div>
 
                 <!-- Tab content: Saved Notes -->
-                <div x-show="activeTab === 'saved'" x-transition class="py-20 text-center glass rounded-[3rem] border-white/60">
-                    <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔖</div>
-                    <h5 class="text-lg font-black text-slate-800">Archive Empty</h5>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Personal library coming in the next update.</p>
+                <div x-show="activeTab === 'saved'" x-transition class="grid md:grid-cols-2 gap-6">
+                    @forelse($user->savedNotes()->with('subject', 'user')->latest()->get() as $sNote)
+                    <div class="glass p-6 rounded-[2.5rem] shadow-glass border-white hover:shadow-xl transition-all group overflow-hidden relative">
+                         <div class="flex justify-between items-start mb-6">
+                            <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                🔖
+                            </div>
+                            <div class="flex gap-2">
+                                <form action="{{ route('notes.save', $sNote->id) }}" method="POST">
+                                    @csrf
+                                    <button class="text-[10px] font-black text-slate-300 hover:text-rose-500 uppercase tracking-tighter">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                        <a href="{{ route('notes.show', $sNote->slug) }}" class="block">
+                            <h4 class="text-lg font-extrabold text-slate-800 mb-1 truncate">{{ $sNote->title }}</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">{{ $sNote->subject->name ?? 'General' }} • By {{ $sNote->user->name }}</p>
+                        </a>
+                        <div class="flex items-center justify-between text-xs font-bold text-slate-500 pt-4 border-t border-slate-50">
+                            <span class="flex items-center gap-1">📥 {{ $sNote->downloads }}</span>
+                            <a href="{{ route('notes.show', $sNote->slug) }}" class="text-primary font-black uppercase tracking-widest text-[9px]">Open Study Node →</a>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="md:col-span-2 py-20 text-center glass rounded-[3rem] border-white/60">
+                        <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔖</div>
+                        <h5 class="text-lg font-black text-slate-800">Archive Empty</h5>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Study assets you bookmark will appear here.</p>
+                        <a href="{{ route('notes.index') }}" class="mt-6 inline-block text-primary font-black uppercase tracking-widest text-xs hover:underline">Explore Knowledge Hub</a>
+                    </div>
+                    @endforelse
                 </div>
 
                 <!-- Tab content: Contributions -->
