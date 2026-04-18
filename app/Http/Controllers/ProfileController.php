@@ -22,7 +22,7 @@ class ProfileController extends Controller
             $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
 
             return view('profile.show', compact('user', 'projects', 'experiences', 'educations', 'layout'));
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return "CATCH ERROR: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
         }
     }
