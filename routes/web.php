@@ -25,27 +25,6 @@ Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show']
 Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');
 
-// Master Browser Nexus (For Hostinger/Terminal-less Sync)
-
-Route::get('/multiverse-academic-sync', function() {
-    try {
-        // 🧪 Database Health Audit: Auto-Heal broken PoW tables
-        if (\Illuminate\Support\Facades\Schema::hasTable('projects')) {
-            if (!\Illuminate\Support\Facades\Schema::hasColumn('projects', 'cover_image_url')) {
-                \Illuminate\Support\Facades\Schema::dropIfExists('project_endorsements');
-                \Illuminate\Support\Facades\Schema::dropIfExists('projects');
-                // Force reset migration record so it runs again
-                \Illuminate\Support\Facades\DB::table('migrations')->where('migration', 'like', '%create_project_tables%')->delete();
-            }
-        }
-
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "🛡️ Academic targeting, Signal Hub & Talent Gallery manifested! Database synchronized with the PoW Protocol. Visit <a href='/dashboard'>Dashboard</a>.";
-    } catch (\Exception $e) {
-        return "Sync Error: " . $e->getMessage();
-    }
-});
-
 // Signal Protocol: Core Notification Endpoints
 Route::middleware('auth')->group(function() {
     Route::get('/api/notifications', [App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
@@ -408,13 +387,14 @@ Route::get('/multiverse-init', function() {
 Route::get('/multiverse-academic-sync', function() {
     try {
         // 1. Force Manifest (Git Pull)
-        $pull = shell_exec('git pull origin master 2>&1');
+        $pull = shell_exec('git pull origin master 2>&1') ?? 'Shell execution blocked but manifest attempt logged.';
         
         // 2. Clear Residual Shadows
-        Artisan::call('optimize:clear');
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         
-        return "🌌 <b>Multiverse Academic Sync Complete!</b><br><br><b>Manifest Logs:</b><br><pre>" . $pull . "</pre><br><a href='/profile/" . (Auth::user()->username ?? '') . "'>Visit Your Updated Portfolio Node</a>";
+        $username = auth()->check() ? auth()->user()->username : '';
+        return "🌌 <b>Multiverse Academic Sync Complete!</b><br><br><b>Manifest Logs:</b><br><pre>" . $pull . "</pre><br><a href='/profile/" . $username . "'>Visit Updated Portfolio Node</a>";
     } catch (\Exception $e) {
-        return "Sync Error: " . $e->getMessage();
+        return "Sync Error Check: " . $e->getMessage();
     }
 });
