@@ -9,22 +9,21 @@ class ProfileController extends Controller
 {
     public function show($user = null)
     {
-        try {
-            if (is_string($user)) {
-                $user = User::where('username', $user)->firstOrFail();
-            }
-            if (!$user && auth()->check()) $user = auth()->user();
-            if (!$user) abort(404);
-
-            $projects = collect();
-            $experiences = collect();
-            $educations = collect();
-            $layout = (auth()->check() && auth()->user()->role === 'recruiter') ? 'layouts.recruiter' : 'layouts.app';
-
-            return view('profile.show', compact('user', 'projects', 'experiences', 'educations', 'layout'));
-        } catch (\Throwable $e) {
-            return "CATCH ERROR: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
+        // Explicitly look up by username if a string is provided
+        if (is_string($user)) {
+            $user = User::where('username', $user)->firstOrFail();
         }
+
+        // Default to Auth user if no username provided
+        if (!$user && auth()->check()) {
+            $user = auth()->user();
+        }
+
+        if (!$user) {
+            abort(404);
+        }
+
+        return view('profile.show', compact('user'));
     }
 
     public function updatePhoto(Request $request)
