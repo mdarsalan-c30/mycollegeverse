@@ -14,6 +14,10 @@
         avatarPreview: '{{ $user->profile_photo_url }}',
         coverPreview: '{{ $user->cover_photo_url ?? 'https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop' }}',
         
+        switchTab(tab) {
+            this.activeTab = tab;
+        },
+
         handleCoverUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -114,7 +118,7 @@
                             </a>
                             @endif
                             @if($isOwner)
-                            <button @click="editMode = true" class="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] hover:text-primary transition-colors ml-4 border-b border-white/10 pb-1">+ Configure Social Network</button>
+                            <button type="button" @click.stop.prevent="editMode = true" class="text-[11px] font-black text-white/40 uppercase tracking-[0.2em] hover:text-primary transition-colors ml-4 border-b border-white/10 pb-1">+ Configure Social Network</button>
                             @endif
                         </div>
                     </div>
@@ -179,7 +183,7 @@
                     <div class="flex justify-between items-center mb-10 border-b border-slate-50 pb-4">
                         <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Skills Matrix</h4>
                         @if($isOwner)
-                        <button @click="editMode = true" class="text-[10px] font-black text-primary hover:underline uppercase">Sync Matrix</button>
+                        <button type="button" @click.stop.prevent="editMode = true" class="text-[10px] font-black text-primary hover:underline uppercase">Sync Matrix</button>
                         @endif
                     </div>
                     
@@ -194,22 +198,6 @@
                         @empty
                         <div class="w-full py-12 text-center bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 italic">
                             <p class="text-[10px] font-black text-slate-300 uppercase tracking-widest">Awaiting Neural Mapping</p>
-                        </div>
-                        @endforelse
-                    </div>
-                </div>
-
-                <!-- Bento Box: Achievement Signaling -->
-                <div class="glass p-10 rounded-[3.5rem] shadow-glass border-white transition-all duration-500 hover:-translate-y-2">
-                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-10 border-b border-slate-50 pb-4">Signal Achievements</h4>
-                    <div class="grid grid-cols-4 gap-4">
-                        @forelse($user->badges as $badge)
-                        <div class="aspect-square {{ $badge['color'] }} rounded-[1.5rem] flex items-center justify-center text-3xl shadow-sm border-4 border-white transform hover:scale-125 hover:rotate-6 transition-all duration-500 cursor-help" title="{{ $badge['name'] }}">
-                            {{ $badge['icon'] }}
-                        </div>
-                        @empty
-                        <div class="col-span-4 py-12 text-center glass rounded-3xl">
-                            <p class="text-[10px] font-black text-slate-300 uppercase italic">Nodes Unlocked: 0</p>
                         </div>
                         @endforelse
                     </div>
@@ -274,102 +262,122 @@
                     </div>
                 </div>
 
-                <!-- Proof of Work & Knowledge Node (Tabs System) -->
-                <div class="glass rounded-[4rem] shadow-glass border-white overflow-hidden transition-all duration-500 min-h-[600px]">
-                    <div class="px-10 py-8 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between overflow-x-auto no-scrollbar">
-                        <div class="flex gap-10">
-                            <button @click="activeTab = 'projects'" :class="activeTab === 'projects' ? 'text-primary' : 'text-slate-400'" class="group relative py-2 transition-all">
-                                <span class="text-xs font-black uppercase tracking-[0.2em] relative z-10">Manifested Projects</span>
-                                <div x-show="activeTab === 'projects'" class="absolute -bottom-2 left-0 w-full h-1.5 bg-primary rounded-full blur-[2px]" x-transition></div>
-                            </button>
-                            <button @click="activeTab = 'uploads'" :class="activeTab === 'uploads' ? 'text-primary' : 'text-slate-400'" class="group relative py-2 transition-all">
-                                <span class="text-xs font-black uppercase tracking-[0.2em] relative z-10">Knowledge Assets</span>
-                                <div x-show="activeTab === 'uploads'" class="absolute -bottom-2 left-0 w-full h-1.5 bg-primary rounded-full blur-[2px]" x-transition></div>
-                            </button>
-                            <button @click="activeTab = 'contributions'" :class="activeTab === 'contributions' ? 'text-primary' : 'text-slate-400'" class="group relative py-2 transition-all">
-                                <span class="text-xs font-black uppercase tracking-[0.2em] relative z-10">Social Broadcasts</span>
-                                <div x-show="activeTab === 'contributions'" class="absolute -bottom-2 left-0 w-full h-1.5 bg-primary rounded-full blur-[2px]" x-transition></div>
-                            </button>
-                        </div>
+                <!-- NEW: Stable Vertical Bento Tabs System (Level 10) -->
+                <div class="grid md:grid-cols-12 gap-8 items-stretch" data-turbo="false">
+                    <!-- Vertical Tab Sidebar (Span 4) -->
+                    <div class="md:col-span-4 space-y-4">
+                        <button type="button" @click.stop.prevent="switchTab('projects')" :class="activeTab === 'projects' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-white text-slate-400 hover:bg-slate-50'" class="w-full flex items-center gap-6 p-6 rounded-[2.5rem] transition-all group overflow-hidden relative">
+                            <div class="text-2xl" :class="activeTab === 'projects' ? 'opacity-100' : 'opacity-40'">🗂️</div>
+                            <div class="text-left">
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-1">Evidence</p>
+                                <p class="text-sm font-black tracking-tight">Proof of Work</p>
+                            </div>
+                            <div x-show="activeTab === 'projects'" class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent"></div>
+                        </button>
                         
+                        <button type="button" @click.stop.prevent="switchTab('uploads')" :class="activeTab === 'uploads' ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20' : 'bg-white text-slate-400 hover:bg-slate-50'" class="w-full flex items-center gap-6 p-6 rounded-[2.5rem] transition-all group overflow-hidden relative">
+                            <div class="text-2xl" :class="activeTab === 'uploads' ? 'opacity-100' : 'opacity-40'">📄</div>
+                            <div class="text-left">
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-1">Knowledge</p>
+                                <p class="text-sm font-black tracking-tight">Academic Assets</p>
+                            </div>
+                        </button>
+
+                        <button type="button" @click.stop.prevent="switchTab('contributions')" :class="activeTab === 'contributions' ? 'bg-violet-600 text-white shadow-xl shadow-violet-600/20' : 'bg-white text-slate-400 hover:bg-slate-50'" class="w-full flex items-center gap-6 p-6 rounded-[2.5rem] transition-all group overflow-hidden relative">
+                            <div class="text-2xl" :class="activeTab === 'contributions' ? 'opacity-100' : 'opacity-40'">📡</div>
+                            <div class="text-left">
+                                <p class="text-[10px] font-black uppercase tracking-[0.2em] mb-1">Broadcasts</p>
+                                <p class="text-sm font-black tracking-tight">Social Signals</p>
+                            </div>
+                        </button>
+
                         @if($isOwner)
-                        <a href="{{ route('projects.create') }}" class="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">+ Manifest New</a>
+                        <div class="p-6 bg-slate-50/50 rounded-[2.5rem] border-2 border-dashed border-slate-100 mt-8 text-center">
+                            <a href="{{ route('projects.create') }}" class="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">+ Manifest New Node</a>
+                        </div>
                         @endif
                     </div>
 
-                    <div class="p-10">
-                        <!-- Tab Content: Projects (Bento Cards) -->
-                        <div x-show="activeTab === 'projects'" x-transition class="grid md:grid-cols-2 gap-8">
-                            @forelse($user->projects as $project)
-                            <div class="group bg-white border border-slate-100 rounded-[3rem] overflow-hidden hover:shadow-2xl transition-all duration-700">
-                                <div class="aspect-[16/10] relative overflow-hidden">
-                                    <img src="{{ $project->cover_image_url }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
-                                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
-                                    <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-                                        <span class="bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-[9px] font-black text-white uppercase tracking-widest border border-white/20">{{ $project->stream }}</span>
-                                        <span class="text-white font-black text-xs">{{ $project->visibility_score }} Signal</span>
-                                    </div>
-                                </div>
-                                <div class="p-8 space-y-4">
-                                    <h5 class="text-xl font-black text-slate-800 tracking-tight group-hover:text-primary transition-colors">{{ $project->title }}</h5>
-                                    <p class="text-xs text-slate-500 font-bold leading-relaxed line-clamp-2">{{ $project->description }}</p>
-                                    <div class="pt-6 border-t border-slate-50 flex items-center justify-between">
-                                        <div class="flex -space-x-3">
-                                            @foreach($project->endorsements->take(3) as $end)
-                                            <img class="w-8 h-8 rounded-full border-2 border-white ring-2 ring-slate-100 shadow-sm" src="{{ $end->user->profile_photo_url }}">
-                                            @endforeach
+                    <!-- Main Dynamic Content (Span 8) -->
+                    <div class="md:col-span-8 glass rounded-[4.5rem] shadow-glass border-white overflow-hidden min-h-[600px] relative">
+                        <div class="p-10">
+                            <!-- Tab Content: Projects -->
+                            <div x-show="activeTab === 'projects'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-y-4" x-transition:enter-end="opacity-100 transform translate-y-0" class="space-y-8">
+                                @forelse($user->projects as $project)
+                                <div class="group bg-white border border-slate-100 rounded-[3rem] overflow-hidden hover:shadow-2xl transition-all duration-700">
+                                    <div class="aspect-[16/8] relative overflow-hidden">
+                                        <img src="{{ $project->cover_image_url }}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-60"></div>
+                                        <div class="absolute bottom-6 left-10 flex items-center gap-4">
+                                            <span class="bg-white/10 backdrop-blur-md px-5 py-2.5 rounded-2xl text-[9px] font-black text-white uppercase tracking-widest border border-white/20">{{ $project->stream }}</span>
                                         </div>
-                                        <a href="{{ $project->file_url }}" target="_blank" class="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2">View Node 🔭</a>
+                                    </div>
+                                    <div class="p-10">
+                                        <h5 class="text-3xl font-black text-slate-800 tracking-tighter italic mb-4 group-hover:text-primary transition-colors">{{ $project->title }}</h5>
+                                        <p class="text-xs text-slate-500 font-bold leading-relaxed line-clamp-3 mb-8">{{ $project->description }}</p>
+                                        <div class="flex items-center justify-between border-t border-slate-50 pt-8 mt-2">
+                                            <div class="flex -space-x-4">
+                                                @foreach($project->endorsements->take(4) as $end)
+                                                <img class="w-10 h-10 rounded-full border-4 border-white shadow-sm ring-1 ring-slate-100" src="{{ $end->user->profile_photo_url }}">
+                                                @endforeach
+                                            </div>
+                                            <a href="{{ $project->file_url }}" target="_blank" class="h-12 px-8 bg-slate-50 rounded-2xl text-[10px] font-black text-slate-600 uppercase tracking-widest flex items-center justify-center hover:bg-primary hover:text-white transition-all">Explore Node 🔭</a>
+                                        </div>
                                     </div>
                                 </div>
+                                @empty
+                                <div class="py-40 text-center italic opacity-40">
+                                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">Evidence Node: Null</p>
+                                </div>
+                                @endforelse
                             </div>
-                            @empty
-                            <div class="col-span-2 py-40 text-center glass rounded-[3.5rem] border-2 border-dashed border-slate-100 italic">
-                                <div class="text-5xl mb-6 opacity-20">🗂️</div>
-                                <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em]">Evidence of work unmapped. Begin manifestation protocol.</p>
+
+                            <!-- Tab Content: Assets -->
+                            <div x-show="activeTab === 'uploads'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 transform translate-x-4" x-transition:enter-end="opacity-100 transform translate-x-0" class="space-y-6">
+                                 @forelse($user->notes()->with('subject')->latest()->get() as $pNote)
+                                 <div class="bg-slate-50/50 border border-slate-100 p-10 rounded-[3rem] hover:bg-white hover:shadow-xl transition-all group">
+                                    <div class="flex justify-between items-start mb-8">
+                                        <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-3xl group-hover:bg-indigo-600 group-hover:text-white transition-all">📘</div>
+                                        <div class="text-right">
+                                            <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest">Repository v12</p>
+                                            <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest mt-1 italic">Verified Asset</p>
+                                        </div>
+                                    </div>
+                                    <h5 class="text-2xl font-black text-slate-800 mb-2 truncate tracking-tight group-hover:text-indigo-600 transition-colors">{{ $pNote->title }}</h5>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $pNote->subject->name ?? 'Core Domain' }}</p>
+                                    <div class="mt-10 flex items-center gap-10 text-[9px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-50 pt-8">
+                                        <span class="bg-indigo-50 px-4 py-2 rounded-xl text-indigo-600">📥 {{ $pNote->downloads }} DLD</span>
+                                        <span class="opacity-60">Manifest Time: {{ $pNote->created_at->format('M Y') }}</span>
+                                    </div>
+                                 </div>
+                                 @empty
+                                 <div class="py-40 text-center italic opacity-40">
+                                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">Knowledge Assets: Null</p>
+                                 </div>
+                                 @endforelse
                             </div>
-                            @endforelse
-                        </div>
 
-                        <!-- Tab Content: Uploads -->
-                        <div x-show="activeTab === 'uploads'" x-transition class="grid md:grid-cols-2 gap-6">
-                             @forelse($user->notes()->with('subject')->latest()->get() as $pNote)
-                             <div class="bg-slate-50/50 border border-slate-100 p-8 rounded-[2.5rem] hover:bg-white hover:shadow-xl transition-all group">
-                                <div class="flex justify-between items-start mb-6">
-                                    <div class="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:bg-primary group-hover:text-white transition-all">📄</div>
-                                    <span class="text-[9px] font-black text-slate-300 uppercase italic">v1.2 Secure</span>
-                                </div>
-                                <h5 class="text-lg font-black text-slate-800 mb-2 truncate group-hover:text-primary transition-colors">{{ $pNote->title }}</h5>
-                                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ $pNote->subject->name ?? 'Core Academic' }}</p>
-                                <div class="mt-8 flex items-center gap-6 text-[9px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-100 pt-6">
-                                    <span>📥 {{ $pNote->downloads }} Downloads</span>
-                                    <span>⚡ Highly Verified</span>
-                                </div>
-                             </div>
-                             @empty
-                             <div class="col-span-2 py-32 text-center">
-                                <p class="text-[11px] font-black text-slate-300 uppercase tracking-widest italic">Node assets: Missing.</p>
-                             </div>
-                             @endforelse
-                        </div>
-
-                        <!-- Tab Content: Contributions -->
-                        <div x-show="activeTab === 'contributions'" x-transition class="space-y-6">
-                             @forelse($user->posts()->latest()->get() as $pPost)
-                             <div class="glass p-10 rounded-[3rem] border-white group hover:translate-x-2 transition-all">
-                                <div class="flex items-center gap-4 mb-4">
-                                    <div class="w-8 h-8 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-sm font-black italic">!</div>
-                                    <span class="text-[9px] font-black text-primary uppercase tracking-widest italic leading-none">Broadcast Recorded: {{ $pPost->created_at->diffForHumans() }}</span>
-                                </div>
-                                <h4 class="text-2xl font-black text-slate-800 tracking-tighter mb-4 group-hover:text-primary transition-colors">{{ $pPost->title }}</h4>
-                                <p class="text-sm text-slate-500 font-bold leading-relaxed mb-6">{{ Str::limit($pPost->content, 180) }}</p>
-                                <a href="{{ route('community.show', [$user->username, $pPost->slug]) }}" class="text-[10px] font-black text-slate-400 hover:text-primary uppercase tracking-[0.2em]">Open Channel Connectivity →</a>
-                             </div>
-                             @empty
-                             <div class="py-32 text-center italic">
-                                <p class="text-[11px] font-black text-slate-300 uppercase tracking-widest">Radio silence in the multiverse node.</p>
-                             </div>
-                             @endforelse
+                            <!-- Tab Content: Social -->
+                            <div x-show="activeTab === 'contributions'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" class="space-y-6">
+                                 @forelse($user->posts()->latest()->get() as $pPost)
+                                 <div class="bg-white border border-slate-100 p-10 rounded-[3.5rem] hover:border-violet-300 transition-all group">
+                                    <div class="flex items-center gap-5 mb-6">
+                                        <div class="w-12 h-12 rounded-2xl bg-violet-600 flex items-center justify-center text-white text-lg font-black italic shadow-lg shadow-violet-100">V</div>
+                                        <div>
+                                            <p class="text-[9px] font-black text-violet-400 uppercase tracking-widest">Broadcast Channel Active</p>
+                                            <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest mt-1">{{ $pPost->created_at->diffForHumans() }}</p>
+                                        </div>
+                                    </div>
+                                    <h4 class="text-3xl font-black text-slate-800 tracking-tighter mb-4 group-hover:text-violet-600 transition-colors italic leading-none">{{ $pPost->title }}</h4>
+                                    <p class="text-sm text-slate-500 font-bold leading-relaxed mb-8 line-clamp-3">{{ Str::limit($pPost->content, 220) }}</p>
+                                    <a href="{{ route('community.show', [$user->username, $pPost->slug]) }}" class="h-12 px-8 border border-slate-100 rounded-2xl text-[10px] font-black text-slate-400 hover:border-violet-600 hover:text-violet-600 uppercase tracking-widest flex items-center justify-center transition-all">Enter Discussion Node →</a>
+                                 </div>
+                                 @empty
+                                 <div class="py-40 text-center italic opacity-40">
+                                    <p class="text-[11px] font-black text-slate-300 uppercase tracking-[0.3em]">Broadcast Stream: Null</p>
+                                 </div>
+                                 @endforelse
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -377,7 +385,7 @@
         </div>
 
         <!-- Professional Sync Modal (Slide-over Edit High-Fidelity) -->
-        <template x-if="editMode">
+        <template x-if="editMode" data-turbo="false">
         <div class="fixed inset-0 z-[100] flex overflow-hidden">
             <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-xl" @click="editMode = false"></div>
             <div class="relative w-full max-w-2xl bg-white shadow-2xl p-12 overflow-y-auto no-scrollbar ml-auto border-l border-white/10 animate-slide-left">
@@ -386,7 +394,7 @@
                         <h3 class="text-3xl font-black text-slate-900 tracking-tighter italic">Persona Manifestation Hub</h3>
                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-2 leading-none">Mapping your professional existence in the Verse.</p>
                     </div>
-                    <button @click="editMode = false" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 flex items-center justify-center transition-all">
+                    <button type="button" @click="editMode = false" class="w-12 h-12 rounded-2xl bg-slate-50 text-slate-400 hover:bg-slate-100 flex items-center justify-center transition-all">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>

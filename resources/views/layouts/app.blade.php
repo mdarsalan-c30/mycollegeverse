@@ -139,10 +139,12 @@
         <!-- Hotwire Turbo (Instant Verse Manifestation) 🚀 -->
         <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es5-umd.js"></script>
         <script>
+            // Deep Memory: Persistent Minimalist Mode Sync
             document.addEventListener("turbo:load", function() {
-                // Alpine handles this automatically, but manually initializing any complex node here if needed
                 window.dispatchEvent(new CustomEvent('mcv:instant-sync'));
             });
+            // Force Flush: Prevents old cache lingering during manifest shifts
+            window.addEventListener('load', () => Turbo.clearCache());
         </script>
         
         <!-- Alpine.js Engineering ⚙️ -->
