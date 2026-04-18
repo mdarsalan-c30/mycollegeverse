@@ -238,10 +238,49 @@
                 </div>
 
                 <!-- Tab content: Saved Notes -->
-                <div x-show="activeTab === 'saved'" x-transition class="py-20 text-center glass rounded-[3rem] border-white/60">
-                    <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔖</div>
-                    <h5 class="text-lg font-black text-slate-800">Archive Empty</h5>
-                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-2">Personal library coming in the next update.</p>
+                <div x-show="activeTab === 'saved'" x-transition class="space-y-6">
+                    @php
+                        $savedNotes = collect();
+                        try {
+                            if (method_exists($user, 'savedNotes')) {
+                                $savedNotes = $user->savedNotes()->with(['user', 'subject'])->latest('saved_notes.created_at')->get();
+                            }
+                        } catch (\Throwable $e) {
+                            \Log::error("Saved Notes Render Exception: " . $e->getMessage());
+                            $savedNotes = collect();
+                        }
+                    @endphp
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        @forelse($savedNotes as $sNote)
+                        <div class="glass p-6 rounded-[2.5rem] shadow-glass border-white hover:shadow-xl transition-all group">
+                             <div class="flex justify-between items-start mb-6">
+                                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                                    🔖
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-tighter block">Saved Archive</span>
+                                    <span class="text-[8px] font-bold text-slate-300 uppercase tracking-widest italic">By {{ $sNote->user->name ?? 'Curator' }}</span>
+                                </div>
+                            </div>
+                            <h4 class="text-lg font-extrabold text-slate-800 mb-1 truncate">{{ $sNote->title }}</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">{{ $sNote->subject->name ?? 'General' }}</p>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-4 text-xs font-bold text-slate-500">
+                                    <span class="flex items-center gap-1">📥 {{ $sNote->downloads }}</span>
+                                </div>
+                                <a href="{{ route('notes.show', $sNote->slug) }}" class="text-[10px] font-black text-primary hover:underline uppercase tracking-widest">Access Vault →</a>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="md:col-span-2 text-center py-24 glass rounded-[3rem] border border-dashed border-slate-200">
+                            <div class="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center text-3xl mx-auto mb-4">🔖</div>
+                            <h5 class="text-xs font-black text-slate-400 uppercase tracking-widest">Archive Empty</h5>
+                            <p class="text-[10px] text-slate-300 font-bold uppercase tracking-widest mt-2 italic">Save high-quality notes to manifest them in your personal vault.</p>
+                        </div>
+                        @endforelse
+                    </div>
                 </div>
 
                 <!-- Tab content: Contributions -->
