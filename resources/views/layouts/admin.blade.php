@@ -157,8 +157,6 @@
                     </div>
 
                     <div class="flex items-center gap-6 divide-x divide-slate-100 italic">
-                        <x-verse-signal />
-                        
                         <div class="flex items-center gap-4 pl-6 first:pl-0">
                             <p class="text-[8px] font-black text-admin-dark/40 uppercase tracking-[0.2em] text-right">System Status: <br> <span class="text-green-500">Node Active</span></p>
                             <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>

@@ -150,9 +150,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/pipeline', [App\Http\Controllers\PipelineController::class, 'index'])->name('pipeline.index');
         Route::post('/jobs/{job}/apply', [App\Http\Controllers\JobApplicationController::class, 'store'])->name('jobs.apply');
 
-        // 🛡️ Social Connections (Following Network)
-        Route::post('/user/{user}/follow', [App\Http\Controllers\FollowController::class, 'toggle'])->name('user.follow');
-
         // 🗂️ Proof of Work (PoW) Showcase: Evidence of Talent 🛡️
         Route::prefix('talent')->name('projects.')->group(function () {
             Route::get('/', [App\Http\Controllers\ProjectController::class, 'index'])->name('index');
@@ -160,10 +157,6 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/store', [App\Http\Controllers\ProjectController::class, 'store'])->name('store');
             Route::post('/endorse/{project}', [App\Http\Controllers\ProjectController::class, 'endorse'])->name('endorse');
         });
-
-        // 📚 Knowledge Asset Management
-        Route::post('/notes/{note}/save', [App\Http\Controllers\NoteController::class, 'toggleSave'])->name('notes.save');
-
 
         // Perks & Rewards Hub 🎁
         Route::get('/perks', [App\Http\Controllers\RewardController::class, 'index'])->name('rewards.index');
