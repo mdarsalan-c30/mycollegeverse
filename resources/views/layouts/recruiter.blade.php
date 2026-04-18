@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        <style>html { background-color: #F8FAFC; }</style>
 
         <title>@yield('title', 'Recruiter Dashboard | VerseOS Pipeline')</title>
 
@@ -55,8 +56,18 @@
 
         <!-- Tailwind CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
-        <!-- Alpine.js -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <!-- Alpine.js Engineering ⚙️ -->
+        <script defer src="https://unpkg.com/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+        <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        
+        <!-- Hotwire Turbo (Instant Verse Manifestation) 🚀 -->
+        <script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es5-umd.js"></script>
+        <script>
+            document.addEventListener("turbo:load", function() {
+                window.dispatchEvent(new CustomEvent('mcv:instant-sync'));
+            });
+            window.addEventListener('load', () => Turbo.clearCache());
+        </script>
         <script>
             tailwind.config = {
                 theme: {
@@ -99,6 +110,21 @@
             ::-webkit-scrollbar { width: 4px; }
             ::-webkit-scrollbar-track { background: transparent; }
             ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+
+            /* High-Fidelity Page Transitions 🌀 */
+            .page-fade-in {
+                animation: mcvFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+            @keyframes mcvFadeIn {
+                from { opacity: 0; transform: translateY(4px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .turbo-progress-bar {
+                height: 4px;
+                background-color: #3B82F6;
+                box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+            }
         </style>
     </head>
     <body class="font-sans antialiased text-slate-800 bg-[#F8FAFC]">
@@ -108,7 +134,8 @@
         <!-- End Google Tag Manager (noscript) -->
         <div class="flex h-screen overflow-hidden">
             <!-- Recruiter Sidebar -->
-            <aside class="hidden lg:flex flex-col w-72 h-full bg-white border-r border-slate-100 relative z-40 transition-all duration-300">
+            <aside id="main-sidebar" data-turbo-permanent 
+                   class="hidden lg:flex flex-col w-72 h-full bg-white border-r border-slate-100 relative z-40 transition-all duration-300">
                 <div class="px-10 py-12">
                     <div class="flex items-center gap-3">
                         <img src="{{ asset('assets/mcv/mycollegeverse.png') }}" class="h-16 md:h-20 w-auto" alt="MyCollegeVerse — Rectuiter Pipeline">
@@ -170,7 +197,8 @@
 
             <!-- Main Content Area -->
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#F8FAFC]">
-                <header class="h-24 glass flex items-center justify-between px-12 shrink-0 z-30 shadow-sm">
+                <header id="top-nav" data-turbo-permanent 
+                        class="h-24 glass flex items-center justify-between px-12 shrink-0 z-30 shadow-sm">
                     <div class="flex-1 max-w-2xl">
                         <div class="relative group">
                             <input type="text" placeholder="Scout verified student talent or campus nodes..." class="w-full h-12 bg-white/60 border border-slate-100 rounded-2xl px-6 pl-14 text-xs font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
@@ -193,7 +221,7 @@
                     </div>
                 </header>
 
-                <main class="flex-1 overflow-y-auto px-12 py-10 relative">
+                <main class="flex-1 overflow-y-auto px-12 py-10 relative page-fade-in">
                     {{ $slot }}
                 </main>
             </div>
