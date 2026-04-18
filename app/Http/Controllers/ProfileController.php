@@ -9,7 +9,17 @@ class ProfileController extends Controller
 {
     public function show($user = null)
     {
-        return "Profile reach test: " . (is_string($user) ? $user : 'no-user');
+        try {
+            if (is_string($user)) {
+                $user = User::where('username', $user)->firstOrFail();
+            }
+            if (!$user && auth()->check()) $user = auth()->user();
+            if (!$user) return "User Null";
+
+            return "User Found: " . $user->name . " | ID: " . $user->id;
+        } catch (\Exception $e) {
+            return "CATCH ERROR: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine();
+        }
     }
 
     public function updatePhoto(Request $request)
