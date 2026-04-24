@@ -166,23 +166,40 @@
                     </article>
                 </div>
                 @else
-                {{-- PDF Viewer --}}
+                {{-- Knowledge Asset Viewer 🛰️ --}}
                 <div class="aspect-[3/4] bg-slate-100 relative">
-                    <embed src="{{ filter_var($note->file_path, FILTER_VALIDATE_URL) ? $note->file_path : asset('storage/' . $note->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
+                    @if(Str::contains($note->file_path, 'drive.google.com'))
+                        {{-- Google Drive High-Fidelity Embed Node --}}
+                        <iframe src="{{ str_replace(['/view', '/edit', '/share'], '/preview', $note->file_path) }}" 
+                                width="100%" 
+                                height="100%" 
+                                class="rounded-[2.5rem] border-none shadow-inner" 
+                                allow="autoplay"></iframe>
+                        
+                        {{-- External Access Overlay (Hidden by default, shows if iframe fails) --}}
+                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+                            <a href="{{ $note->file_path }}" target="_blank" class="bg-white/90 backdrop-blur-md text-slate-800 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:bg-primary hover:text-white transition-all border border-slate-200">
+                                <span>🔗</span> Open Original Drive Node
+                            </a>
+                        </div>
+                    @else
+                        {{-- Standard PDF/Cloudinary Embed --}}
+                        <embed src="{{ filter_var($note->file_path, FILTER_VALIDATE_URL) ? $note->file_path : asset('storage/' . $note->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
+                    @endif
                     
-                    <!-- Fallback for browsers that don't support embed -->
+                    <!-- Fallback for legacy environments -->
                     <div class="absolute inset-0 flex items-center justify-center p-10 text-center bg-slate-50 z-[-1]">
                         <div class="space-y-4">
                             <div class="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             </div>
-                            <h3 class="font-black text-slate-800">Preview not available</h3>
-                            <p class="text-sm text-slate-500 font-medium">Your browser doesn't support PDF previews. Please download to view.</p>
+                            <h3 class="font-black text-slate-800">Preview Hub Offline</h3>
+                            <p class="text-sm text-slate-500 font-medium">Your browser manifest doesn't support inline previews.</p>
                             
                             @auth
-                            <a href="{{ route('notes.download', $note->id) }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Download Instead</a>
+                            <a href="{{ route('notes.download', $note->id) }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Download Asset</a>
                             @else
-                            <a href="{{ route('login') }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Sign in to Download</a>
+                            <a href="{{ route('login') }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Sign in to Access</a>
                             @endauth
                         </div>
                     </div>
