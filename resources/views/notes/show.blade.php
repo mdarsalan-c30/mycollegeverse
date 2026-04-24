@@ -214,14 +214,27 @@
                         <div class="flex items-center gap-3 mb-2">
                             <h2 class="text-4xl font-black text-secondary tracking-tight">{{ $note->title }}</h2>
                             @auth
-                            <form action="{{ route('notes.save', $note->id) }}" method="POST">
-                                @csrf
-                                <button type="submit" class="p-3 rounded-2xl transition-all {{ $isSaved ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-300 hover:text-rose-400' }}" title="{{ $isSaved ? 'Remove from library' : 'Save to library' }}">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="{{ $isSaved ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                </button>
-                            </form>
+                            <div class="flex items-center gap-2">
+                                <form action="{{ route('notes.save', $note->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="p-3 rounded-2xl transition-all {{ $isSaved ? 'bg-rose-50 text-rose-500' : 'bg-slate-50 text-slate-300 hover:text-rose-400' }}" title="{{ $isSaved ? 'Remove from library' : 'Save to library' }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="{{ $isSaved ? 'currentColor' : 'none' }}" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                        </svg>
+                                    </button>
+                                </form>
+
+                                {{-- Master Authority Node: Admin Delete --}}
+                                @if(Auth::user()->role === 'admin')
+                                <form action="{{ route('admin.notes.destroy', $note->id) }}" method="POST" onsubmit="return confirm('🌌 Warning: Permanent Deletion requested. Proceed to wipe this Knowledge Asset?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="bg-rose-100 text-rose-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-600 hover:text-white transition-all shadow-sm border border-rose-200">
+                                        🗑️ Delete Asset
+                                    </button>
+                                </form>
+                                @endif
+                            </div>
                             @endauth
                         </div>
                         <p class="text-slate-400 font-bold uppercase tracking-[0.2em] text-[10px] flex items-center gap-2">
