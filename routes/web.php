@@ -398,3 +398,17 @@ Route::get('/multiverse-academic-sync', function() {
         return "Sync Error Check: " . $e->getMessage();
     }
 });
+
+Route::get('/multiverse-force-sync', function() {
+    try {
+        // 🛡️ Master Reset: Discard any server-side conflicts and pull fresh from origin
+        $pull = shell_exec('git fetch origin master 2>&1');
+        $pull .= shell_exec('git reset --hard origin/master 2>&1');
+        
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        
+        return "🌌 <b>FORCE MANIFEST COMPLETE!</b><br><br><b>Reset Logs:</b><br><pre>" . $pull . "</pre><br><a href='/'>Return to Home Hub</a>";
+    } catch (\Exception $e) {
+        return "Force Sync Error: " . $e->getMessage();
+    }
+});

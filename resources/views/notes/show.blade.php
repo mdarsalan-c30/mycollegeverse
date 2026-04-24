@@ -168,7 +168,7 @@
                 @else
                 {{-- Knowledge Asset Viewer 🛰️ --}}
                 <div class="aspect-[3/4] bg-slate-100 relative">
-                    @if(Str::contains($note->file_path, 'drive.google.com'))
+                    @if(\Illuminate\Support\Str::contains($note->file_path, 'drive.google.com'))
                         {{-- Google Drive High-Fidelity Embed Node --}}
                         <iframe src="{{ str_replace(['/view', '/edit', '/share'], '/preview', $note->file_path) }}" 
                                 width="100%" 
