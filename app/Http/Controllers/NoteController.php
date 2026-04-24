@@ -180,8 +180,11 @@ class NoteController extends Controller
             'title' => 'required|string|max:255',
             'subject_id' => 'required',
             'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
-            'file' => 'required|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
+            'file' => 'nullable|required_without:drive_link|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
+            'drive_link' => 'nullable|required_without:file|url|max:500',
         ], [
+            'file.required_without' => 'Please upload a file OR provide a Drive link.',
+            'drive_link.required_without' => 'Please provide a Drive link OR upload a file.',
             'file.max' => 'The file is too large! Maximum allowed is 10MB.',
             'file.mimes' => 'Unsupported file format! Please use PDF, DOC, or common images.',
             'custom_subject.required_if' => 'Please provide the custom subject name.',
@@ -192,34 +195,41 @@ class NoteController extends Controller
         }
 
         try {
-            $file = $request->file('file');
-            $cloudName = env('CLOUDINARY_CLOUD_NAME');
-            $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+            $filePath = null;
 
-            if (!$cloudName || !$uploadPreset) {
-                throw new \Exception('Cloudinary configuration missing.');
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $cloudName = env('CLOUDINARY_CLOUD_NAME');
+                $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+
+                if (!$cloudName || !$uploadPreset) {
+                    throw new \Exception('Cloudinary configuration missing.');
+                }
+
+                // Upload via Cloudinary API
+                $response = Http::attach(
+                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
+                    'upload_preset' => $uploadPreset,
+                ]);
+
+                if (!$response->successful()) {
+                    \Log::error('Cloudinary API Error: ' . $response->body());
+                    throw new \Exception('Failed to upload to cloud storage.');
+                }
+
+                $filePath = $response->json('secure_url');
+            } else {
+                // Use the Drive Link as the manifest path 🛰️
+                $filePath = $request->drive_link;
             }
-
-            // Upload via Cloudinary API
-            $response = Http::attach(
-                'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
-            )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
-                'upload_preset' => $uploadPreset,
-            ]);
-
-            if (!$response->successful()) {
-                \Log::error('Cloudinary API Error: ' . $response->body());
-                throw new \Exception('Failed to upload to cloud storage.');
-            }
-
-            $secureUrl = $response->json('secure_url');
 
             // Ensure we have a college_id
             $college_id = Auth::user()->college_id ?? 1;
 
             Note::create([
                 'title' => $request->title,
-                'file_path' => $secureUrl,
+                'file_path' => $filePath,
                 'user_id' => Auth::id(),
                 'college_id' => $college_id,
                 'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
