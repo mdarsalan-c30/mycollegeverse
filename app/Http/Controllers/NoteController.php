@@ -222,14 +222,15 @@ class NoteController extends Controller
                 $filePath = $request->drive_link;
             }
 
-            $college_id = Auth::user()->college_id ?? 1;
+            $userId = auth()->id();
+            $college_id = auth()->user()->college_id ?? 1;
 
             Note::create([
                 'title' => $request->title,
                 'note_type' => $request->note_type,
                 'exam_name' => $request->note_type === 'competitive' ? $request->exam_name : null,
                 'file_path' => $filePath,
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'college_id' => $college_id,
                 'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
                 'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,

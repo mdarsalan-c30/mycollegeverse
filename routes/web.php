@@ -387,13 +387,12 @@ Route::get('/multiverse-init', function() {
 Route::get('/multiverse-academic-sync', function() {
     try {
         // 1. Force Manifest (Git Pull)
-        $pull = shell_exec('git pull origin master 2>&1') ?? 'Shell execution blocked but manifest attempt logged.';
+        $pull = @shell_exec('git pull origin master 2>&1') ?? 'Manifest attempt logged.';
         
         // 2. Clear Residual Shadows
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         
-        $username = auth()->check() ? auth()->user()->username : '';
-        return "🌌 <b>Multiverse Academic Sync Complete!</b><br><br><b>Manifest Logs:</b><br><pre>" . $pull . "</pre><br><a href='/profile/" . $username . "'>Visit Updated Portfolio Node</a>";
+        return "🌌 <b>Sync Complete!</b><br><br><pre>" . $pull . "</pre><br><a href='/'>Return Home</a>";
     } catch (\Exception $e) {
         return "Sync Error Check: " . $e->getMessage();
     }
