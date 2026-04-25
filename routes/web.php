@@ -393,27 +393,30 @@ Route::get('/multiverse-init', function() {
 Route::get('/multiverse-academic-sync', function() {
     try {
         // 1. Force Manifest (Git Pull)
-        $pull = @shell_exec('git pull origin master 2>&1') ?? 'Manifest attempt logged.';
+        $pull = shell_exec('git pull origin master 2>&1') ?? 'Manifest attempt logged but no output.';
         
         // 2. Clear Residual Shadows
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
         
-        return "🌌 <b>Sync Complete!</b><br><br><pre>" . $pull . "</pre><br><a href='/'>Return Home</a>";
+        return "🌌 <b>Sync Output:</b><br><br><pre>" . $pull . "</pre><br><a href='/'>Return Home</a>";
     } catch (\Exception $e) {
-        return "Sync Error Check: " . $e->getMessage();
+        return "Sync Exception: " . $e->getMessage();
     }
 });
 
 Route::get('/multiverse-force-sync', function() {
     try {
+        $output = "";
         // 🛡️ Master Reset: Discard any server-side conflicts and pull fresh from origin
-        $pull = shell_exec('git fetch origin master 2>&1');
-        $pull .= shell_exec('git reset --hard origin/master 2>&1');
+        $output .= "FETCH: " . shell_exec('git fetch origin master 2>&1') . "\n";
+        $output .= "RESET: " . shell_exec('git reset --hard origin/master 2>&1') . "\n";
         
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
         
-        return "🌌 <b>FORCE MANIFEST COMPLETE!</b><br><br><b>Reset Logs:</b><br><pre>" . $pull . "</pre><br><a href='/'>Return to Home Hub</a>";
+        return "🌌 <b>FORCE MANIFEST COMPLETE!</b><br><br><b>Execution Logs:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Home Hub</a>";
     } catch (\Exception $e) {
-        return "Force Sync Error: " . $e->getMessage();
+        return "Force Sync Critical Error: " . $e->getMessage();
     }
 });
