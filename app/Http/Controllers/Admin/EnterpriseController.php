@@ -16,26 +16,35 @@ class EnterpriseController extends Controller
      */
     public function index()
     {
-        // 1. Fetch Recruiters with Job Stats
+        // 1. Fetch Recruiters with Job Stats (Safe check for role existence)
         $recruiters = User::where('role', 'recruiter')
             ->withCount('jobPostings')
             ->latest()
             ->paginate(10);
 
-        // 2. Pending Jobs for Moderation
+        // 2. Pending Jobs for Moderation (Ensure recruiter relation is safe)
         $pendingJobs = JobPosting::where('is_approved', false)
             ->with('recruiter')
             ->latest()
-            ->get();
+            ->get()
+            ->filter(function($job) {
+                return $job->recruiter !== null;
+            });
 
-        // 3. Overall Stats
-        $stats = [
-            'total_recruiters' => User::where('role', 'recruiter')->count(),
-            'active_jobs' => JobPosting::where('is_approved', true)->count(),
-            'pending_jobs' => JobPosting::where('is_approved', false)->count(),
-            'total_applications' => JobApplication::count(),
-            'total_hired' => JobApplication::where('status', 'shortlisted')->count(),
-        ];
+        // 3. Overall Stats (Safe check for missing data)
+        try {
+            $stats = [
+                'total_recruiters' => User::where('role', 'recruiter')->count(),
+                'active_jobs' => JobPosting::where('is_approved', true)->count(),
+                'pending_jobs' => JobPosting::where('is_approved', false)->count(),
+                'total_applications' => JobApplication::count(),
+                'total_hired' => JobApplication::where('status', 'shortlisted')->count(),
+            ];
+        } catch (\Exception $e) {
+            $stats = [
+                'total_recruiters' => 0, 'active_jobs' => 0, 'pending_jobs' => 0, 'total_applications' => 0, 'total_hired' => 0
+            ];
+        }
 
         return view('admin.enterprise.index', compact('recruiters', 'pendingJobs', 'stats'));
     }
