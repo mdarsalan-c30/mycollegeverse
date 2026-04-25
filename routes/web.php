@@ -405,18 +405,23 @@ Route::get('/multiverse-academic-sync', function() {
     }
 });
 
-Route::get('/multiverse-force-sync', function() {
+Route::get('/multiverse-teleport', function() {
     try {
-        $output = "";
-        // 🛡️ Master Reset: Discard any server-side conflicts and pull fresh from origin
-        $output .= "FETCH: " . shell_exec('git fetch origin master 2>&1') . "\n";
-        $output .= "RESET: " . shell_exec('git reset --hard origin/master 2>&1') . "\n";
+        // 🛡️ Safe Mode: First, check if we can even talk to the environment
+        $disabled = explode(',', ini_get('disable_functions'));
+        $can_shell = !in_array('shell_exec', $disabled);
+        
+        if (!$can_shell) {
+            return "🚫 <b>ERROR:</b> Hostinger has strictly disabled 'shell_exec'. Git commands cannot run via PHP.<br><br><b>FIX:</b> Please go to <b>Hostinger Panel -> Advanced -> GIT</b> and click <b>'Pull'</b> or <b>'Deploy'</b> manually. This is the only way to sync your code now.";
+        }
+
+        // If not disabled, maybe it's just path issues? Let's try full path
+        $output = shell_exec('/usr/bin/git pull origin master 2>&1') ?? 'No output signal.';
         
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
         
-        return "🌌 <b>FORCE MANIFEST COMPLETE!</b><br><br><b>Execution Logs:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Home Hub</a>";
+        return "🌌 <b>Teleport Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
     } catch (\Exception $e) {
-        return "Force Sync Critical Error: " . $e->getMessage();
+        return "Teleport Error: " . $e->getMessage();
     }
 });
