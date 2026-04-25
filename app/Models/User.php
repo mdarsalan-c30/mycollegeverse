@@ -55,10 +55,6 @@ class User extends Authenticatable
         return $this->belongsTo(\App\Models\Course::class);
     }
 
-    public function jobPostings()
-    {
-        return $this->hasMany(\App\Models\JobPosting::class, 'recruiter_id');
-    }
 
     public function academicEvents()
     {
