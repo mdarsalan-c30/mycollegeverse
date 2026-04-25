@@ -32,40 +32,74 @@
             this.$refs.filterForm.submit();
         }
     }">
-        <!-- Page Header -->
-        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <!-- Page Header (Dynamic based on Domain) -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
             <div>
-                <h1 class="text-4xl font-extrabold text-secondary mb-2">Notes Repository</h1>
-                <p class="text-slate-500 font-medium">Browse and download verified academic resources.</p>
+                @if(request('domain') === 'pyq')
+                    <h1 class="text-5xl font-black text-rose-600 mb-2 tracking-tight">PYQ Vault 📝</h1>
+                    <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] italic">Accessing Previous Year Question nodes from the multiverse archive</p>
+                @elseif(request('domain') === 'competitive')
+                    <h1 class="text-5xl font-black text-amber-500 mb-2 tracking-tight">Competitive Edge 🎯</h1>
+                    <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] italic">Scanning high-intent assets for entrance exams and skill mastery</p>
+                @else
+                    <h1 class="text-5xl font-black text-secondary mb-2 tracking-tight">Knowledge Hub 🎓</h1>
+                    <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.2em] italic">Browsing verified academic resources and semester Manifests</p>
+                @endif
             </div>
             
             @auth
-            <div class="flex gap-3">
-                <a href="{{ route('notes.generate') }}" class="bg-gradient-to-r from-violet-600 to-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-violet-500/20 hover:scale-105 transition-all flex items-center gap-2">
-                    🤖 Generate AI Notes
+            <div class="flex gap-4">
+                <a href="{{ route('notes.generate') }}" class="h-16 bg-gradient-to-r from-violet-600 to-indigo-600 text-white px-10 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-violet-500/20 hover:scale-105 transition-all flex items-center gap-3">
+                    🤖 AI Generate
                 </a>
-                <button @click="showUploadModal = true; uploadStep = 1" class="bg-primary text-white px-8 py-4 rounded-[1.5rem] font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+                <button @click="showUploadModal = true; uploadStep = 1" class="h-16 bg-primary text-white px-10 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-3 border-b-4 border-primary-dark">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 4v16m8-8H4" />
                     </svg>
-                    Upload PDF
+                    Upload Asset
                 </button>
             </div>
             @else
-            <a href="{{ route('login') }}" class="bg-slate-100 text-slate-600 px-8 py-4 rounded-[1.5rem] font-bold hover:bg-primary hover:text-white transition-all flex items-center gap-2 group">
+            <a href="{{ route('login') }}" class="h-16 bg-slate-100 text-slate-600 px-10 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:bg-primary hover:text-white transition-all flex items-center gap-3 group">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                 </svg>
-                Sign in to Upload
+                Sign In
             </a>
             @endauth
         </div>
- 
-        <!-- Domain Intelligence Tabs 🛰️ -->
-        <div class="flex items-center gap-2 border-b border-slate-100 pb-px mb-8">
-            <a href="{{ route('notes.index', ['domain' => 'academic']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain', 'academic') === 'academic' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-slate-400 hover:text-slate-600' }}">🎓 Academic Realm</a>
-            <a href="{{ route('notes.index', ['domain' => 'competitive']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain') === 'competitive' ? 'text-amber-500 border-b-2 border-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600' }}">🎯 Competitive Edge</a>
-            <a href="{{ route('notes.index', ['domain' => 'pyq']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain') === 'pyq' ? 'text-rose-500 border-b-2 border-rose-500 bg-rose-50' : 'text-slate-400 hover:text-slate-600' }}">📝 PYQ Vault</a>
+
+        <!-- Domain Switcher (High-Fidelity Segmented Control) 🛰️ -->
+        <div class="bg-slate-100/50 p-2 rounded-[2.5rem] flex flex-col md:flex-row items-stretch gap-2 border border-slate-200">
+            <a href="{{ route('notes.index', ['domain' => 'academic']) }}" 
+               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
+               {{ request('domain', 'academic') === 'academic' ? 'bg-white shadow-xl text-primary' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50' }}">
+                <span class="text-xl">🎓</span>
+                <div class="text-left">
+                    <p class="text-[10px] font-black uppercase tracking-widest leading-none">Academic</p>
+                    <p class="text-[8px] font-bold opacity-60 mt-1 uppercase">College Resources</p>
+                </div>
+            </a>
+
+            <a href="{{ route('notes.index', ['domain' => 'competitive']) }}" 
+               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
+               {{ request('domain') === 'competitive' ? 'bg-amber-400 shadow-xl shadow-amber-400/20 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50' }}">
+                <span class="text-xl">🎯</span>
+                <div class="text-left">
+                    <p class="text-[10px] font-black uppercase tracking-widest leading-none">Competitive</p>
+                    <p class="text-[8px] font-bold opacity-60 mt-1 uppercase">Entrance Prep</p>
+                </div>
+            </a>
+
+            <a href="{{ route('notes.index', ['domain' => 'pyq']) }}" 
+               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
+               {{ request('domain') === 'pyq' ? 'bg-rose-600 shadow-xl shadow-rose-600/20 text-white' : 'text-slate-400 hover:text-slate-600' }}">
+                <span class="text-xl">📝</span>
+                <div class="text-left">
+                    <p class="text-[10px] font-black uppercase tracking-widest leading-none">PYQ Vault</p>
+                    <p class="text-[8px] font-bold opacity-60 mt-1 uppercase">Real Exam Papers</p>
+                </div>
+            </a>
         </div>
 
         <!-- Filters & Search (Intel Hub) 🛰️ -->
