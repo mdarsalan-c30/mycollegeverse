@@ -25,11 +25,15 @@ class NoteController extends Controller
         $query = Note::query();
 
         // High-Fidelity Filtering 🔍
-        if ($request->has('status') && $request->status != 'all') {
-            $query->where('is_verified', $request->status == 'verified' ? 1 : 0);
+        if ($request->has('status')) {
+            if ($request->status == 'verified') {
+                $query->where('is_verified', 1);
+            } elseif ($request->status == 'pending') {
+                $query->where('is_verified', 0);
+            }
+            // 'all' doesn't add a where clause
         } else {
-            // Default to Pending for efficiency
-            $query->where('is_verified', 0);
+            // Default to 'all' for Master Authority overview
         }
 
         if ($request->has('search')) {
