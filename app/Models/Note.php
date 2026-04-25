@@ -21,6 +21,8 @@ class Note extends Model
         'custom_subject',
         'is_verified',
         'exam_name',
+        'is_pyq',
+        'pyq_year',
     ];
 
     public function isAiGenerated()

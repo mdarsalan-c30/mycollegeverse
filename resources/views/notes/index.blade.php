@@ -18,6 +18,9 @@
         selectedSubject: '',
         examName: '',
         allSubjects: {{ $subjects->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'course_id' => $s->course_id, 'semester' => $s->semester])->toJson() }},
+        isPyq: false,
+        pyqYear: '',
+        currentDomain: '{{ request('domain', 'academic') }}',
 
         get filteredSubjects() {
             if (this.noteType === 'competitive') return this.allSubjects; // In competitive mode, show all or let them pick 'other'
@@ -56,6 +59,13 @@
                 Sign in to Upload
             </a>
             @endauth
+        </div>
+ 
+        <!-- Domain Intelligence Tabs 🛰️ -->
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-px mb-8">
+            <a href="{{ route('notes.index', ['domain' => 'academic']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain', 'academic') === 'academic' ? 'text-primary border-b-2 border-primary bg-primary/5' : 'text-slate-400 hover:text-slate-600' }}">🎓 Academic Realm</a>
+            <a href="{{ route('notes.index', ['domain' => 'competitive']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain') === 'competitive' ? 'text-amber-500 border-b-2 border-amber-500 bg-amber-50' : 'text-slate-400 hover:text-slate-600' }}">🎯 Competitive Edge</a>
+            <a href="{{ route('notes.index', ['domain' => 'pyq']) }}" class="px-8 py-4 text-[10px] font-black uppercase tracking-widest transition-all {{ request('domain') === 'pyq' ? 'text-rose-500 border-b-2 border-rose-500 bg-rose-50' : 'text-slate-400 hover:text-slate-600' }}">📝 PYQ Vault</a>
         </div>
 
         <!-- Filters & Search (Intel Hub) 🛰️ -->
@@ -139,6 +149,14 @@
                 <div class="absolute top-0 {{ (Auth::check() && $note->college_id == Auth::user()->college_id) ? '' : 'right-0' }} z-10">
                     <div class="bg-violet-500 text-white text-[9px] font-black uppercase px-4 py-1.5 rounded-bl-2xl {{ (Auth::check() && $note->college_id == Auth::user()->college_id) ? 'rounded-br-2xl' : '' }} shadow-sm tracking-widest flex items-center gap-1">
                         🤖 AI Generated
+                    </div>
+                </div>
+                @endif
+
+                @if($note->is_pyq)
+                <div class="absolute bottom-0 right-0 z-10">
+                    <div class="bg-rose-500 text-white text-[9px] font-black uppercase px-4 py-2 rounded-tl-2xl shadow-lg shadow-rose-500/20 tracking-widest flex items-center gap-1">
+                        📝 PYQ {{ $note->pyq_year }}
                     </div>
                 </div>
                 @endif
@@ -240,6 +258,33 @@
                                         </button>
                                     </div>
                                     <input type="hidden" name="note_type" :value="noteType">
+                                </div>
+
+                                <!-- PYQ Toggle 📝 -->
+                                <div class="bg-slate-50 p-6 rounded-[2rem] border border-white flex items-center justify-between">
+                                    <div>
+                                        <p class="text-[10px] font-black text-slate-800 uppercase tracking-widest">Previous Year Question (PYQ)?</p>
+                                        <p class="text-[8px] text-slate-400 font-bold uppercase mt-1 italic">Mark this as a real exam paper</p>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <input type="hidden" name="is_pyq" :value="isPyq ? '1' : '0'">
+                                        <button type="button" @click="isPyq = !isPyq" 
+                                                :class="isPyq ? 'bg-rose-500 text-white' : 'bg-slate-200 text-slate-400'"
+                                                class="h-10 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                                            <span x-text="isPyq ? 'YES' : 'NO'"></span>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- PYQ Year Selector -->
+                                <div x-show="isPyq" x-transition>
+                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Exam Year</label>
+                                    <select name="pyq_year" :required="isPyq" x-model="pyqYear" class="w-full h-14 bg-rose-50/50 border border-rose-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
+                                        <option value="">Select Year</option>
+                                        @for($y=date('Y'); $y>=2010; $y--)
+                                            <option value="{{ $y }}">{{ $y }}</option>
+                                        @endfor
+                                    </select>
                                 </div>
 
                                 <div>

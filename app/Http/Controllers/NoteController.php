@@ -21,6 +21,16 @@ class NoteController extends Controller
         $user = Auth::user();
         $query = Note::with(['college', 'user', 'subject']);
 
+        // Domain Specific Isolation 🛸
+        if ($request->domain === 'competitive') {
+            $query->where('note_type', 'competitive');
+        } elseif ($request->domain === 'pyq') {
+            $query->where('is_pyq', true);
+        } else {
+            // Academic is the default void
+            $query->where('note_type', '!=', 'competitive')->where('is_pyq', false);
+        }
+
         // High-Performance Intelligence Filtering 🛰️
         if ($request->filled('search')) {
             $search = $request->get('search');
@@ -188,6 +198,7 @@ class NoteController extends Controller
             'file.required_without' => 'Please upload a file OR provide a Drive link.',
             'drive_link.required_without' => 'Please provide a Drive link OR upload a file.',
             'exam_name.required_if' => 'Bhai, exam ka naam to batado (e.g. AAI ATC)!',
+            'pyq_year.required_if' => 'Kis saal ka paper hai ye? Year select kijiye.',
         ]);
 
         if ($request->subject_id !== 'other') {
@@ -234,6 +245,8 @@ class NoteController extends Controller
                 'college_id' => $college_id,
                 'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
                 'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
+                'is_pyq' => $request->has('is_pyq'),
+                'pyq_year' => $request->is_pyq ? $request->pyq_year : null,
             ]);
 
             return redirect()->route('notes.index')->with('success', 'Knowledge node manifested in the verse! 🚀');
