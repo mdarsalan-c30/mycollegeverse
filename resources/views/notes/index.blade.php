@@ -70,6 +70,19 @@
         </div>
 
         <!-- Domain Switcher (High-Fidelity Segmented Control) 🛰️ -->
+        <style>
+            @keyframes domain-nudge-amber {
+                0%, 100% { border-color: transparent; box-shadow: none; }
+                50% { border-color: #fbbf24; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
+            }
+            @keyframes domain-nudge-rose {
+                0%, 100% { border-color: transparent; box-shadow: none; }
+                50% { border-color: #e11d48; box-shadow: 0 0 15px rgba(225, 29, 72, 0.4); }
+            }
+            .nudge-amber { animation: domain-nudge-amber 1.5s ease-in-out 2; }
+            .nudge-rose { animation: domain-nudge-rose 1.5s ease-in-out 2; }
+        </style>
+
         <div class="bg-slate-100/50 p-2 rounded-[2.5rem] flex flex-col md:flex-row items-stretch gap-2 border border-slate-200">
             <a href="{{ route('notes.index', ['domain' => 'academic']) }}" 
                class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
@@ -82,8 +95,8 @@
             </a>
 
             <a href="{{ route('notes.index', ['domain' => 'competitive']) }}" 
-               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
-               {{ request('domain') === 'competitive' ? 'bg-amber-400 shadow-xl shadow-amber-400/20 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50' }}">
+               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3 border-2 border-transparent
+               {{ request('domain') === 'competitive' ? 'bg-amber-400 shadow-xl shadow-amber-400/20 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50 ' . (request('domain', 'academic') === 'academic' ? 'nudge-amber' : '') }}">
                 <span class="text-xl">🎯</span>
                 <div class="text-left">
                     <p class="text-[10px] font-black uppercase tracking-widest leading-none">Competitive</p>
@@ -92,8 +105,8 @@
             </a>
 
             <a href="{{ route('notes.index', ['domain' => 'pyq']) }}" 
-               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3
-               {{ request('domain') === 'pyq' ? 'bg-rose-600 shadow-xl shadow-rose-600/20 text-white' : 'text-slate-400 hover:text-slate-600' }}">
+               class="flex-1 px-8 py-5 rounded-[2rem] text-center transition-all flex items-center justify-center gap-3 border-2 border-transparent
+               {{ request('domain') === 'pyq' ? 'bg-rose-600 shadow-xl shadow-rose-600/20 text-white' : 'text-slate-400 hover:text-slate-600 hover:bg-white/50 ' . (request('domain', 'academic') === 'academic' ? 'nudge-rose' : '') }}">
                 <span class="text-xl">📝</span>
                 <div class="text-left">
                     <p class="text-[10px] font-black uppercase tracking-widest leading-none">PYQ Vault</p>
