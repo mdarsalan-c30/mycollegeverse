@@ -277,6 +277,12 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     // Perks & Rewards Governance 🎁
     Route::resource('rewards', App\Http\Controllers\Admin\RewardController::class);
+
+    // Enterprise Hub Governance (Recruiters & Jobs) 🏢
+    Route::get('/enterprise', [App\Http\Controllers\Admin\EnterpriseController::class, 'index'])->name('enterprise.index');
+    Route::post('/enterprise/jobs/{job}/approve', [App\Http\Controllers\Admin\EnterpriseController::class, 'approveJob'])->name('enterprise.jobs.approve');
+    Route::delete('/enterprise/jobs/{job}', [App\Http\Controllers\Admin\EnterpriseController::class, 'rejectJob'])->name('enterprise.jobs.reject');
+    Route::post('/enterprise/recruiters/{user}/toggle', [App\Http\Controllers\Admin\EnterpriseController::class, 'toggleRecruiterStatus'])->name('enterprise.recruiters.toggle');
 });
 
 Route::get('/multiverse-slug-sync', function() {
