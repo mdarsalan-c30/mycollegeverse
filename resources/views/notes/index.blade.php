@@ -12,12 +12,15 @@
 
         // For Upload Modal
         uploadStep: 1,
+        noteType: 'academic',
         selectedCourse: '',
         selectedSemester: '',
         selectedSubject: '',
+        examName: '',
         allSubjects: {{ $subjects->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'course_id' => $s->course_id, 'semester' => $s->semester])->toJson() }},
 
         get filteredSubjects() {
+            if (this.noteType === 'competitive') return this.allSubjects; // In competitive mode, show all or let them pick 'other'
             if (!this.selectedCourse || !this.selectedSemester) return [];
             return this.allSubjects.filter(s => s.course_id == this.selectedCourse && s.semester == this.selectedSemester);
         },
@@ -159,7 +162,13 @@
                 </div>
 
                 <h4 class="text-xl font-extrabold text-slate-800 mb-2 truncate group-hover:text-primary transition-colors">{{ $note->title }}</h4>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">{{ optional($note->subject)->name ?? 'Subject' }} • {{ optional($note->subject->course)->name ?? 'Global' }}</p>
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6">
+                    @if($note->note_type === 'competitive')
+                        <span class="text-amber-500">🎯 {{ $note->exam_name ?? 'Competitive' }}</span>
+                    @else
+                        {{ optional($note->subject)->name ?? 'Subject' }} • {{ optional($note->subject->course)->name ?? 'Global' }}
+                    @endif
+                </p>
 
                 <div class="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div class="flex items-center gap-3">
@@ -213,15 +222,42 @@
                             
                             <!-- Step 1: Core Selection -->
                             <div x-show="uploadStep === 1" class="space-y-6" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
+                                <!-- Domain Selector 🌌 -->
                                 <div>
-                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Note Title</label>
-                                    <input type="text" name="title" required placeholder="e.g. Operating System Unit 1 Notes" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 focus:ring-primary/20 focus:border-primary text-sm font-bold">
+                                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 px-1">Knowledge Domain</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <button type="button" @click="noteType = 'academic'" 
+                                                :class="noteType === 'academic' ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-105' : 'bg-slate-50 text-slate-400'"
+                                                class="h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex flex-col items-center justify-center border border-white">
+                                            <span>🎓 Academic</span>
+                                            <span class="text-[8px] opacity-60 mt-1">(College & Semester)</span>
+                                        </button>
+                                        <button type="button" @click="noteType = 'competitive'" 
+                                                :class="noteType === 'competitive' ? 'bg-amber-400 text-white shadow-lg shadow-amber-400/20 scale-105' : 'bg-slate-50 text-slate-400'"
+                                                class="h-14 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex flex-col items-center justify-center border border-white">
+                                            <span>🎯 Competitive</span>
+                                            <span class="text-[8px] opacity-60 mt-1">(Exams & Skills)</span>
+                                        </button>
+                                    </div>
+                                    <input type="hidden" name="note_type" :value="noteType">
                                 </div>
 
-                                <div class="grid grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Note Title</label>
+                                    <input type="text" name="title" required placeholder="e.g. AAI ATC Physics Formula Sheet" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 focus:ring-primary/20 focus:border-primary text-sm font-bold">
+                                </div>
+
+                                <!-- Competitive Only: Exam Name 🎯 -->
+                                <div x-show="noteType === 'competitive'" x-transition>
+                                    <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Target Exam / Goal</label>
+                                    <input type="text" name="exam_name" x-model="examName" placeholder="e.g. AAI ATC, GATE 2026, FullStack Dev" class="w-full h-14 bg-amber-50/50 border border-amber-100 rounded-2xl px-6 focus:ring-amber-200 focus:border-amber-400 text-sm font-bold">
+                                </div>
+
+                                <!-- Academic Only: Path & Sem 🎓 -->
+                                <div x-show="noteType === 'academic'" x-transition class="grid grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Academic Path</label>
-                                        <select x-model="selectedCourse" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
+                                        <select x-model="selectedCourse" :required="noteType === 'academic'" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
                                             <option value="">Select Course</option>
                                             @foreach($courses as $course)
                                                 <option value="{{ $course->id }}">{{ $course->name }}</option>
@@ -230,7 +266,7 @@
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Semester</label>
-                                        <select x-model="selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
+                                        <select x-model="selectedSemester" :required="noteType === 'academic'" class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700">
                                             <option value="">Select Sem</option>
                                             @for($i=1; $i<=8; $i++)
                                                 <option value="{{ $i }}">Semester {{ $i }}</option>
@@ -241,7 +277,7 @@
 
                                 <div>
                                     <label class="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Subject Node</label>
-                                    <select name="subject_id" x-model="selectedSubject" :disabled="!selectedCourse || !selectedSemester" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 disabled:opacity-50 transition-opacity">
+                                    <select name="subject_id" x-model="selectedSubject" :disabled="noteType === 'academic' && (!selectedCourse || !selectedSemester)" required class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 disabled:opacity-50 transition-opacity">
                                         <option value="">Select Subject</option>
                                         <option value="other" class="text-primary font-black">Other / Custom Subject ✍️</option>
                                         <template x-for="subject in filteredSubjects" :key="subject.id">
@@ -255,7 +291,6 @@
                                     <label class="block text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-4 italic">Custom Subject Name</label>
                                     <input type="text" name="custom_subject" placeholder="Enter full subject name..." 
                                            class="w-full h-14 bg-white border-white/50 rounded-2xl px-6 text-sm font-bold focus:ring-primary/20 focus:border-primary transition-all shadow-sm">
-                                    <p class="text-[10px] text-slate-400 mt-3 font-medium px-1 leading-relaxed">Ensure accuracy—this helps peers from your college discover your insights! 🛰️</p>
                                 </div>
 
                                 <button type="button" 

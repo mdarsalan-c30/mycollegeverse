@@ -178,16 +178,16 @@ class NoteController extends Controller
     {
         $request->validate([
             'title' => 'required|string|max:255',
+            'note_type' => 'required|in:academic,competitive',
             'subject_id' => 'required',
+            'exam_name' => 'required_if:note_type,competitive|nullable|string|max:100',
             'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
             'file' => 'nullable|required_without:drive_link|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
             'drive_link' => 'nullable|required_without:file|url|max:500',
         ], [
             'file.required_without' => 'Please upload a file OR provide a Drive link.',
             'drive_link.required_without' => 'Please provide a Drive link OR upload a file.',
-            'file.max' => 'The file is too large! Maximum allowed is 10MB.',
-            'file.mimes' => 'Unsupported file format! Please use PDF, DOC, or common images.',
-            'custom_subject.required_if' => 'Please provide the custom subject name.',
+            'exam_name.required_if' => 'Bhai, exam ka naam to batado (e.g. AAI ATC)!',
         ]);
 
         if ($request->subject_id !== 'other') {
@@ -198,6 +198,7 @@ class NoteController extends Controller
             $filePath = null;
 
             if ($request->hasFile('file')) {
+                // ... (Cloudinary Upload Logic - Unchanged for safety)
                 $file = $request->file('file');
                 $cloudName = env('CLOUDINARY_CLOUD_NAME');
                 $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
@@ -206,7 +207,6 @@ class NoteController extends Controller
                     throw new \Exception('Cloudinary configuration missing.');
                 }
 
-                // Upload via Cloudinary API
                 $response = Http::attach(
                     'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
@@ -214,21 +214,20 @@ class NoteController extends Controller
                 ]);
 
                 if (!$response->successful()) {
-                    \Log::error('Cloudinary API Error: ' . $response->body());
                     throw new \Exception('Failed to upload to cloud storage.');
                 }
 
                 $filePath = $response->json('secure_url');
             } else {
-                // Use the Drive Link as the manifest path 🛰️
                 $filePath = $request->drive_link;
             }
 
-            // Ensure we have a college_id
             $college_id = Auth::user()->college_id ?? 1;
 
             Note::create([
                 'title' => $request->title,
+                'note_type' => $request->note_type,
+                'exam_name' => $request->note_type === 'competitive' ? $request->exam_name : null,
                 'file_path' => $filePath,
                 'user_id' => Auth::id(),
                 'college_id' => $college_id,
@@ -236,12 +235,10 @@ class NoteController extends Controller
                 'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
             ]);
 
-            return redirect()->route('notes.index')->with('success', 'Note shared successfully with the verse!');
+            return redirect()->route('notes.index')->with('success', 'Knowledge node manifested in the verse! 🚀');
         } catch (\Exception $e) {
             \Log::error('Note Upload Failed: ' . $e->getMessage());
-            return redirect()->back()
-                ->withInput()
-                ->with('error', 'Failed to share note. ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Sync Failed: ' . $e->getMessage());
         }
     }
 

@@ -15,7 +15,11 @@
             <nav class="flex text-sm font-bold text-slate-400 gap-2">
                 <a href="{{ route('notes.index') }}" class="hover:text-primary">Notes</a>
                 <span>/</span>
-                <span class="text-secondary">{{ $note->subject->name ?? 'General' }}</span>
+                @if($note->note_type === 'competitive')
+                    <span class="text-amber-500 uppercase tracking-tighter">🎯 {{ $note->exam_name ?? 'Competitive' }}</span>
+                @else
+                    <span class="text-secondary">{{ $note->subject->name ?? 'General' }}</span>
+                @endif
                 <span>/</span>
                 <span class="text-slate-800">{{ $note->title }}</span>
             </nav>
