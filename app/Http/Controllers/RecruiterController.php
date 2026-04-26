@@ -199,7 +199,7 @@ class RecruiterController extends Controller
             } elseif ($action === 'interview') {
                 $link       = $request->interview_link ?? '';
                 $date       = $request->interview_date ? \Carbon\Carbon::parse($request->interview_date)->format('D, d M Y • h:i A') : '';
-                $extraNote  = $request->message ?? '';
+                $extraNote  = preg_replace('/\{name\}/i', $student->name, $request->message ?? '');
                 $message    = "📅 **Interview Invitation** — {$jobTitle} at {$company}\n\n";
                 if ($date)  $message .= "🗓️ **Date & Time:** {$date}\n";
                 if ($link)  $message .= "🔗 **Meeting Link:** {$link}\n";
