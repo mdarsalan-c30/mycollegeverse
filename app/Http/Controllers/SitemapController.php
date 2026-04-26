@@ -39,14 +39,14 @@ class SitemapController extends Controller
 
         // Dynamic Notes
         foreach ($notes as $note) {
-            $loc = route('notes.show', $note->id);
+            $loc = route('notes.show', $note->slug ?? $note->id);
             $lastmod = $note->updated_at->toAtomString();
             $xml .= "<url><loc>{$loc}</loc><lastmod>{$lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>";
         }
 
         // Dynamic Jobs
         foreach ($jobs as $job) {
-            $loc = route('jobs.show', $job->id);
+            $loc = route('jobs.show', $job->slug ?? $job->id);
             $lastmod = $job->updated_at->toAtomString();
             $xml .= "<url><loc>{$loc}</loc><lastmod>{$lastmod}</lastmod><changefreq>weekly</changefreq><priority>0.7</priority></url>";
         }
