@@ -274,18 +274,42 @@
             <!-- Role Management Tab -->
             <div x-show="activeTab === 'postings'" x-cloak x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
                  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @forelse(\App\Models\JobPosting::where('recruiter_id', Auth::id())->get() as $job)
+                    @forelse(\App\Models\JobPosting::where('recruiter_id', Auth::id())->where('status', '!=', 'deleted')->get() as $job)
                     <div class="bg-white rounded-[2.5rem] p-8 shadow-sm border border-slate-100 hover:shadow-xl transition-all group">
                         <div class="flex justify-between items-start mb-6">
-                            <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black group-hover:bg-primary group-hover:text-white transition-all text-xl">💼</div>
-                            <span class="px-3 py-1 bg-{{ $job->is_approved ? 'green' : 'amber' }}-50 text-{{ $job->is_approved ? 'green' : 'amber' }}-600 text-[10px] font-black rounded-lg uppercase tracking-widest">{{ $job->is_approved ? 'Live' : 'Pending' }}</span>
+                            <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary font-black group-hover:bg-primary group-hover:text-white transition-all text-xl">
+                                @if($job->status === 'closed') 🔒 @else 💼 @endif
+                            </div>
+                            <div class="flex items-center gap-2">
+                                @if($job->status === 'closed')
+                                    <span class="px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-black rounded-lg uppercase tracking-widest">Closed</span>
+                                @else
+                                    <span class="px-3 py-1 bg-{{ $job->is_approved ? 'green' : 'amber' }}-50 text-{{ $job->is_approved ? 'green' : 'amber' }}-600 text-[10px] font-black rounded-lg uppercase tracking-widest">{{ $job->is_approved ? 'Live' : 'Pending' }}</span>
+                                @endif
+                            </div>
                         </div>
                         <h4 class="text-lg font-black text-slate-900 mb-1">{{ $job->title }}</h4>
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">{{ $job->location }} • {{ $job->type }}</p>
                         
-                        <div class="flex items-center justify-between text-[10px] font-black border-t border-slate-50 pt-6">
-                             <span class="text-slate-400 uppercase tracking-widest">Applications</span>
-                             <a href="{{ route('recruiter.jobs.applicants', $job->id) }}" class="text-primary hover:underline">{{ $job->applications()->count() }} Total</a>
+                        <div class="flex flex-col gap-4 mt-6">
+                            <div class="flex items-center justify-between text-[10px] font-black border-t border-slate-50 pt-6">
+                                <span class="text-slate-400 uppercase tracking-widest">Applications</span>
+                                <a href="{{ route('recruiter.jobs.applicants', $job->id) }}" class="text-primary hover:underline">{{ $job->applications()->count() }} Total</a>
+                            </div>
+
+                            <div class="flex items-center gap-2 pt-2">
+                                @if($job->status === 'active')
+                                <form action="{{ route('recruiter.jobs.close', $job->id) }}" method="POST" class="flex-1">
+                                    @csrf
+                                    <button type="submit" class="w-full py-2 bg-slate-50 text-slate-600 text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-slate-100 transition-all">Close Role</button>
+                                </form>
+                                @endif
+                                
+                                <form action="{{ route('recruiter.jobs.delete', $job->id) }}" method="POST" onsubmit="return confirm('Archive this role? It will be removed from the public board.')" class="flex-1">
+                                    @csrf
+                                    <button type="submit" class="w-full py-2 bg-red-50 text-red-500 text-[8px] font-black uppercase tracking-widest rounded-lg hover:bg-red-100 transition-all">Archive</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                     @empty

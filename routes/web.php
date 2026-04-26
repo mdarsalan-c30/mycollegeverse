@@ -196,7 +196,9 @@ Route::middleware(['auth'])->group(function () {
     // Recruiter Only Routes
     Route::middleware(['role:recruiter'])->group(function () {
         Route::get('/recruiter', [App\Http\Controllers\RecruiterController::class, 'index'])->name('recruiter.dashboard');
-        Route::post('/recruiter/jobs', [App\Http\Controllers\RecruiterController::class, 'storeJob'])->name('recruiter.jobs.store');
+        Route::post('/recruiter/jobs/store', [App\Http\Controllers\RecruiterController::class, 'storeJob'])->name('recruiter.jobs.store');
+        Route::post('/recruiter/jobs/{job}/close', [App\Http\Controllers\RecruiterController::class, 'closeJob'])->name('recruiter.jobs.close');
+        Route::post('/recruiter/jobs/{job}/delete', [App\Http\Controllers\RecruiterController::class, 'deleteJob'])->name('recruiter.jobs.delete');
         Route::get('/recruiter/jobs/{job}/applicants', [App\Http\Controllers\RecruiterController::class, 'viewApplicants'])->name('recruiter.jobs.applicants');
         Route::post('/recruiter/applications/{application}/status', [App\Http\Controllers\RecruiterController::class, 'updateApplicationStatus'])->name('recruiter.applications.status');
         Route::post('/recruiter/integration/initialize', [App\Http\Controllers\RecruiterController::class, 'initializeIntegration'])->name('recruiter.integration.initialize');

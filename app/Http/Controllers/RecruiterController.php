@@ -222,6 +222,30 @@ class RecruiterController extends Controller
         return back()->with('success', "✅ Bulk action sent to {$count} candidates successfully!");
     }
 
+    public function closeJob($jobId)
+    {
+        $job = JobPosting::where('id', $jobId)
+            ->where('recruiter_id', Auth::id())
+            ->firstOrFail();
+
+        $job->update(['status' => 'closed']);
+
+        return back()->with('success', 'Job posting closed successfully.');
+    }
+
+    public function deleteJob($jobId)
+    {
+        $job = JobPosting::where('id', $jobId)
+            ->where('recruiter_id', Auth::id())
+            ->firstOrFail();
+
+        $job->update(['status' => 'deleted']);
+        // Optionally actually delete it: $job->delete();
+        // But status 'deleted' keeps history.
+
+        return back()->with('success', 'Job posting removed from public board.');
+    }
+
     public function initializeIntegration()
     {
         /** @var \App\Models\User $user */

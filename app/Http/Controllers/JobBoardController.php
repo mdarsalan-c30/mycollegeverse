@@ -9,7 +9,9 @@ class JobBoardController extends Controller
 {
     public function index(Request $request)
     {
-        $query = JobPosting::with(['recruiter', 'targetCollege'])->where('is_approved', true);
+        $query = JobPosting::with(['recruiter', 'targetCollege'])
+            ->where('is_approved', true)
+            ->where('status', 'active');
 
         // College-based targeting
         if (auth()->check()) {

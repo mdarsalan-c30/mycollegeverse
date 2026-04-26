@@ -19,6 +19,7 @@ class JobPosting extends Model
         'location',
         'salary_range',
         'is_approved',
+        'status',
     ];
 
     protected $casts = [
