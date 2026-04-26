@@ -51,6 +51,38 @@ Route::get('/multiverse-note-slug-sync', function() {
 Route::get('/community', [App\Http\Controllers\CommunityController::class, 'index'])->name('community.index');
 Route::get('/community/{user:username}/{post:slug}', [App\Http\Controllers\CommunityController::class, 'show'])->name('community.show');
 
+Route::get('/multiverse-job-sync', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "🌌 Multiverse Database Synced! Job slugs column added. <a href='/dashboard'>Return to Dashboard</a>";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
+
+Route::get('/multiverse-job-slug-sync', function() {
+    try {
+        $count = 0;
+        foreach(\App\Models\JobPosting::all() as $j) {
+            if(!$j->slug) {
+                $j->slug = \Illuminate\Support\Str::slug($j->title) . '-' . $j->id;
+                $j->save();
+                $count++;
+            }
+        }
+        foreach(\App\Models\Note::all() as $n) {
+            if(!$n->slug) {
+                $n->slug = \Illuminate\Support\Str::slug($n->title) . '-' . $n->id;
+                $n->save();
+                $count++;
+            }
+        }
+        return "🌌 Identity Mapped! Generated $count slugs for Jobs & Notes. <a href='/sitemap.xml'>Check Sitemap</a>";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-post-slug-sync', function() {
     try {
         $posts = \App\Models\Post::whereNull('slug')->get();
