@@ -7,30 +7,51 @@ use Illuminate\Http\Request;
 
 class JobBoardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $query = JobPosting::with(['recruiter', 'targetCollege'])->where('is_approved', true);
 
+        // College-based targeting
         if (auth()->check()) {
             $user = auth()->user();
             if ($user->role === 'student' && $user->college_id) {
-                // Students see Global (null) OR their specific college
                 $query->where(function($q) use ($user) {
                     $q->whereNull('target_college_id')
                       ->orWhere('target_college_id', $user->college_id);
                 });
             } elseif ($user->role === 'recruiter') {
-                 // Recruiters see all public jobs on the main board too
-                 $query->whereNull('target_college_id');
+                $query->whereNull('target_college_id');
             }
         } else {
-            // Guests see only Global jobs
             $query->whereNull('target_college_id');
         }
 
-        $jobs = $query->latest()->paginate(12);
+        // 🔍 Filter by type/location
+        $filter = $request->get('filter');
+        if ($filter === 'remote') {
+            $query->where(function($q) {
+                $q->where('location', 'like', '%remote%')
+                  ->orWhere('location', 'like', '%Remote%')
+                  ->orWhereNull('location');
+            });
+        } elseif ($filter === 'internship') {
+            $query->where('type', 'Internship');
+        } elseif ($filter === 'fulltime') {
+            $query->where('type', 'Full-time');
+        }
 
-        return view('jobs.index', compact('jobs'));
+        // 🔍 Keyword search
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(function($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")
+                  ->orWhere('description', 'like', "%{$s}%");
+            });
+        }
+
+        $jobs = $query->latest()->paginate(12)->withQueryString();
+
+        return view('jobs.index', compact('jobs', 'filter'));
     }
 
     public function show(JobPosting $job)

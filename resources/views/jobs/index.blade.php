@@ -78,12 +78,40 @@
                     <p class="text-lg font-medium text-slate-500 max-w-2xl">Broadcast your academic leverage. Explore curated opportunities from corporate nodes verified on the Verse network.</p>
                 </div>
 
-                <!-- Filters (Simulated) -->
-                <div class="flex flex-wrap gap-4 mb-12">
-                     <button class="bg-primary text-white px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest shadow-xl shadow-primary/20">All Streams</button>
-                     <button class="glass px-6 py-3 rounded-2xl text-xs font-black text-slate-600 uppercase tracking-widest hover:bg-white transition-all">Remote Only</button>
-                     <button class="glass px-6 py-3 rounded-2xl text-xs font-black text-slate-600 uppercase tracking-widest hover:bg-white transition-all">Internships</button>
-                     <button class="glass px-6 py-3 rounded-2xl text-xs font-black text-slate-600 uppercase tracking-widest hover:bg-white transition-all">Full-Time</button>
+                <!-- Search & Filters -->
+                <div class="space-y-6 mb-12">
+                    <!-- Search Bar -->
+                    <form action="{{ route('jobs.index') }}" method="GET" class="relative max-w-2xl">
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search by job title or description..." 
+                               class="w-full h-16 bg-white border border-slate-200 rounded-[1.5rem] px-14 focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all text-sm font-medium shadow-sm">
+                        <svg class="absolute left-5 top-5.5 h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        @if(request('filter'))
+                            <input type="hidden" name="filter" value="{{ request('filter') }}">
+                        @endif
+                        <button type="submit" class="absolute right-3 top-3 px-6 h-10 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-primary/20 hover:scale-105 transition-all">Search</button>
+                    </form>
+
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-4">
+                         <a href="{{ route('jobs.index', array_merge(request()->query(), ['filter' => null])) }}" 
+                            class="{{ !request('filter') ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'glass text-slate-600 hover:bg-white' }} px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+                            All Streams
+                         </a>
+                         <a href="{{ route('jobs.index', array_merge(request()->query(), ['filter' => 'remote'])) }}" 
+                            class="{{ request('filter') === 'remote' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'glass text-slate-600 hover:bg-white' }} px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+                            Remote Only
+                         </a>
+                         <a href="{{ route('jobs.index', array_merge(request()->query(), ['filter' => 'internship'])) }}" 
+                            class="{{ request('filter') === 'internship' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'glass text-slate-600 hover:bg-white' }} px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+                            Internships
+                         </a>
+                         <a href="{{ route('jobs.index', array_merge(request()->query(), ['filter' => 'fulltime'])) }}" 
+                            class="{{ request('filter') === 'fulltime' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'glass text-slate-600 hover:bg-white' }} px-6 py-3 rounded-2xl text-xs font-black uppercase tracking-widest transition-all">
+                            Full-Time
+                         </a>
+                    </div>
                 </div>
 
                 <!-- Jobs Grid -->
