@@ -208,7 +208,7 @@ class RecruiterController extends Controller
 
             } else { // message
                 $raw     = $request->message ?? "Hello, we have reviewed your application for {$jobTitle}.";
-                $message = str_replace('{name}', $student->name, $raw);
+                $message = preg_replace('/\{name\}/i', $student->name, $raw);
             }
 
             \App\Models\ChatMessage::create([

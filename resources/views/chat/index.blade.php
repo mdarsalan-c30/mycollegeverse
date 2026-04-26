@@ -99,7 +99,7 @@
                         </a>
                         @endif
                         <div class="max-w-[75%] md:max-w-md {{ $msg->sender_id == Auth::id() ? 'bg-primary text-white rounded-br-none' : 'bg-white text-slate-700 rounded-bl-none' }} px-4 py-3 rounded-2xl shadow-sm text-xs font-medium leading-relaxed">
-                            {{ $msg->message }}
+                            {!! \App\Helpers\ChatFormatter::format($msg->message) !!}
                         </div>
                     </div>
                 @endforeach
@@ -141,6 +141,20 @@
     </div>
 
     <script>
+        // Format chat messages: **bold** → <strong>, URLs → clickable links, \n → <br>
+        function formatChatMsg(text) {
+            if (!text) return '';
+            // Escape HTML first
+            let t = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+            // **bold** → <strong>
+            t = t.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            // URLs → clickable links
+            t = t.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" class="underline opacity-80 hover:opacity-100 break-all">$1</a>');
+            // Newlines → <br>
+            t = t.replace(/\n/g, '<br>');
+            return t;
+        }
+
         const chatForm = document.getElementById('chat-form');
         const messageInput = document.getElementById('message-input');
         const chatMessages = document.getElementById('chat-messages');
@@ -218,7 +232,7 @@
                            </div>`
                         : '';
 
-                    const textHtml = msg.message ? `<div>${msg.message}</div>` : '';
+                    const textHtml = msg.message ? `<div>${formatChatMsg(msg.message)}</div>` : '';
 
                     return `<div class="flex gap-3 items-end ${isMine ? 'justify-end' : ''}">
                         ${avatarHtml}
