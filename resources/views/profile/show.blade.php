@@ -1,3 +1,4 @@
+@php 
     $layout = (Auth::check() && Auth::user()->role === 'recruiter') ? 'recruiter' : 'app'; 
     $isOwner = Auth::id() === $user->id;
     $socialLinks = $user->social_links ?? [];
