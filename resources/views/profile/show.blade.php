@@ -148,7 +148,7 @@
                             @endif
 
                             <div x-data="{ copied: false }" class="ml-auto md:ml-4">
-                                <button @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2000)" 
+                                <button @click="navigator.clipboard.writeText('{{ route('profile.show', $user->username) }}'); copied = true; setTimeout(() => copied = false, 2000)" 
                                         class="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-white hover:text-primary transition-all group">
                                     <span x-show="!copied">📡 Broadcast Identity</span>
                                     <span x-show="copied" x-cloak class="text-green-400 flex items-center gap-1">✅ Node Copied</span>
