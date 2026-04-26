@@ -1,9 +1,34 @@
-@php 
     $layout = (Auth::check() && Auth::user()->role === 'recruiter') ? 'recruiter' : 'app'; 
     $isOwner = Auth::id() === $user->id;
     $socialLinks = $user->social_links ?? [];
     $skills = $user->skills ?? [];
+    
+    // SEO & Social Identity 🧬
+    $seoTitle = $user->name . " | " . ($user->career_role ?? 'Academic Identity') . " on MyCollegeVerse";
+    $seoDescription = "View " . $user->name . "'s academic profile, projects, and verified notes at " . ($user->college->name ?? 'the Verse') . ". Connect via the Multiverse Pipeline.";
+    $ogImage = $user->profile_photo_path 
+               ? $user->profile_photo_url 
+               : "https://ui-avatars.com/api/?name=" . urlencode($user->name) . "&background=3B82F6&color=fff&size=512&bold=true";
 @endphp
+
+@section('title', $seoTitle)
+@section('meta_description', $seoDescription)
+
+@push('head')
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="profile">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="{{ $seoTitle }}">
+    <meta property="og:description" content="{{ $seoDescription }}">
+    <meta property="og:image" content="{{ $ogImage }}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="{{ $seoTitle }}">
+    <meta property="twitter:description" content="{{ $seoDescription }}">
+    <meta property="twitter:image" content="{{ $ogImage }}">
+@endpush
 
 <x-dynamic-component :component="$layout.'-layout'">
     <div class="space-y-10 pb-24 relative" x-data="{ 
@@ -120,6 +145,14 @@
                             @if($isOwner)
                             <button type="button" @click.stop.prevent="editMode = true" class="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] hover:text-primary transition-colors ml-4 border-b border-white/10 pb-1">Edit Persona</button>
                             @endif
+
+                            <div x-data="{ copied: false }" class="ml-auto md:ml-4">
+                                <button @click="navigator.clipboard.writeText(window.location.href); copied = true; setTimeout(() => copied = false, 2000)" 
+                                        class="flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl text-[10px] font-black text-white uppercase tracking-widest hover:bg-white hover:text-primary transition-all group">
+                                    <span x-show="!copied">📡 Broadcast Identity</span>
+                                    <span x-show="copied" x-cloak class="text-green-400 flex items-center gap-1">✅ Node Copied</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
