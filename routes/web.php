@@ -279,10 +279,34 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::resource('rewards', App\Http\Controllers\Admin\RewardController::class);
 
     // Enterprise Hub Governance (Recruiters & Jobs) 🏢
-    Route::get('/enterprise', [App\Http\Controllers\Admin\EnterpriseController::class, 'index'])->name('enterprise.index');
-    Route::post('/enterprise/jobs/{job}/approve', [App\Http\Controllers\Admin\EnterpriseController::class, 'approveJob'])->name('enterprise.jobs.approve');
-    Route::delete('/enterprise/jobs/{job}', [App\Http\Controllers\Admin\EnterpriseController::class, 'rejectJob'])->name('enterprise.jobs.reject');
-    Route::post('/enterprise/recruiters/{user}/toggle', [App\Http\Controllers\Admin\EnterpriseController::class, 'toggleRecruiterStatus'])->name('enterprise.recruiters.toggle');
+    Route::get('/enterprise', function() {
+        $pendingJobs = \App\Models\JobPosting::where('is_approved', false)->with('recruiter')->latest()->get();
+        $approvedJobs = \App\Models\JobPosting::where('is_approved', true)->with('recruiter')->latest()->get();
+        $recruiters = \App\Models\User::where('role', 'recruiter')->withCount('jobPostings')->latest()->get();
+        $stats = [
+            'total_recruiters' => \App\Models\User::where('role', 'recruiter')->count(),
+            'pending_jobs'     => \App\Models\JobPosting::where('is_approved', false)->count(),
+            'active_jobs'      => \App\Models\JobPosting::where('is_approved', true)->count(),
+        ];
+        return view('admin.enterprise.index', compact('pendingJobs', 'approvedJobs', 'recruiters', 'stats'));
+    })->name('enterprise.index');
+
+    Route::post('/enterprise/jobs/{job}/approve', function(\App\Models\JobPosting $job) {
+        $job->update(['is_approved' => true]);
+        return back()->with('success', "Job '{$job->title}' approved and is now live!");
+    })->name('enterprise.jobs.approve');
+
+    Route::delete('/enterprise/jobs/{job}', function(\App\Models\JobPosting $job) {
+        $title = $job->title;
+        $job->delete();
+        return back()->with('warning', "Job '{$title}' rejected and removed.");
+    })->name('enterprise.jobs.reject');
+
+    Route::post('/enterprise/recruiters/{user}/toggle', function(\App\Models\User $user) {
+        $newStatus = $user->status === 'active' ? 'banned' : 'active';
+        $user->update(['status' => $newStatus]);
+        return back()->with('success', "Recruiter '{$user->name}' is now {$newStatus}.");
+    })->name('enterprise.recruiters.toggle');
 });
 
 Route::get('/multiverse-slug-sync', function() {
