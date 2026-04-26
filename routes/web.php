@@ -168,6 +168,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/recruiter/jobs/{job}/applicants', [App\Http\Controllers\RecruiterController::class, 'viewApplicants'])->name('recruiter.jobs.applicants');
         Route::post('/recruiter/applications/{application}/status', [App\Http\Controllers\RecruiterController::class, 'updateApplicationStatus'])->name('recruiter.applications.status');
         Route::post('/recruiter/integration/initialize', [App\Http\Controllers\RecruiterController::class, 'initializeIntegration'])->name('recruiter.integration.initialize');
+        Route::post('/recruiter/bulk-action', [App\Http\Controllers\RecruiterController::class, 'bulkAction'])->name('recruiter.bulk.action');
     });
 });
 

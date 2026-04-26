@@ -168,6 +168,60 @@ class RecruiterController extends Controller
         return back()->with('success', 'Candidacy status updated and student notified via Nexus Comms.');
     }
 
+    public function bulkAction(Request $request)
+    {
+        $request->validate([
+            'action'          => 'required|in:message,interview,shortlist,reject',
+            'application_ids' => 'required|array|min:1',
+            'application_ids.*' => 'exists:job_applications,id',
+        ]);
+
+        $recruiter   = Auth::user();
+        $action      = $request->action;
+        $applications = \App\Models\JobApplication::whereIn('id', $request->application_ids)
+            ->whereHas('job', fn($q) => $q->where('recruiter_id', $recruiter->id))
+            ->with('student', 'job')
+            ->get();
+
+        foreach ($applications as $app) {
+            $student  = $app->student;
+            $jobTitle = $app->job->title;
+            $company  = $recruiter->company_name ?? 'Our Company';
+
+            if ($action === 'shortlist') {
+                $app->update(['status' => 'shortlisted', 'is_seen_by_student' => false]);
+                $message = "🎉 Congratulations {$student->name}! You have been **Shortlisted** for {$jobTitle} at {$company}. We will be in touch shortly with next steps.";
+
+            } elseif ($action === 'reject') {
+                $app->update(['status' => 'rejected', 'is_seen_by_student' => false]);
+                $message = "Thank you for applying for {$jobTitle} at {$company}. After careful review, we have decided to move forward with other candidates at this time. We wish you the best!";
+
+            } elseif ($action === 'interview') {
+                $link       = $request->interview_link ?? '';
+                $date       = $request->interview_date ? \Carbon\Carbon::parse($request->interview_date)->format('D, d M Y • h:i A') : '';
+                $extraNote  = $request->message ?? '';
+                $message    = "📅 **Interview Invitation** — {$jobTitle} at {$company}\n\n";
+                if ($date)  $message .= "🗓️ **Date & Time:** {$date}\n";
+                if ($link)  $message .= "🔗 **Meeting Link:** {$link}\n";
+                if ($extraNote) $message .= "\n{$extraNote}";
+                $app->update(['status' => 'shortlisted', 'is_seen_by_student' => false]);
+
+            } else { // message
+                $raw     = $request->message ?? "Hello, we have reviewed your application for {$jobTitle}.";
+                $message = str_replace('{name}', $student->name, $raw);
+            }
+
+            \App\Models\ChatMessage::create([
+                'sender_id'   => $recruiter->id,
+                'receiver_id' => $student->id,
+                'message'     => $message,
+            ]);
+        }
+
+        $count = $applications->count();
+        return back()->with('success', "✅ Bulk action sent to {$count} candidates successfully!");
+    }
+
     public function initializeIntegration()
     {
         /** @var \App\Models\User $user */
