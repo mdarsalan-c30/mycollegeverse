@@ -69,7 +69,7 @@ class JobBoardController extends Controller
             "@context" => "https://schema.org",
             "@type" => "JobPosting",
             "title" => $job->title,
-            "description" => $job->job_description,
+            "description" => $job->description,
             "datePosted" => $job->created_at->toIso8601String(),
             "validThrough" => $job->created_at->addMonths(3)->toIso8601String(),
             "hiringOrganization" => [

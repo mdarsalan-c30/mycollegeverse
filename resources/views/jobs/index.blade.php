@@ -152,7 +152,7 @@
 
                             <div class="flex items-center justify-between pt-8 border-t border-slate-50">
                                 <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest">{{ $job->created_at->diffForHumans() }}</span>
-                                <a href="{{ route('jobs.show', $job->id) }}" class="px-8 h-12 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-black/10 hover:scale-105 transition-all flex items-center justify-center">
+                                <a href="{{ route('jobs.show', $job) }}" class="px-8 h-12 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-black/10 hover:scale-105 transition-all flex items-center justify-center">
                                     Inspect Role
                                 </a>
                             </div>
