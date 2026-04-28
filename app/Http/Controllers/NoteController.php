@@ -245,8 +245,8 @@ class NoteController extends Controller
                 'college_id' => $college_id,
                 'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
                 'custom_subject' => $request->subject_id === 'other' ? $request->custom_subject : null,
-                'is_pyq' => $request->has('is_pyq'),
-                'pyq_year' => $request->is_pyq ? $request->pyq_year : null,
+                'is_pyq' => $request->boolean('is_pyq'),
+                'pyq_year' => $request->boolean('is_pyq') ? $request->pyq_year : null,
             ]);
 
             return redirect()->route('notes.index')->with('success', 'Knowledge node manifested in the verse! 🚀');
