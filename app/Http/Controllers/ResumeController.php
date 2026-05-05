@@ -36,8 +36,8 @@ class ResumeController extends Controller
             ],
             'education' => [
                 [
-                    'institution' => $user->college->name ?? '',
-                    'degree' => $user->course->name ?? '',
+                    'institution' => $user->college?->name ?? '',
+                    'degree' => $user->course?->name ?? '',
                     'year' => $user->year ?? '',
                     'description' => '',
                 ]
