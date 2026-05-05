@@ -7,98 +7,156 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .latex-font { font-family: 'Libre+Baskerville', serif; }
+        /* LaTeX Computer Modern Feel */
+        @import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600;1,700;1,800&display=swap');
+        
+        body { 
+            font-family: 'EB Garamond', serif; 
+            color: #000;
+            line-height: 1.2;
+        }
+        
         @media print {
             .no-print { display: none !important; }
-            body { background: white !important; }
-            .print-shadow-none { box-shadow: none !important; }
-            @page { margin: 1cm; }
+            body { background: white !important; padding: 0 !important; }
+            .resume-container { 
+                box-shadow: none !important; 
+                margin: 0 !important; 
+                padding: 0.5in !important;
+                width: 100% !important;
+                max-width: none !important;
+            }
+            @page { 
+                size: letter;
+                margin: 0.5in; 
+            }
         }
-        .section-line {
-            border-bottom: 1.5px solid #000;
-            margin-bottom: 8px;
+
+        .resume-container {
+            max-width: 850px;
+            margin: 40px auto;
+            background: white;
+            padding: 0.6in;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            border-bottom: 1px solid #000;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 14px;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            padding-bottom: 2px;
+        }
+
+        .subheading-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .subheading-subtext {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 12px;
+            font-style: italic;
+            margin-top: 1px;
+        }
+
+        .bullet-list {
+            list-style-type: disc;
+            margin-left: 1.5rem;
             margin-top: 4px;
+            margin-bottom: 8px;
         }
+
+        .bullet-item {
+            font-size: 12px;
+            margin-bottom: 2px;
+            text-align: justify;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        a:hover { text-decoration: underline; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen pb-20">
-    <!-- Floating Toolbar -->
+<body class="bg-slate-50">
+    <!-- Toolbar -->
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 no-print">
         <div class="bg-slate-900 text-white px-6 py-4 rounded-3xl shadow-2xl flex items-center gap-6 backdrop-blur-md bg-opacity-90">
-            <button onclick="window.print()" class="bg-white text-slate-900 px-6 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-slate-100">Print / PDF</button>
-            <button onclick="window.location.href='{{ route('resumes.index') }}'" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Back to Vault</button>
+            <button onclick="window.print()" class="bg-white text-slate-900 px-6 py-2 rounded-xl font-black text-xs uppercase tracking-widest transition-all hover:bg-slate-100">Print / Save PDF</button>
+            <button onclick="window.location.href='{{ route('resumes.index') }}'" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Back</button>
         </div>
     </div>
 
-    <!-- Resume Page -->
-    <main class="max-w-[850px] mx-auto bg-white my-12 p-16 shadow-xl print-shadow-none relative text-[#000]">
-        
-        <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold uppercase tracking-tight mb-2">{{ $resume->data['personal']['name'] }}</h1>
-            <div class="flex justify-center flex-wrap gap-x-4 text-[11px] font-medium italic">
-                <span>{{ $resume->data['personal']['location'] }}</span>
-                @if($resume->data['personal']['phone']) <span>• {{ $resume->data['personal']['phone'] }}</span> @endif
-                <span>• {{ $resume->data['personal']['email'] }}</span>
+    <div class="resume-container">
+        <!-- HEADER (Exact LaTeX Format) -->
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h1 class="text-4xl font-bold tracking-tight">{{ $resume->data['personal']['name'] }}</h1>
+                <p class="text-sm font-medium mt-1">{{ $resume->data['personal']['role'] ?? 'Bachelor of Technology' }}</p>
             </div>
-            <div class="flex justify-center gap-4 mt-2 text-[11px] font-bold">
-                 @if(isset($resume->data['personal']['website']) && $resume->data['personal']['website'])
-                    <a href="{{ $resume->data['personal']['website'] }}" class="underline">{{ $resume->data['personal']['website'] }}</a>
-                 @endif
+            <div class="text-right text-[12px]">
+                <p>{{ $resume->data['personal']['location'] ?? 'Noida, India' }}</p>
+                <p><a href="mailto:{{ $resume->data['personal']['email'] }}">{{ $resume->data['personal']['email'] }}</a></p>
+                <p>+91-{{ $resume->data['personal']['phone'] }}</p>
+                @if(isset($resume->data['personal']['website']))
+                <p><a href="{{ $resume->data['personal']['website'] }}">LinkedIn / Portfolio</a></p>
+                @endif
             </div>
         </div>
 
-        <!-- Summary -->
+        <!-- SUMMARY -->
         @if($resume->data['personal']['summary'])
-        <div class="mb-6">
-            <h2 class="text-xs font-bold uppercase tracking-wider">Summary</h2>
-            <div class="section-line"></div>
-            <p class="text-[12px] leading-relaxed">{{ $resume->data['personal']['summary'] }}</p>
+        <div class="mb-4">
+            <div class="section-title">Professional Summary</div>
+            <p class="text-[12px] text-justify leading-snug">
+                {{ $resume->data['personal']['summary'] }}
+            </p>
         </div>
         @endif
 
-        <!-- Education -->
-        <div class="mb-6">
-            <h2 class="text-xs font-bold uppercase tracking-wider">Education</h2>
-            <div class="section-line"></div>
-            <div class="space-y-4">
+        <!-- EDUCATION -->
+        <div class="mb-4">
+            <div class="section-title">Education</div>
+            <div class="space-y-2">
                 @foreach($resume->data['education'] as $edu)
-                <div class="flex justify-between items-start">
-                    <div>
-                        <span class="text-[12px] font-bold">{{ $edu['institution'] }}</span>
-                        <p class="text-[11px] italic">{{ $edu['degree'] }}</p>
+                <div>
+                    <div class="subheading-row">
+                        <span>{{ $edu['degree'] }}</span>
+                        <span>{{ $edu['year'] }}</span>
                     </div>
-                    <span class="text-[11px] font-bold">{{ $edu['year'] }}</span>
+                    <div class="subheading-subtext">
+                        <span>{{ $edu['institution'] }}</span>
+                    </div>
                 </div>
                 @endforeach
             </div>
         </div>
 
-        <!-- Skills -->
-        <div class="mb-6">
-            <h2 class="text-xs font-bold uppercase tracking-wider">Technical Skills</h2>
-            <div class="section-line"></div>
-            <div class="text-[12px] leading-relaxed">
-                <span class="font-bold">Languages & Tools:</span> {{ implode(', ', $resume->data['skills']) }}
-            </div>
-        </div>
-
-        <!-- Experience -->
+        <!-- EXPERIENCE -->
         @if(count($resume->data['experience']) > 0)
-        <div class="mb-6">
-            <h2 class="text-xs font-bold uppercase tracking-wider">Experience</h2>
-            <div class="section-line"></div>
+        <div class="mb-4">
+            <div class="section-title">Professional Experience</div>
             <div class="space-y-4">
                 @foreach($resume->data['experience'] as $exp)
                 <div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[12px] font-bold">{{ $exp['company'] }}</span>
-                        <span class="text-[11px] font-bold">{{ $exp['duration'] }}</span>
+                    <div class="subheading-row">
+                        <span>{{ $exp['role'] }} — {{ $exp['company'] }}</span>
+                        <span>{{ $exp['duration'] }}</span>
                     </div>
-                    <p class="text-[11px] italic font-medium">{{ $exp['role'] }}</p>
                     @if(isset($exp['description']))
-                        <p class="text-[11px] mt-1 text-slate-700">{{ $exp['description'] }}</p>
+                    <ul class="bullet-list">
+                        @foreach(explode("\n", $exp['description']) as $bullet)
+                            @if(trim($bullet))
+                            <li class="bullet-item">{{ ltrim(trim($bullet), '-•') }}</li>
+                            @endif
+                        @endforeach
+                    </ul>
                     @endif
                 </div>
                 @endforeach
@@ -106,29 +164,48 @@
         </div>
         @endif
 
-        <!-- Projects -->
-        <div class="mb-6">
-            <h2 class="text-xs font-bold uppercase tracking-wider">Projects</h2>
-            <div class="section-line"></div>
-            <div class="space-y-4">
+        <!-- PROJECTS -->
+        @if(count($resume->data['projects']) > 0)
+        <div class="mb-4">
+            <div class="section-title">Projects</div>
+            <div class="space-y-3">
                 @foreach($resume->data['projects'] as $proj)
                 <div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-[12px] font-bold">{{ $proj['title'] }}</span>
+                    <div class="subheading-row">
+                        <span>{{ $proj['title'] }}</span>
                         @if(isset($proj['link']) && $proj['link'])
-                        <a href="{{ $proj['link'] }}" class="text-[10px] underline italic">{{ $proj['link'] }}</a>
+                        <span class="text-[10px] italic font-normal">{{ $proj['link'] }}</span>
                         @endif
                     </div>
-                    <p class="text-[11px] mt-1">{{ $proj['description'] }}</p>
+                    @if(isset($proj['description']))
+                    <ul class="bullet-list">
+                        @foreach(explode("\n", $proj['description']) as $bullet)
+                            @if(trim($bullet))
+                            <li class="bullet-item">{{ ltrim(trim($bullet), '-•') }}</li>
+                            @endif
+                        @endforeach
+                    </ul>
+                    @endif
                 </div>
                 @endforeach
             </div>
         </div>
+        @endif
 
-        <!-- Footer -->
-        <div class="mt-12 pt-8 border-t border-slate-50 text-center no-print">
-            <p class="text-[10px] text-slate-300 font-bold uppercase tracking-[0.2em]">Generated via MyCollegeVerse Professional Vault</p>
+        <!-- SKILLS -->
+        @if(count($resume->data['skills']) > 0)
+        <div class="mb-4">
+            <div class="section-title">Skills</div>
+            <div class="text-[12px] leading-relaxed">
+                <span class="font-bold">Languages & Technologies:</span> {{ implode(', ', $resume->data['skills']) }}
+            </div>
         </div>
-    </main>
+        @endif
+
+        <!-- Footer (Optional / Hidden in Print) -->
+        <div class="mt-12 pt-4 border-t border-slate-50 text-center no-print">
+            <p class="text-[9px] text-slate-300 font-bold uppercase tracking-[0.3em]">Generated via MyCollegeVerse Professional</p>
+        </div>
+    </div>
 </body>
 </html>
