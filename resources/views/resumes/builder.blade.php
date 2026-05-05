@@ -57,16 +57,24 @@
                     const newCommandRegex = /\\newcommand\{\\([^}]+)\}\{([^}]+)\}/g;
                     let match;
                     while ((match = newCommandRegex.exec(code)) !== null) { vars[match[1]] = match[2]; }
-                    Object.keys(vars).forEach(key => { code = code.replace(new RegExp('\\\\' + key, 'g'), vars[key]); });
+                    Object.keys(vars).forEach(key => { 
+                        const regex = new RegExp('\\\\' + key + '(?![a-zA-Z])', 'g');
+                        code = code.replace(regex, vars[key]); 
+                    });
 
                     let html = '<div class="text-slate-900 space-y-6">';
                     
                     // Header
-                    const name = code.match(/\\huge \\textbf\{([^}]+)\}/)?.[1] || vars['name'] || "Name";
+                    const name = vars['name'] || code.match(/\\huge \\textbf\{([^}]+)\}/)?.[1] || "Name";
                     const role = code.match(/\\small ([^}]+)\}/)?.[1] || "Professional Profile";
-                    html += `<div class="flex justify-between items-start mb-8 border-b-2 border-black pb-5">
-                        <div><h1 class="text-4xl font-bold tracking-tight mb-1">${name}</h1><p class="text-sm font-bold text-slate-700 uppercase">${role}</p></div>
-                        <div class="text-right text-[12px] space-y-0.5 font-medium">`;
+                    
+                    html += `<div class="flex justify-between items-start mb-6 border-b-2 border-black pb-5">
+                        <div>
+                            <h1 contenteditable="true" @blur="syncToLatex($event, 'name')" class="text-4xl font-bold tracking-tight mb-1 outline-none focus:bg-yellow-50">${name}</h1>
+                            <p contenteditable="true" @blur="syncToLatex($event, 'role')" class="text-sm font-bold text-slate-700 uppercase outline-none focus:bg-yellow-50">${role}</p>
+                        </div>
+                        <div class="text-right text-[10px] space-y-0.5 font-medium">`;
+                    
                     if (code.match(/([^\\n\r\t{}&]+, India)/)) html += `<p>${code.match(/([^\\n\r\t{}&]+, India)/)[1].trim()}</p>`;
                     if (vars['email']) html += `<p><a href="mailto:${vars['email']}" class="text-blue-700 underline">${vars['email']}</a></p>`;
                     if (vars['phone']) html += `<p>+91-${vars['phone']}</p>`;
@@ -76,35 +84,81 @@
                     // Sections
                     const sections = code.match(/\\section\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g);
                     if (sections) {
-                        sections.forEach(sec => {
+                        sections.forEach((sec, sIdx) => {
                             const title = sec.match(/\\section\{([^}]+)\}/)[1];
                             let content = sec.replace(/\\section\{[^}]+\}/, '').trim();
+                            
                             content = content.replace(/\\begin\{(tabular|tabularx)\}[\s\S]*?\\end\{\1\}/g, ' ');
                             content = content.replace(/\\resumeSubheading\s*\{([^}]+)\}\s*\{([^}]+)\}/g, '<div class="flex justify-between font-bold text-[14px] mt-1"><span>$1</span><span class="text-right">$2</span></div>');
                             content = content.replace(/\\textbf\{([^}]+)\}/g, '<strong>$1</strong>');
 
                             let sectionHtml = `<div><h3 class="text-[15px] font-bold uppercase border-b border-black pb-1 mb-2 tracking-wider">${title}</h3>`;
+                            
                             if (content.includes('\\item')) {
                                 const itemMatches = content.match(/\\item\s+([\s\S]*?)(?=\\item|\\end\{itemize\})/g);
                                 if (itemMatches) {
                                     sectionHtml += `<ul class="list-disc ml-6 mt-1 space-y-1">`;
-                                    itemMatches.forEach(i => {
+                                    itemMatches.forEach((i, iIdx) => {
                                         let itemText = i.replace('\\item ', '').trim();
-                                        itemText = itemText.replace(/\\\\[a-zA-Z]+|[{}]|&|\\\\/g, (m) => (m === '<strong>' || m === '</strong>') ? m : ' ');
                                         itemText = itemText.replace(/[\\{}]/g, '');
-                                        sectionHtml += `<li class="text-[13.5px] leading-relaxed text-justify">${itemText.trim()}</li>`;
+                                        sectionHtml += `<li contenteditable="true" @blur="syncItemToLatex($event, ${sIdx}, ${iIdx})" class="text-[13.5px] leading-relaxed text-justify outline-none focus:bg-yellow-50">${itemText.trim()}</li>`;
                                     });
                                     sectionHtml += `</ul>`;
                                 }
                             } else {
-                                sectionHtml += `<div class="text-[13.5px] text-justify leading-relaxed mt-1">${content.replace(/[\\{}&]|\\\\/g, ' ').trim()}</div>`;
+                                const cleanContent = content.replace(/[\\{}&]|\\\\/g, ' ').trim();
+                                sectionHtml += `<div contenteditable="true" @blur="syncSectionToLatex($event, ${sIdx})" class="text-[13.5px] text-justify leading-relaxed mt-1 outline-none focus:bg-yellow-50">${cleanContent}</div>`;
                             }
+                            
                             sectionHtml += `</div>`;
                             html += sectionHtml;
                         });
                     }
                     html += '</div>';
                     document.getElementById('latex-preview-mount').innerHTML = html;
+                },
+
+                syncToLatex(e, type) {
+                    const newVal = e.target.innerText.trim();
+                    if (type === 'name') {
+                        // Try \huge \textbf{...} or \newcommand{\name}{...}
+                        if (this.latexCode.includes('\\huge \\textbf')) {
+                            this.latexCode = this.latexCode.replace(/(\\huge \\textbf\{)([^}]+)(\})/, `$1${newVal}$3`);
+                        }
+                        if (this.latexCode.includes('\\newcommand{\\name}')) {
+                            this.latexCode = this.latexCode.replace(/(\\newcommand\{\\name\}\{)([^}]+)(\})/, `$1${newVal}$3`);
+                        }
+                    } else if (type === 'role') {
+                        this.latexCode = this.latexCode.replace(/(\\small\s+)([^}]+)(\})/, `$1${newVal}$3`);
+                    }
+                },
+
+                syncSectionToLatex(e, sIdx) {
+                    const newVal = e.target.innerText.trim();
+                    const sections = this.latexCode.match(/\\section\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g);
+                    if (sections && sections[sIdx]) {
+                        const oldSec = sections[sIdx];
+                        const newSec = oldSec.replace(/(\}\\section\{[^}]+\}|(?:\n|^))([\s\S]+)$/, `$1${newVal}`);
+                        // This is a bit complex due to regex, simpler approach:
+                        // Just find the summary text if it's the summary section
+                        if (oldSec.includes('Professional Summary')) {
+                            this.latexCode = this.latexCode.replace(/(\\section\{Professional Summary\})(?:\s*)([\s\S]*?)(?=\\section|\\end\{document\})/, `$1\n\n${newVal}\n\n`);
+                        }
+                    }
+                },
+
+                syncItemToLatex(e, sIdx, iIdx) {
+                    const newVal = e.target.innerText.trim();
+                    // Find the section, then find the i-th \item
+                    const sections = this.latexCode.match(/\\section\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g);
+                    if (sections && sections[sIdx]) {
+                        const items = sections[sIdx].match(/\\item\s+([\s\S]*?)(?=\\item|\\end\{itemize\})/g);
+                        if (items && items[iIdx]) {
+                            const oldItem = items[iIdx];
+                            const newItem = `\\item ${newVal} `;
+                            this.latexCode = this.latexCode.replace(oldItem, newItem);
+                        }
+                    }
                 },
 
                 async saveResume() {
