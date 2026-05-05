@@ -21,6 +21,14 @@ Route::get('/notes/generate', [App\Http\Controllers\NoteController::class, 'gene
 Route::post('/notes/generate', [App\Http\Controllers\NoteController::class, 'generate'])->name('notes.generate.store')->middleware('auth');
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
+// Career OS: Resume Builder 🚀
+Route::get('/resumes', [App\Http\Controllers\ResumeController::class, 'index'])->name('resumes.index');
+Route::get('/resume/build', [App\Http\Controllers\ResumeController::class, 'create'])->name('resumes.create');
+Route::post('/resume/store', [App\Http\Controllers\ResumeController::class, 'store'])->name('resumes.store');
+Route::get('/resume/{slug}', [App\Http\Controllers\ResumeController::class, 'show'])->name('resumes.show');
+Route::delete('/resume/{resume}', [App\Http\Controllers\ResumeController::class, 'destroy'])->name('resumes.destroy')->middleware('auth');
+Route::post('/resume/ai-review', [App\Http\Controllers\ResumeController::class, 'aiReview'])->name('resumes.ai-review');
+
 // Editorial Discovery 🚀
 Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
 Route::get('/blog/{slug}', [App\Http\Controllers\BlogController::class, 'show'])->name('blogs.show');

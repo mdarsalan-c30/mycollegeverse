@@ -36,4 +36,8 @@ return [
         'endpoint' => env('IMAGEKIT_ENDPOINT'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
 ];

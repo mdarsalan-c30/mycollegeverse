@@ -300,6 +300,11 @@ class User extends Authenticatable
         return $this->morphMany(Report::class, 'reportable');
     }
 
+    public function resumes()
+    {
+        return $this->hasMany(Resume::class);
+    }
+
     public function claimedRewards()
     {
         return $this->belongsToMany(Reward::class, 'reward_claims')->withPivot('claimed_at')->withTimestamps();
