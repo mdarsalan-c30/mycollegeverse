@@ -302,7 +302,7 @@ class User extends Authenticatable
 
     public function resumes()
     {
-        return $this->hasMany(Resume::class);
+        return $this->hasMany(\App\Models\Resume::class);
     }
 
     public function claimedRewards()

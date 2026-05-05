@@ -22,12 +22,12 @@ Route::post('/notes/generate', [App\Http\Controllers\NoteController::class, 'gen
 Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show'])->name('notes.show');
 
 // Career OS: Resume Builder 🚀
-Route::get('/resumes', [App\Http\Controllers\ResumeController::class, 'index'])->name('resumes.index');
-Route::get('/resume/build', [App\Http\Controllers\ResumeController::class, 'create'])->name('resumes.create');
-Route::post('/resume/store', [App\Http\Controllers\ResumeController::class, 'store'])->name('resumes.store');
-Route::get('/resume/{slug}', [App\Http\Controllers\ResumeController::class, 'show'])->name('resumes.show');
-Route::delete('/resume/{resume}', [App\Http\Controllers\ResumeController::class, 'destroy'])->name('resumes.destroy')->middleware('auth');
-Route::post('/resume/ai-review', [App\Http\Controllers\ResumeController::class, 'aiReview'])->name('resumes.ai-review');
+Route::get('/resumes', 'App\Http\Controllers\ResumeController@index')->name('resumes.index');
+Route::get('/resume/build', 'App\Http\Controllers\ResumeController@create')->name('resumes.create');
+Route::post('/resume/store', 'App\Http\Controllers\ResumeController@store')->name('resumes.store');
+Route::get('/resume/{slug}', 'App\Http\Controllers\ResumeController@show')->name('resumes.show');
+Route::delete('/resume/{resume}', 'App\Http\Controllers\ResumeController@destroy')->name('resumes.destroy')->middleware('auth');
+Route::post('/resume/ai-review', 'App\Http\Controllers\ResumeController@aiReview')->name('resumes.ai-review');
 
 // Editorial Discovery 🚀
 Route::get('/blog', [App\Http\Controllers\BlogController::class, 'index'])->name('blogs.index');
