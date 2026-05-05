@@ -25,6 +25,7 @@ Route::get('/notes/{slug}', [App\Http\Controllers\NoteController::class, 'show']
 Route::get('/resumes', 'App\Http\Controllers\ResumeController@index')->name('resumes.index');
 Route::get('/resume/build', 'App\Http\Controllers\ResumeController@create')->name('resumes.create');
 Route::post('/resume/store', 'App\Http\Controllers\ResumeController@store')->name('resumes.store');
+Route::get('/resume/edit/{slug}', 'App\Http\Controllers\ResumeController@edit')->name('resumes.edit');
 Route::get('/resume/{slug}', 'App\Http\Controllers\ResumeController@show')->name('resumes.show');
 Route::delete('/resume/{resume}', 'App\Http\Controllers\ResumeController@destroy')->name('resumes.destroy')->middleware('auth');
 Route::post('/resume/ai-review', 'App\Http\Controllers\ResumeController@aiReview')->name('resumes.ai-review');

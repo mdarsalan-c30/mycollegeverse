@@ -23,6 +23,12 @@
                 <div class="flex items-center justify-between mb-8">
                     <button @click="mode = null" class="text-slate-400 font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:text-primary transition-colors">Back</button>
                     <div class="flex items-center gap-4">
+                        @if(isset($resume_model))
+                        <button @click="copyEditorLink" class="bg-white border-2 border-slate-900 text-slate-900 px-6 py-4 rounded-2xl font-black uppercase tracking-widest flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
+                            Copy Editor Link
+                        </button>
+                        @endif
                         <button @click="recompile" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl">Recompile Preview</button>
                         <button @click="saveResume" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-primary-dark transition-all">Save & Manifest</button>
                     </div>
@@ -44,9 +50,17 @@
     <script>
         function resumeBuilder() {
             return {
-                mode: null, currentStep: 0, roleSelected: false, steps: ['Basic Details', 'Projects', 'Skills'],
+                mode: @json(isset($resume_model) ? 'latex' : null), 
+                currentStep: 0, roleSelected: false, steps: ['Basic Details', 'Projects', 'Skills'],
                 roleTemplates: @json($roleTemplates), resume: @json($initialData), latexCode: @json($defaultLatex),
                 init() { setTimeout(() => this.recompile(), 500); },
+
+                copyEditorLink() {
+                    const url = window.location.origin + '/resume/edit/{{ $resume_model->slug ?? '' }}';
+                    navigator.clipboard.writeText(url).then(() => {
+                        alert('🚀 Shareable Editor Link Copied!');
+                    });
+                },
                 
                 recompile() {
                     let code = this.latexCode;

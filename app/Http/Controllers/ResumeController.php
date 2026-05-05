@@ -111,6 +111,29 @@ class ResumeController extends Controller
         ]);
     }
 
+    public function edit($slug)
+    {
+        $resume = Resume::where('slug', $slug)->firstOrFail();
+        $user = Auth::user();
+        $existingProjects = $user ? $user->projects()->get() : collect();
+
+        $roleTemplates = [
+            'SDE' => ['summary' => '...', 'skills' => []], // Simplified for now
+            'Frontend' => ['summary' => '...', 'skills' => []],
+        ];
+
+        $initialData = (isset($resume->data['raw_latex'])) ? [] : $resume->data;
+        $defaultLatex = $resume->data['raw_latex'] ?? '';
+
+        return view('resumes.builder', [
+            'resume_model' => $resume,
+            'initialData' => $initialData,
+            'existingProjects' => $existingProjects,
+            'roleTemplates' => $roleTemplates,
+            'defaultLatex' => $defaultLatex
+        ]);
+    }
+
 
     public function show($slug)
     {
