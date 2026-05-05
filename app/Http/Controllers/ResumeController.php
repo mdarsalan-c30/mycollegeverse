@@ -109,7 +109,7 @@ class ResumeController extends Controller
 
         try {
             $apiKey = config('services.gemini.key');
-            $response = \Illuminate\Support\Facades\Http::post(\"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}\", [
+            $response = \Illuminate\Support\Facades\Http::post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}", [
                 'contents' => [
                     [
                         'parts' => [
@@ -119,11 +119,11 @@ class ResumeController extends Controller
                 ]
             ]);
 
-            $feedback = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? \"The Verse is currently quiet. Try again later.\";
+            $feedback = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? "The Verse is currently quiet. Try again later.";
             
             return response()->json(['feedback' => $feedback]);
         } catch (\Exception $e) {
-            return response()->json(['feedback' => \"AI is currently offline. Focus on your projects for now!\"], 500);
+            return response()->json(['feedback' => "AI is currently offline. Focus on your projects for now!"], 500);
         }
     }
 }
