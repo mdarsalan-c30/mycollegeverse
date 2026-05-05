@@ -161,12 +161,7 @@
                     let code = this.latexCode;
                     // Strip comments
                     code = code.replace(/%.*$/gm, '');
-                    // Strip structural tabular garbage
-                    code = code.replace(/\\begin\{tabular\}[\s\S]*?\\end\{tabular\}/g, (match) => {
-                        return match.replace(/\\begin\{tabular\}[^}]*\}|\\end\{tabular\}|&|\\|{tabular}/g, ' ');
-                    });
-                    code = code.replace(/{tabular}|@{}|r|l|{|}/g, ' ');
-
+                    
                     let html = '<div class="text-slate-900 space-y-5">';
                     
                     // Parse Header
@@ -177,7 +172,7 @@
                         <div><h1 class="text-2xl font-bold uppercase">${name}</h1><p class="text-xs font-bold">${degree}</p></div>
                         <div class="text-right text-[10px] space-y-0.5 font-medium">`;
                     
-                    if (code.match(/([^\\n\r\t{}&]+, India)/)) html += `<p>${code.match(/([^\\n\r\t{}&]+, India)/)[1].trim()}</p>`;
+                    if (code.match(/([^\\n\r\t{}&]+, India)/)) html += `<p>${code.match(/([^\\n\r\t{}&]+, India)/)[1].trim().replace(/[\\{}]/g, '')}</p>`;
                     if (code.match(/\\email\{([^}]+)\}/)) html += `<p>${code.match(/\\email\{([^}]+)\}/)[1]}</p>`;
                     if (code.match(/\\phone\{([^}]+)\}/)) html += `<p>+91-${code.match(/\\phone\{([^}]+)\}/)[1]}</p>`;
                     if (code.match(/LinkedIn/)) html += `<p>LinkedIn</p>`;
@@ -194,6 +189,10 @@
                             content = content.replace(/\\textbf\{([^}]+)\}/g, '<strong class="font-bold">$1</strong>');
                             content = content.replace(/\\resumeSubheading\{([^}]+)\}\{([^}]+)\}/g, '<div class="flex justify-between font-bold text-xs"><span>$1</span><span>$2</span></div>');
                             
+                            // Specific Tabular Cleanup
+                            content = content.replace(/\\begin\{tabular\}[\s\S]*?\\end\{tabular\}/g, (m) => m.replace(/\\begin\{tabular\}[^}]*\}|\\end\{tabular\}|&|\\\\|{tabular}/g, ' '));
+                            content = content.replace(/\\begin\{tabularx\}[\s\S]*?\\end\{tabularx\}/g, (m) => m.replace(/\\begin\{tabularx\}[^}]*\}|\\end\{tabularx\}|&|\\\\|{tabularx}/g, ' '));
+
                             // Lists
                             content = content.replace(/\\begin\{itemize\}[\s\S]*?\\end\{itemize\}/g, (list) => {
                                 const items = list.match(/\\item\s+([^\n\\%]+)/g);

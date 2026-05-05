@@ -42,20 +42,14 @@
         @if($isRawLatex)
             @php
                 $raw = $data['raw_latex'];
-                // Clean LaTeX Comments and junk
+                // Clean LaTeX Comments
                 $raw = preg_replace('/%.*$/m', '', $raw);
-                $raw = str_replace(['\begin{tabular}', '\end{tabular}', '\begin{tabularx}', '\end{tabularx}', '{tabular}', '{@{}l@{}}', '{@{}r@{}}', '\linewidth', '\extracolsep{\fill}'], '', $raw);
                 
                 // Extract Name and Degree
                 preg_match('/\\\\huge \\\\textbf\{([^}]+)\}/', $raw, $nameMatch);
                 preg_match('/\\\\small ([^}]+)\}/', $raw, $degreeMatch);
                 
-                // Parse Contact Block
-                $contactBlock = '';
-                if (preg_match('/India([\s\S]*?)\\\\section/', $raw, $contactSection)) {
-                    $contactBlock = $contactSection[1];
-                }
-                
+                // Parse Contact Info
                 $contactLines = [];
                 if (preg_match('/([^\\\\n\r\t{}]+, India)/', $raw, $loc)) $contactLines[] = trim($loc[1]);
                 if (preg_match('/mailto:([^}]+)/', $raw, $email)) $contactLines[] = trim($email[1]);
@@ -70,7 +64,7 @@
                 </div>
                 <div class="text-right header-text font-medium">
                     @foreach($contactLines as $line)
-                        <p>{{ trim(str_replace(['\\', '&', '{', '}', 'r'], '', $line)) }}</p>
+                        <p>{{ trim(preg_replace('/\\{[^}]*\\}|\\\\|&/', '', $line)) }}</p>
                     @endforeach
                 </div>
             </div>
@@ -87,28 +81,29 @@
                             $content = trim($sections[2][$index]);
                             // Clean subheadings
                             $content = preg_replace('/\\\\resumeSubheading\{([^}]+)\}\{([^}]+)\}/', '<div class="item-row"><span>$1</span><span>$2</span></div>', $content);
-                            // Clean bold and italics
+                            // Clean bold
                             $content = preg_replace('/\\\\textbf\{([^}]+)\}/', '<strong>$1</strong>', $content);
-                            $content = preg_replace('/\\\\textit\{([^}]+)\}/', '<em>$1</em>', $content);
-                            // Clean items
+                            
+                            // Clean tabular garbage specifically without breaking everything
+                            $content = str_replace(['\begin{tabular}', '\end{tabular}', '\begin{tabularx}', '\end{tabularx}', '{tabular}', '{@{}l@{}}', '{@{}r@{}}', '\linewidth', '\extracolsep{\fill}', '&', '\\\\'], ' ', $content);
+
                             if (strpos($content, '\\item') !== false) {
                                 preg_match_all('/\\\\item\s+([^\n\\\\\\%]+)/', $content, $items);
                                 echo '<ul class="bullet-list">';
                                 foreach($items[1] as $item) {
-                                    $cleanedItem = trim(str_replace(['\\', '{', '}'], '', $item));
-                                    if($cleanedItem) echo '<li class="bullet-item">'.$cleanedItem.'</li>';
+                                    $it = trim(preg_replace('/[\\{}]/', '', $item));
+                                    if($it) echo '<li class="bullet-item">'.$it.'</li>';
                                 }
                                 echo '</ul>';
                             } else {
-                                $cleanedText = str_replace(['\\', '{', '}', '&'], ' ', $content);
-                                echo '<p class="text-justify leading-snug">'.trim($cleanedText).'</p>';
+                                echo '<p class="text-justify leading-snug">'.trim(preg_replace('/[\\{}]/', '', $content)).'</p>';
                             }
                         @endphp
                     </div>
                 </div>
             @endforeach
         @else
-            <!-- ... (Guided mode logic remains same) ... -->
+            <!-- Guided mode ... -->
              <div class="flex justify-between items-start mb-6">
                 <div><h1 class="text-3xl font-bold">{{ $data['personal']['name'] }}</h1><p class="text-sm">{{ $data['personal']['role'] ?? 'Bachelor of Technology' }}</p></div>
                 <div class="text-right header-text font-medium"><p>{{ $data['personal']['location'] ?? 'Noida, India' }}</p><p>{{ $data['personal']['email'] }}</p><p>+91-{{ $data['personal']['phone'] }}</p></div>
