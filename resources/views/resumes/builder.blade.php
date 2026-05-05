@@ -1,7 +1,7 @@
 <x-app-layout>
     @section('title', 'Resume Builder | Professional Profiles')
     
-    <div class="min-h-screen bg-slate-50 py-12" x-data="resumeBuilder()">
+    <div class="min-h-screen bg-slate-50 py-12" x-data="resumeBuilder()" x-init="init()">
         <div class="max-w-7xl mx-auto px-4">
             <!-- Header -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
@@ -19,7 +19,7 @@
 
             <!-- Role Selection (Initial State) -->
             <div x-show="!roleSelected" class="bg-white rounded-[2.5rem] p-12 text-center border border-slate-100 shadow-xl mb-12">
-                <h2 class="text-3xl font-black text-slate-800 mb-4">Choose Your Career Path</h2>
+                <h2 class="text-3xl font-black text-slate-800 mb-4 uppercase italic">Choose Your Career Path 🚀</h2>
                 <p class="text-slate-500 font-bold mb-10">We'll auto-fill some suggestions based on your target role.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <div x-show="roleSelected" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <div x-show="roleSelected" style="display: none;" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
                 <!-- Editor Side -->
                 <div class="space-y-8">
                     <!-- Step Indicator -->

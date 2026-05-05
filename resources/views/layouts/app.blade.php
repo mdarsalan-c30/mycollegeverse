@@ -557,5 +557,6 @@
                 </a>
             @endforeach
         </div>
+        @stack('scripts')
     </body>
 </html>
