@@ -161,7 +161,7 @@
                 roleTemplates: @json($roleTemplates),
                 newSkill: '',
                 resume: @json($initialData),
-                latexCode: @json($initialData['personal']['name'] ? "% Custom LaTeX Code\n\\documentclass[letterpaper,10pt]{article}\n\\begin{document}\n\\huge \\textbf{".($initialData['personal']['name'])."}\n\\end{document}" : "\\documentclass[letterpaper,10pt]{article}\n\n% HEADER\n\\huge \\textbf{Vanshika Singh}\n\\small Bachelor Of Technology (B.Tech)\n\nNoida, India\n\\email{vanshikas117@gmail.com}\n\\phone{8076343451}\n\n\\section{Professional Summary}\nCloud Engineer with practical experience...\n\n\\section{Education}\n\\resumeSubheading{Bachelor of Technology (B.Tech)}{AKTU}\n\n\\end{document}"),
+                latexCode: @json($defaultLatex),
 
                 init() {
                     this.resume.template_id = 'ats-clean';

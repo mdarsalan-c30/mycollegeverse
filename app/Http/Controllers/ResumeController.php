@@ -69,8 +69,24 @@ class ResumeController extends Controller
             ])->toArray(),
         ];
 
-        return view('resumes.builder', compact('initialData', 'existingProjects', 'roleTemplates'));
+        // Build Default LaTeX String safely in PHP
+        $userName = $user->name ?? 'Vanshika Singh';
+        $defaultLatex = "\\documentclass[letterpaper,10pt]{article}\n\n" .
+            "% HEADER\n" .
+            "\\huge \\textbf{{$userName}}\n" .
+            "\\small Bachelor Of Technology (B.Tech)\n\n" .
+            "Noida, India\n" .
+            "\\email{vanshikas117@gmail.com}\n" .
+            "\\phone{8076343451}\n\n" .
+            "\\section{Professional Summary}\n" .
+            "Cloud Engineer with practical experience...\n\n" .
+            "\\section{Education}\n" .
+            "\\resumeSubheading{Bachelor of Technology (B.Tech)}{AKTU}\n\n" .
+            "\\end{document}";
+
+        return view('resumes.builder', compact('initialData', 'existingProjects', 'roleTemplates', 'defaultLatex'));
     }
+
 
 
     public function store(Request $request)
