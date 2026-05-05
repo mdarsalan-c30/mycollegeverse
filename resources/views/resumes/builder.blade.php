@@ -1,218 +1,191 @@
 <x-app-layout>
-    @section('title', 'Resume Builder | Professional Profiles')
+    @section('title', 'Professional Resume Builder | MyCollegeVerse')
     
     <div class="min-h-screen bg-slate-50 py-12" x-data="resumeBuilder()" x-init="init()">
         <div class="max-w-7xl mx-auto px-4">
-            <!-- Header -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                <div>
-                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">Resume <span class="text-primary">Builder</span></h1>
-                    <p class="text-slate-500 font-bold mt-1 uppercase text-xs tracking-widest">Create a professional resume in minutes.</p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <button @click="saveResume" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl flex items-center gap-3">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
-                        Save Resume
-                    </button>
-                </div>
-            </div>
-
-            <!-- Role Selection (Initial State) -->
-            <div x-show="!roleSelected" class="bg-white rounded-[2.5rem] p-12 text-center border border-slate-100 shadow-xl mb-12">
-                <h2 class="text-3xl font-black text-slate-800 mb-4 uppercase italic">Choose Your Career Path 🚀</h2>
-                <p class="text-slate-500 font-bold mb-10">We'll auto-fill some suggestions based on your target role.</p>
+            
+            <!-- INITIAL CHOICE SCREEN -->
+            <div x-show="!mode" class="max-w-4xl mx-auto text-center py-20 animate-fade-in">
+                <h1 class="text-5xl font-black text-slate-900 tracking-tighter uppercase mb-4">Choose Your <span class="text-primary">Building Mode</span></h1>
+                <p class="text-slate-500 font-bold mb-12 uppercase tracking-widest text-xs">How do you want to manifest your professional identity?</p>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    @foreach($roleTemplates as $role => $data)
-                    <button @click="selectRole('{{ $role }}')" class="p-8 bg-slate-50 rounded-3xl border-2 border-transparent hover:border-primary hover:bg-primary/5 transition-all group">
-                        <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-sm">
-                            <span class="text-3xl">
-                                @if($role === 'SDE') 💻 @elseif($role === 'Frontend') 🎨 @elseif($role === 'QA') 🛡️ @else 📊 @endif
-                            </span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Option 1: Guided -->
+                    <button @click="mode = 'guided'" class="bg-white p-10 rounded-[3rem] border-2 border-transparent hover:border-primary transition-all shadow-xl group text-left">
+                        <div class="w-20 h-20 bg-primary/10 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                            <svg class="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                         </div>
-                        <h3 class="font-black text-slate-800 uppercase tracking-tight">{{ $role }}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold mt-2">Engineer / Developer</p>
+                        <h3 class="text-2xl font-black text-slate-800 uppercase italic mb-2">Guided Builder</h3>
+                        <p class="text-slate-400 font-bold text-sm leading-relaxed">Fast, role-based auto-fill and professional templates. Perfect for quick applications.</p>
+                        <div class="mt-8 flex items-center gap-2 text-primary font-black text-[10px] uppercase tracking-widest">
+                            Start Building <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </div>
                     </button>
-                    @endforeach
-                </div>
-                <div class="mt-10">
-                    <button @click="roleSelected = true" class="text-slate-400 font-bold hover:text-primary transition-colors underline">Skip, I'll start from scratch</button>
+
+                    <!-- Option 2: LaTeX Expert -->
+                    <button @click="mode = 'latex'" class="bg-slate-900 p-10 rounded-[3rem] border-2 border-transparent hover:border-primary transition-all shadow-xl group text-left">
+                        <div class="w-20 h-20 bg-white/10 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform">
+                            <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                        </div>
+                        <h3 class="text-2xl font-black text-white uppercase italic mb-2">LaTeX Expert</h3>
+                        <p class="text-slate-400 font-bold text-sm leading-relaxed">Full control via LaTeX code. Real-time preview and raw code management.</p>
+                        <div class="mt-8 flex items-center gap-2 text-white font-black text-[10px] uppercase tracking-widest">
+                            Open Editor <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                        </div>
+                    </button>
                 </div>
             </div>
 
-            <div x-show="roleSelected" style="display: none;" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                <!-- Editor Side -->
-                <div class="space-y-8">
-                    <!-- Step Indicator -->
-                    <div class="flex items-center gap-2 overflow-x-auto pb-4 custom-scrollbar">
-                        <template x-for="(step, index) in steps" :key="index">
-                            <button @click="currentStep = index" 
-                                    :class="currentStep === index ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-slate-400 hover:text-slate-600'"
-                                    class="px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all shrink-0 border border-slate-100">
-                                <span x-text="step"></span>
-                            </button>
-                        </template>
+            <!-- GUIDED BUILDER FLOW -->
+            <div x-show="mode === 'guided'" style="display: none;" class="animate-fade-in">
+                <!-- Header -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+                    <div>
+                        <button @click="mode = null" class="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2 hover:text-primary transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg> Back to Modes
+                        </button>
+                        <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">Guided <span class="text-primary">Builder</span></h1>
                     </div>
+                    <div class="flex items-center gap-4">
+                        <button @click="saveResume" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl flex items-center gap-3">
+                            Save & Manifest
+                        </button>
+                    </div>
+                </div>
 
-                    <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 min-h-[600px]">
-                        <!-- Step 0: Personal -->
-                        <div x-show="currentStep === 0" class="space-y-8 animate-fade-in">
-                            <h2 class="text-2xl font-black text-slate-800 uppercase italic">Basic <span class="text-primary">Details</span></h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Full Name</label>
-                                    <input type="text" x-model="resume.personal.name" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-primary/20">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Target Role</label>
-                                    <input type="text" x-model="resume.personal.role" placeholder="e.g. Frontend Developer" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-primary/20">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Email Address</label>
-                                    <input type="email" x-model="resume.personal.email" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-primary/20">
-                                </div>
-                                <div class="space-y-2">
-                                    <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Phone</label>
-                                    <input type="text" x-model="resume.personal.phone" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-primary/20">
-                                </div>
-                            </div>
-                            <div class="space-y-2">
-                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400">Professional Summary</label>
-                                <textarea x-model="resume.personal.summary" rows="4" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700 focus:ring-2 focus:ring-primary/20"></textarea>
-                            </div>
+                <!-- Role Selection Step (Only if not selected) -->
+                <div x-show="!roleSelected" class="bg-white rounded-[2.5rem] p-12 text-center border border-slate-100 shadow-xl mb-12">
+                    <h2 class="text-3xl font-black text-slate-800 mb-4 uppercase italic">Choose Your Career Role 🚀</h2>
+                    <p class="text-slate-500 font-bold mb-10">Select a role to auto-fill professional summaries and skills.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        @foreach($roleTemplates as $role => $data)
+                        <button @click="selectRole('{{ $role }}')" class="p-8 bg-slate-50 rounded-3xl border-2 border-transparent hover:border-primary hover:bg-primary/5 transition-all group">
+                            <h3 class="font-black text-slate-800 uppercase tracking-tight">{{ $role }}</h3>
+                        </button>
+                        @endforeach
+                    </div>
+                </div>
+
+                <!-- Main Editor -->
+                <div x-show="roleSelected" class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <div class="space-y-8">
+                        <!-- Step Indicator -->
+                        <div class="flex items-center gap-2 overflow-x-auto pb-4 custom-scrollbar">
+                            <template x-for="(step, index) in steps" :key="index">
+                                <button @click="currentStep = index" 
+                                        :class="currentStep === index ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'bg-white text-slate-400 hover:text-slate-600'"
+                                        class="px-6 py-3 rounded-xl font-black uppercase text-[10px] tracking-widest transition-all shrink-0 border border-slate-100">
+                                    <span x-text="step"></span>
+                                </button>
+                            </template>
                         </div>
 
-                        <!-- Step 1: Projects -->
-                        <div x-show="currentStep === 1" class="space-y-8 animate-fade-in">
-                            <div class="flex justify-between items-center">
-                                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Key <span class="text-primary">Projects</span></h2>
-                                <button @click="addProject" class="text-primary font-black text-[10px] uppercase tracking-widest hover:underline">+ Add Project</button>
+                        <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 min-h-[600px]">
+                            <!-- Steps Content (Personal, Projects, Skills, etc.) -->
+                            <div x-show="currentStep === 0" class="space-y-8 animate-fade-in">
+                                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Basic <span class="text-primary">Details</span></h2>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <input type="text" x-model="resume.personal.name" placeholder="Full Name" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700">
+                                    <input type="text" x-model="resume.personal.role" placeholder="Target Role" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700">
+                                    <input type="email" x-model="resume.personal.email" placeholder="Email" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700">
+                                    <input type="text" x-model="resume.personal.phone" placeholder="Phone" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700">
+                                </div>
+                                <textarea x-model="resume.personal.summary" placeholder="Professional Summary" rows="4" class="w-full bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700"></textarea>
                             </div>
-
-                            <div class="space-y-6">
+                            
+                            <!-- More steps can be added here mirroring previous flow -->
+                             <div x-show="currentStep === 1" class="space-y-8 animate-fade-in">
+                                <div class="flex justify-between items-center"><h2 class="text-2xl font-black text-slate-800 uppercase italic">Key <span class="text-primary">Projects</span></h2><button @click="addProject" class="text-primary font-black text-[10px] uppercase">+ Add</button></div>
                                 <template x-for="(proj, index) in resume.projects" :key="index">
-                                    <div class="bg-slate-50 p-6 rounded-3xl relative group border border-transparent hover:border-slate-200 transition-all">
-                                        <button @click="removeProject(index)" class="absolute -top-2 -right-2 bg-white text-rose-500 p-1.5 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                                        </button>
-                                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            <input type="text" x-model="proj.title" placeholder="Project Title" class="bg-transparent border-none font-black text-slate-800 p-0 focus:ring-0">
-                                            <input type="text" x-model="proj.link" placeholder="Link (GitHub/Live)" class="bg-transparent border-none font-bold text-primary text-xs p-0 focus:ring-0">
-                                        </div>
-                                        <textarea x-model="proj.description" placeholder="Short description..." rows="2" class="w-full bg-white border-none rounded-xl p-3 text-xs font-medium focus:ring-1 focus:ring-primary/10"></textarea>
+                                    <div class="bg-slate-50 p-6 rounded-3xl border border-transparent hover:border-slate-200">
+                                        <input type="text" x-model="proj.title" placeholder="Project Title" class="w-full bg-transparent border-none font-black text-slate-800 p-0 mb-2">
+                                        <textarea x-model="proj.description" placeholder="Description..." class="w-full bg-white border-none rounded-xl p-3 text-xs"></textarea>
                                     </div>
                                 </template>
                             </div>
-                        </div>
 
-                        <!-- Step 2: Skills -->
-                        <div x-show="currentStep === 2" class="space-y-8 animate-fade-in">
-                            <h2 class="text-2xl font-black text-slate-800 uppercase italic">Core <span class="text-primary">Skills</span></h2>
-                            <div class="space-y-4">
-                                <div class="flex gap-2">
-                                    <input type="text" x-model="newSkill" @keydown.enter.prevent="addSkill" placeholder="e.g. React, SQL" class="flex-1 bg-slate-50 border-none rounded-2xl p-4 font-bold text-slate-700">
-                                    <button @click="addSkill" class="bg-primary text-white px-6 rounded-2xl font-black uppercase text-[10px]">Add</button>
-                                </div>
+                            <div x-show="currentStep === 2" class="space-y-8 animate-fade-in">
+                                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Core <span class="text-primary">Skills</span></h2>
+                                <div class="flex gap-2"><input type="text" x-model="newSkill" @keydown.enter.prevent="addSkill" class="flex-1 bg-slate-50 border-none rounded-2xl p-4 font-bold"><button @click="addSkill" class="bg-primary text-white px-6 rounded-2xl font-black uppercase text-[10px]">Add</button></div>
                                 <div class="flex flex-wrap gap-2">
                                     <template x-for="(skill, index) in resume.skills" :key="index">
-                                        <span class="bg-slate-100 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 flex items-center gap-2 group">
-                                            <span x-text="skill"></span>
-                                            <button @click="removeSkill(index)" class="text-slate-400 hover:text-rose-500">×</button>
-                                        </span>
+                                        <span class="bg-slate-100 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 flex items-center gap-2 group"><span x-text="skill"></span><button @click="removeSkill(index)" class="text-slate-400 hover:text-rose-500">×</button></span>
                                     </template>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Step 3: Education -->
-                        <div x-show="currentStep === 3" class="space-y-8 animate-fade-in">
-                            <div class="flex justify-between items-center mb-6">
-                                <h2 class="text-2xl font-black text-slate-800 uppercase italic">Academic <span class="text-primary">Background</span></h2>
-                                <button @click="addEducation" class="text-primary font-black text-[10px] uppercase tracking-widest">+ Add Edu</button>
-                            </div>
-                            <div class="space-y-4">
-                                <template x-for="(edu, index) in resume.education" :key="index">
-                                    <div class="bg-slate-50 p-6 rounded-3xl border border-transparent hover:border-slate-200">
-                                        <input type="text" x-model="edu.institution" placeholder="College Name" class="w-full bg-transparent border-none font-black text-slate-800 p-0 mb-1">
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <input type="text" x-model="edu.degree" placeholder="Degree" class="bg-transparent border-none font-bold text-slate-500 text-xs p-0">
-                                            <input type="text" x-model="edu.year" placeholder="Year" class="bg-transparent border-none font-bold text-slate-500 text-xs p-0 text-right">
-                                        </div>
-                                    </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- Step 4: Template Selector -->
-                        <div x-show="currentStep === 4" class="space-y-8 animate-fade-in">
-                            <h2 class="text-2xl font-black text-slate-800 uppercase italic">Choose <span class="text-primary">Template</span></h2>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <button @click="resume.template_id = 'ats-clean'" 
-                                        :class="resume.template_id === 'ats-clean' ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'"
-                                        class="p-6 bg-white rounded-3xl border-2 text-left transition-all">
-                                    <h3 class="font-black text-slate-800 uppercase text-sm">ATS Clean</h3>
-                                    <p class="text-[10px] text-slate-400 font-bold mt-1">Simple, high-conversion template.</p>
-                                </button>
-                                <button @click="resume.template_id = 'latex-classic'" 
-                                        :class="resume.template_id === 'latex-classic' ? 'border-primary ring-4 ring-primary/10' : 'border-slate-100'"
-                                        class="p-6 bg-white rounded-3xl border-2 text-left transition-all">
-                                    <h3 class="font-black text-slate-800 uppercase text-sm">LaTeX Classic</h3>
-                                    <p class="text-[10px] text-slate-400 font-bold mt-1">Academic & Professional (Black/White).</p>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Preview Side (Minimal & Clean) -->
-                <div class="hidden lg:block sticky top-32 h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 p-8">
-                    <div class="flex justify-between items-center mb-8">
-                        <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">Live Preview</span>
-                        <div class="flex gap-2">
-                            <div class="w-2 h-2 rounded-full bg-slate-200"></div>
-                        </div>
                     </div>
 
-                    <!-- Resume Live Sheet -->
-                    <div id="resume-preview" class="bg-white text-slate-900 font-sans p-4 border border-slate-50 min-h-full">
-                        <div class="border-b-2 border-slate-900 pb-6 mb-6">
-                            <h1 class="text-3xl font-black uppercase tracking-tighter mb-2" x-text="resume.personal.name || 'YOUR NAME'"></h1>
-                            <p class="text-sm font-bold text-primary uppercase mb-4" x-text="resume.personal.role"></p>
-                            <div class="flex flex-wrap gap-4 text-[9px] font-bold text-slate-500 uppercase tracking-widest">
-                                <span x-text="resume.personal.email"></span>
-                                <span x-text="resume.personal.phone"></span>
+                    <!-- Live Preview -->
+                    <div class="hidden lg:block sticky top-32 h-[calc(100vh-200px)] overflow-y-auto bg-white rounded-[2.5rem] shadow-2xl border border-slate-200 p-8">
+                        <div id="resume-preview-guided" class="min-h-full">
+                            <!-- Mimic LaTeX Classic Look -->
+                            <div class="border-b-2 border-slate-900 pb-4 mb-4">
+                                <h1 class="text-3xl font-black uppercase tracking-tighter" x-text="resume.personal.name || 'YOUR NAME'"></h1>
+                                <p class="text-sm font-bold text-primary uppercase" x-text="resume.personal.role"></p>
                             </div>
-                        </div>
-
-                        <div class="mb-8" x-show="resume.personal.summary">
-                            <p class="text-xs leading-relaxed font-medium" x-text="resume.personal.summary"></p>
-                        </div>
-
-                        <div class="mb-8" x-show="resume.projects.length > 0">
-                            <h4 class="text-[10px] font-black uppercase text-slate-400 mb-4 tracking-[0.2em]">Projects</h4>
+                            <div class="mb-6"><p class="text-xs leading-relaxed font-medium text-slate-600" x-text="resume.personal.summary"></p></div>
                             <div class="space-y-4">
                                 <template x-for="proj in resume.projects">
                                     <div>
-                                        <div class="flex justify-between items-center mb-1">
-                                            <span class="text-xs font-black uppercase" x-text="proj.title"></span>
-                                        </div>
-                                        <p class="text-[10px] leading-relaxed text-slate-600" x-text="proj.description"></p>
+                                        <h4 class="text-xs font-black uppercase" x-text="proj.title"></h4>
+                                        <p class="text-[10px] text-slate-500" x-text="proj.description"></p>
                                     </div>
-                                </template>
-                            </div>
-                        </div>
-
-                        <div class="mb-8" x-show="resume.skills.length > 0">
-                            <h4 class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-[0.2em]">Skills</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <template x-for="skill in resume.skills">
-                                    <span class="bg-slate-50 px-3 py-1 rounded text-[9px] font-black text-slate-600 uppercase border border-slate-100" x-text="skill"></span>
                                 </template>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <!-- LATEX EXPERT MODE -->
+            <div x-show="mode === 'latex'" style="display: none;" class="animate-fade-in h-[80vh]">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <button @click="mode = null" class="text-slate-400 font-black text-[10px] uppercase tracking-widest mb-2 flex items-center gap-2 hover:text-primary transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg> Back to Modes
+                        </button>
+                        <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase italic">LaTeX <span class="text-primary">Expert</span></h1>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button @click="recompile" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-900 transition-all shadow-xl flex items-center gap-3">
+                            Recompile
+                        </button>
+                        <button @click="saveResume" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl">
+                            Save & Manifest
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
+                    <!-- Editor Left -->
+                    <div class="bg-slate-900 rounded-[2.5rem] p-6 shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 right-0 p-4">
+                            <span class="text-[9px] font-black uppercase tracking-[0.2em] text-slate-600">tex_editor_v1.0</span>
+                        </div>
+                        <textarea x-model="latexCode" class="w-full h-full bg-transparent border-none text-slate-300 font-mono text-sm focus:ring-0 resize-none p-4 custom-scrollbar" spellcheck="false"></textarea>
+                    </div>
+
+                    <!-- Preview Right -->
+                    <div class="bg-white rounded-[2.5rem] p-10 shadow-sm border border-slate-200 overflow-y-auto custom-scrollbar">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 italic">Live Device Manifestation</span>
+                            <div class="flex gap-1">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            </div>
+                        </div>
+                        <div id="latex-preview-mount" class="font-serif">
+                            <!-- Preview Content will be injected here via JS based on LaTeX parsing -->
+                            <div class="animate-pulse flex flex-col gap-4">
+                                <div class="h-8 bg-slate-100 w-1/2 rounded"></div>
+                                <div class="h-4 bg-slate-50 w-1/4 rounded"></div>
+                                <div class="h-32 bg-slate-50 w-full rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -220,15 +193,36 @@
     <script>
         function resumeBuilder() {
             return {
+                mode: null, // 'guided' or 'latex'
                 currentStep: 0,
                 roleSelected: false,
-                steps: ['Basic Details', 'Projects', 'Skills', 'Education', 'Choose Template'],
+                steps: ['Basic Details', 'Projects', 'Skills', 'Education'],
                 roleTemplates: @json($roleTemplates),
                 newSkill: '',
                 resume: @json($initialData),
+                latexCode: `\\documentclass[letterpaper,10pt]{article}
+\\usepackage{latexsym}
+\\usepackage[empty]{fullpage}
+\\usepackage{titlesec}
+\\usepackage{enumitem}
+
+\\begin{document}
+
+\\section{Professional Summary}
+Cloud Engineer with practical experience in designing and deploying scalable solutions on Google Cloud Platform (GCP).
+
+\\section{Education}
+\\textbf{Bachelor of Technology (B.Tech)} \\hfill AKTU
+
+\\section{Skills}
+\\textbf{Cloud:} GCP, Gemini AI, AgentSpace
+\\textbf{Programming:} Java, JavaScript, Python
+
+\\end{document}`,
 
                 init() {
                     this.resume.template_id = 'ats-clean';
+                    this.recompile();
                 },
 
                 selectRole(role) {
@@ -249,39 +243,54 @@
                     this.resume.skills.splice(index, 1);
                 },
                 addProject() {
-                    this.resume.projects.push({ title: '', link: '', description: '' });
+                    this.resume.projects.push({ title: '', description: '' });
                 },
-                removeProject(index) {
-                    this.resume.projects.splice(index, 1);
-                },
-                addEducation() {
-                    this.resume.education.push({ institution: '', degree: '', year: '' });
+
+                recompile() {
+                    // Simple Regex Parser to Mock LaTeX -> HTML
+                    const code = this.latexCode;
+                    let html = '<div class="text-slate-900 space-y-6">';
+                    
+                    // Extract sections
+                    const sections = code.match(/\\section\{([^}]+)\}([\s\S]*?)(?=\\section|\\end\{document\})/g);
+                    if (sections) {
+                        sections.forEach(sec => {
+                            const title = sec.match(/\\section\{([^}]+)\}/)[1];
+                            const content = sec.replace(/\\section\{[^}]+\}/, '').trim()
+                                            .replace(/\\textbf\{([^}]+)\}/g, '<strong class="font-bold">$1</strong>')
+                                            .replace(/\\hfill/g, '<span class="flex-1"></span>')
+                                            .replace(/\\begin\{itemize\}[\s\S]*?\\end\{itemize\}/g, (list) => {
+                                                const items = list.match(/\\item\s+([^\n]+)/g);
+                                                return `<ul class="list-disc ml-4 space-y-1">${items.map(i => `<li class="text-[11px]">${i.replace('\\item ', '')}</li>`).join('')}</ul>`;
+                                            });
+                            
+                            html += `<div>
+                                <h3 class="text-xs font-black uppercase border-b border-slate-900 pb-1 mb-2">${title}</h3>
+                                <div class="text-[12px] leading-relaxed">${content}</div>
+                            </div>`;
+                        });
+                    }
+                    html += '</div>';
+                    document.getElementById('latex-preview-mount').innerHTML = html;
                 },
 
                 async saveResume() {
-                    const title = prompt("Name your resume:", "My Professional Resume");
+                    const title = prompt("Name your resume:", "Professional Identity");
                     if (!title) return;
 
                     try {
                         const res = await fetch('{{ route('resumes.store') }}', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                            },
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                             body: JSON.stringify({
                                 title: title,
-                                data: this.resume,
-                                template_id: this.resume.template_id
+                                data: this.mode === 'latex' ? { raw_latex: this.latexCode } : this.resume,
+                                template_id: this.mode === 'latex' ? 'latex-classic' : this.resume.template_id
                             })
                         });
                         const data = await res.json();
-                        if (data.status === 'success') {
-                            window.location.href = data.redirect;
-                        }
-                    } catch (e) {
-                        alert("Error saving resume.");
-                    }
+                        if (data.status === 'success') window.location.href = data.redirect;
+                    } catch (e) { alert("Error saving."); }
                 }
             }
         }
