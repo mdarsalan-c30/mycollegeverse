@@ -181,7 +181,7 @@
                             ['label' => 'Colleges', 'route' => 'colleges.index', 'icon' => 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4'],
                             ['label' => 'Messages', 'route' => 'chat.index', 'icon' => 'M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z'],
                             ['label' => 'Career Hub', 'route' => 'jobs.index', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745V20a2 2 0 002 2h14a2 2 0 002-2v-6.745zM16 8V5a2 2 0 00-2-2H10a2 2 0 00-2 2v3m4 6.138V21M7.074 21.33l6.574-6.574m0 0l-6.574-6.574'],
-                            ['label' => 'Resume Builder', 'route' => 'resumes.index', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+                            ['label' => 'Resume', 'route' => 'resumes.create', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
                             ['label' => 'Verse Pipeline', 'route' => 'pipeline.index', 'icon' => 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745V20a2 2 0 002 2h14a2 2 0 002-2v-6.745zM16 8V5a2 2 0 00-2-2H10a2 2 0 00-2 2v3m4 6.138V21M7.074 21.33l6.574-6.574m0 0l-6.574-6.574'],
                         ];
                     @endphp
@@ -485,7 +485,7 @@
                                     <h4 class="font-black text-slate-900 text-[10px] uppercase tracking-widest mb-6">Platform</h4>
                                     <ul class="space-y-3 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                         <li><a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Notes Repo</a></li>
-                                        <li><a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors">Resume Maker</a></li>
+                                        <li><a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors">Build Free Resume</a></li>
                                         <li><a href="/blog" class="hover:text-primary transition-colors">Editorial</a></li>
                                         <li><a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community</a></li>
                                         <li><a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Campus Hubs</a></li>
