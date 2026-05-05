@@ -55,9 +55,9 @@ class ResumeController extends Controller
             ],
             'education' => [
                 [
-                    'institution' => $user->college?->name ?? '',
-                    'degree' => $user->course?->name ?? '',
-                    'year' => $user->year ? "Graduating " . (2024 + (4 - $user->year)) : '',
+                    'institution' => $user?->college?->name ?? '',
+                    'degree' => $user?->course?->name ?? '',
+                    'year' => ($user && $user->year) ? "Graduating " . (2024 + (4 - (int)$user->year)) : '',
                 ]
             ],
             'experience' => [],
@@ -71,6 +71,7 @@ class ResumeController extends Controller
 
         return view('resumes.builder', compact('initialData', 'existingProjects', 'roleTemplates'));
     }
+
 
     public function store(Request $request)
     {
