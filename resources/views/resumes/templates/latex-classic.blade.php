@@ -17,7 +17,6 @@
         .resume-container { max-width: 850px; margin: 30px auto; background: white; padding: 0.6in; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
         .section-title { border-bottom: 1.1px solid #000; font-weight: bold; text-transform: uppercase; font-size: 13.5px; margin-top: 15px; margin-bottom: 8px; padding-bottom: 1.5px; }
         .item-row { display: flex; justify-content: space-between; align-items: baseline; font-weight: bold; font-size: 13px; }
-        .item-subrow { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; font-style: italic; }
         .bullet-list { list-style-type: disc; margin-left: 1.3rem; margin-top: 3px; }
         .bullet-item { font-size: 11.5px; margin-bottom: 2px; text-align: justify; line-height: 1.4; }
         .header-text { font-size: 11px; line-height: 1.5; }
@@ -44,28 +43,27 @@
             @php
                 $raw = $data['raw_latex'];
                 $raw = preg_replace('/%.*$/m', '', $raw); // Strip comments
+                $raw = str_replace('\\\\', ' ', $raw); // Strip all double backslashes
                 
                 // Parse Name & Degree
                 preg_match('/\\\\huge \\\\textbf\{([^}]+)\}/', $raw, $nameMatch);
                 preg_match('/\\\\small ([^}]+)\}/', $raw, $degreeMatch);
                 
-                // Parse Links & Contact
+                // Parse Links & Contact (Specific boundary matching)
                 $contactLines = [];
                 // Location
                 if (preg_match('/([^\\\\n\r\t{}&]+, India)/', $raw, $loc)) $contactLines[] = trim($loc[1]);
                 // Email
                 if (preg_match('/\\\\email\{([^}]+)\}/', $raw, $email)) {
                     $contactLines[] = '<a href="mailto:'.$email[1].'">'.$email[1].'</a>';
-                } elseif (preg_match('/mailto:([^}]+)/', $raw, $email)) {
-                    $contactLines[] = '<a href="mailto:'.$email[1].'">'.$email[1].'</a>';
                 }
-                // Phone
-                if (preg_match('/\\\\phone[^}]*\{([^}]+)\}/', $raw, $phone)) $contactLines[] = "+91-" . trim($phone[1]);
-                // LinkedIn / Social
+                // Phone (Non-greedy)
+                if (preg_match('/\\\\phone[^}]*\{([0-9+\-]+)\}/', $raw, $phone)) {
+                    $contactLines[] = "+91-" . trim($phone[1]);
+                }
+                // LinkedIn
                 if (preg_match('/\\\\href\{([^}]+)\}\{LinkedIn\}/', $raw, $li)) {
                     $contactLines[] = '<a href="'.$li[1].'" target="_blank">LinkedIn</a>';
-                } elseif (strpos($raw, 'LinkedIn') !== false) {
-                    $contactLines[] = '<a href="#">LinkedIn</a>';
                 }
             @endphp
 
@@ -91,18 +89,11 @@
                     <div class="text-[12px]">
                         @php
                             $content = trim($sections[2][$index]);
-                            
-                            // 1. Handle resumeSubheading WITH FLEXIBILITY (Handle spaces)
                             $content = preg_replace('/\\\\resumeSubheading\s*\{([^}]+)\}\s*\{([^}]+)\}/', '<div class="item-row"><span>$1</span><span>$2</span></div>', $content);
-                            
-                            // 2. Handle Bold & Italics
                             $content = preg_replace('/\\\\textbf\{([^}]+)\}/', '<strong>$1</strong>', $content);
                             $content = preg_replace('/\\\\textit\{([^}]+)\}/', '<em>$1</em>', $content);
-                            
-                            // 3. Handle href links in content
                             $content = preg_replace('/\\\\href\{([^}]+)\}\{([^}]+)\}/', '<a href="$1" target="_blank">$2</a>', $content);
 
-                            // 4. Handle Lists (itemize)
                             if (strpos($content, '\\item') !== false) {
                                 preg_match_all('/\\\\item\s+([^\n\\\\\\%]+)/', $content, $items);
                                 echo '<ul class="bullet-list">';
@@ -112,7 +103,6 @@
                                 }
                                 echo '</ul>';
                             } else {
-                                // Strip remaining LaTeX junk
                                 $cleanedText = preg_replace('/\\\\[a-zA-Z]+\{[^}]*\}|\\\\[a-zA-Z]+|[{}]|&/', ' ', $content);
                                 echo '<p class="text-justify leading-snug">'.trim($cleanedText).'</p>';
                             }
