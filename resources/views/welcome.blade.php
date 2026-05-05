@@ -188,6 +188,7 @@
                 
                 <div class="hidden md:flex items-center gap-8 font-medium text-slate-600">
                     <a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Browse Notes</a>
+                    <a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors">Resume</a>
                     <a href="/blog" class="hover:text-primary transition-colors">Editorial Hub</a>
                     <a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community Hub</a>
                     <a href="{{ route('jobs.index') }}" class="hover:text-primary transition-colors">Jobs</a>
@@ -255,6 +256,7 @@
                 <div class="space-y-6 text-left">
                     <div class="space-y-1">
                         <a href="{{ route('notes.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Browse NotesHub</a>
+                        <a href="{{ route('resumes.create') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Build Free Resume</a>
                         <a href="/blog" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Editorial Hub</a>
                         <a href="{{ route('community.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Community Verse</a>
                         <a href="{{ route('jobs.index') }}" class="block py-4 text-slate-600 font-bold text-lg hover:text-primary transition-all border-b border-slate-50">Carrier Pipeline</a>
@@ -624,6 +626,7 @@
                         <h4 class="font-black text-slate-900 text-xs uppercase tracking-[0.2em] mb-8 italic">Platform</h4>
                         <ul class="space-y-4 text-sm font-bold text-slate-500">
                             <li><a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Digital Identity Hub</a></li>
+                            <li><a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors font-black text-primary">Build Free Resume</a></li>
                             <li><a href="/blog" class="hover:text-primary transition-colors">Editorial Hub</a></li>
                             <li><a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community Verse</a></li>
                             <li><a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Campus Nodes</a></li>
