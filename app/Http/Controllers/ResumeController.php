@@ -23,32 +23,53 @@ class ResumeController extends Controller
     {
         $user = Auth::user();
         $existingProjects = $user ? $user->projects()->get() : collect();
-        
-        // Initial state for the builder
+
+        // Role-based Templates for Auto-fill
+        $roleTemplates = [
+            'SDE' => [
+                'summary' => 'Passionate Software Development Engineer focused on building scalable web applications and solving complex algorithmic challenges.',
+                'skills' => ['Java', 'Spring Boot', 'MySQL', 'System Design', 'Git', 'Data Structures']
+            ],
+            'Frontend' => [
+                'summary' => 'Frontend Developer dedicated to crafting immersive user experiences with modern JavaScript frameworks and responsive design.',
+                'skills' => ['React.js', 'Next.js', 'Tailwind CSS', 'TypeScript', 'Redux', 'Figma']
+            ],
+            'QA' => [
+                'summary' => 'Detail-oriented Quality Assurance Engineer experienced in automated testing and ensuring robust software reliability.',
+                'skills' => ['Selenium', 'JUnit', 'Postman', 'Manual Testing', 'Bug Tracking', 'CI/CD']
+            ],
+            'Data' => [
+                'summary' => 'Data Analyst focused on extracting actionable insights from complex datasets using statistical modeling and visualization.',
+                'skills' => ['Python', 'SQL', 'Pandas', 'Tableau', 'Power BI', 'Statistics']
+            ]
+        ];
+
         $initialData = [
             'personal' => [
                 'name' => $user->name ?? '',
                 'email' => $user->email ?? '',
                 'phone' => $user->mobile ?? '',
                 'location' => '',
-                'website' => '',
-                'summary' => $user->mentor_bio ?? '',
+                'role' => '',
+                'summary' => ''
             ],
             'education' => [
                 [
                     'institution' => $user->college?->name ?? '',
                     'degree' => $user->course?->name ?? '',
-                    'year' => $user->year ?? '',
-                    'description' => '',
+                    'year' => $user->year ? "Graduating " . (2024 + (4 - $user->year)) : '',
                 ]
             ],
             'experience' => [],
             'skills' => $user->skills ?? [],
-            'projects' => [],
-            'custom_sections' => []
+            'projects' => $existingProjects->map(fn($p) => [
+                'title' => $p->title,
+                'link' => $p->live_url ?? $p->github_url ?? '',
+                'description' => strip_tags($p->description)
+            ])->toArray(),
         ];
 
-        return view('resumes.builder', compact('initialData', 'existingProjects'));
+        return view('resumes.builder', compact('initialData', 'existingProjects', 'roleTemplates'));
     }
 
     public function store(Request $request)
@@ -56,20 +77,20 @@ class ResumeController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'data' => 'required|array',
+            'template_id' => 'required|string'
         ]);
 
         $resume = Resume::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
+            'slug' => (string) \Illuminate\Support\Str::uuid(),
+            'template_id' => $request->template_id,
             'data' => $request->data,
-            'template_id' => $request->template_id ?? 'ats-clean',
-            'is_public' => $request->is_public ?? true,
+            'is_public' => true
         ]);
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Resume manifested successfully!',
-            'slug' => $resume->slug,
             'redirect' => route('resumes.show', $resume->slug)
         ]);
     }
@@ -78,52 +99,46 @@ class ResumeController extends Controller
     {
         $resume = Resume::where('slug', $slug)->firstOrFail();
         
-        // Increment view count
         $resume->increment('views_count');
 
-        $template = 'resumes.templates.' . $resume->template_id;
-        
-        if (!view()->exists($template)) {
-            $template = 'resumes.templates.ats-clean';
+        $template = $resume->template_id ?? 'ats-clean';
+        $viewPath = "resumes.templates.{$template}";
+
+        if (!view()->exists($viewPath)) {
+            $viewPath = 'resumes.templates.ats-clean';
         }
 
-        return view($template, compact('resume'));
+        return view($viewPath, compact('resume'));
     }
 
     public function destroy(Resume $resume)
     {
-        $this->authorize('delete', $resume);
+        if ($resume->user_id !== Auth::id()) abort(403);
         $resume->delete();
-
-        return back()->with('success', 'Resume deleted from the Verse.');
+        return back()->with('success', 'Resume archived successfully.');
     }
 
     public function aiReview(Request $request)
     {
-        $resumeData = $request->input('resume');
-        $type = $request->input('type', 'review');
+        $apiKey = config('services.gemini.key');
+        if (!$apiKey) {
+            return response()->json(['feedback' => "AI is offline."], 500);
+        }
 
-        $prompt = $type === 'roast' 
-            ? "You are a brutal, sarcastic tech recruiter. Roast this student resume data in 3-4 sentences. Be funny but helpful. Resume Data: " . json_encode($resumeData)
-            : "Analyze this resume and provide 3 actionable improvements. Resume Data: " . json_encode($resumeData);
+        $type = $request->get('type', 'roast');
+        $prompt = ($type === 'roast') 
+            ? "Roast this student resume JSON brutally but constructively: " . json_encode($request->resume)
+            : "Give 3 ATS improvement tips for this resume JSON: " . json_encode($request->resume);
 
         try {
-            $apiKey = config('services.gemini.key');
             $response = \Illuminate\Support\Facades\Http::post("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={$apiKey}", [
-                'contents' => [
-                    [
-                        'parts' => [
-                            ['text' => $prompt]
-                        ]
-                    ]
-                ]
+                'contents' => [['parts' => [['text' => $prompt]]]]
             ]);
 
-            $feedback = $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? "The Verse is currently quiet. Try again later.";
-            
-            return response()->json(['feedback' => $feedback]);
+            return response()->json(['feedback' => $response->json()['candidates'][0]['content']['parts'][0]['text'] ?? "AI busy."]);
         } catch (\Exception $e) {
-            return response()->json(['feedback' => "AI is currently offline. Focus on your projects for now!"], 500);
+            return response()->json(['feedback' => "AI Error."], 500);
         }
     }
+
 }

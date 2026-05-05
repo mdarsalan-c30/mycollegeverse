@@ -1,16 +1,16 @@
 <x-app-layout>
-    @section('title', 'My Resume Vault | Student Career OS')
-    @section('meta_description', 'Manage your professional identities and proof-of-work resumes on MyCollegeVerse.')
+    @section('title', 'My Resumes | MyCollegeVerse')
+    @section('meta_description', 'Manage and download your professional resumes on MyCollegeVerse.')
 
     <div class="min-h-screen bg-slate-50 py-12">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
                 <div>
-                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">My Resumes <span class="text-primary">/ Verse Vault</span></h1>
-                    <p class="text-slate-500 font-bold mt-2">Manage your career manifestos and proof-of-work identities.</p>
+                    <h1 class="text-4xl font-black text-slate-900 tracking-tighter uppercase">My Resumes</h1>
+                    <p class="text-slate-500 font-bold mt-2">Manage your professional resumes and job-ready profiles.</p>
                 </div>
                 <a href="{{ route('resumes.create') }}" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-primary-dark transition-all shadow-xl shadow-primary/20 text-center">
-                    + Create New Identity
+                    + Create New Resume
                 </a>
             </div>
 
@@ -30,11 +30,11 @@
                     </div>
 
                     <h3 class="text-xl font-black text-slate-800 mb-2 truncate">{{ $resume->title }}</h3>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">Manifested {{ $resume->created_at->diffForHumans() }}</p>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8">Created {{ $resume->created_at->diffForHumans() }}</p>
 
                     <div class="flex items-center gap-3">
-                        <a href="{{ route('resumes.show', $resume->slug) }}" class="flex-1 bg-slate-900 text-white py-3 rounded-xl font-black text-center text-xs uppercase tracking-widest hover:bg-slate-800 transition-colors">View</a>
-                        <form action="{{ route('resumes.destroy', $resume->id) }}" method="POST" onsubmit="return confirm('Archive this identity forever?')">
+                        <a href="{{ route('resumes.show', $resume->slug) }}" class="flex-1 bg-slate-900 text-white py-3 rounded-xl font-black text-center text-xs uppercase tracking-widest hover:bg-slate-800 transition-colors">View / Download</a>
+                        <form action="{{ route('resumes.destroy', $resume->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this resume?')">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="bg-slate-100 text-slate-400 p-3 rounded-xl hover:text-rose-500 hover:bg-rose-50 transition-all">
@@ -50,9 +50,9 @@
                 <div class="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">
                     <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 </div>
-                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">No Identities Detected</h2>
-                <p class="text-slate-400 font-bold mt-2 max-w-md mx-auto">Your career manifestos will appear here. Start building your first professional identity today.</p>
-                <a href="{{ route('resumes.create') }}" class="inline-block mt-10 bg-primary text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-primary/20">Forge My First Resume</a>
+                <h2 class="text-2xl font-black text-slate-800 uppercase tracking-tight">No Resumes Found</h2>
+                <p class="text-slate-400 font-bold mt-2 max-w-md mx-auto">Build your professional resume and get noticed by recruiters.</p>
+                <a href="{{ route('resumes.create') }}" class="inline-block mt-10 bg-primary text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest shadow-lg shadow-primary/20">Build My First Resume</a>
             </div>
             @endif
         </div>
