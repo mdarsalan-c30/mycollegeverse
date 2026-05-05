@@ -23,14 +23,40 @@
                 <div class="flex items-center justify-between mb-8">
                     <button @click="mode = null" class="text-slate-400 font-black uppercase text-[10px] tracking-widest flex items-center gap-2 hover:text-primary transition-colors">Back</button>
                     <div class="flex items-center gap-4">
-                        @if(isset($resume_model))
-                        <button @click="copyEditorLink" class="bg-white border-2 border-slate-900 text-slate-900 px-6 py-4 rounded-2xl font-black uppercase tracking-widest flex items-center gap-2">
+                        <button @click="generateAndShare" class="bg-white border-2 border-primary text-primary px-6 py-4 rounded-2xl font-black uppercase tracking-widest flex items-center gap-2 hover:bg-primary hover:text-white transition-all shadow-lg shadow-primary/10">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" /></svg>
-                            Copy Editor Link
+                            Generate Shareable Link
                         </button>
-                        @endif
                         <button @click="recompile" class="bg-slate-800 text-white px-6 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl">Recompile Preview</button>
                         <button @click="saveResume" class="bg-primary text-white px-8 py-4 rounded-2xl font-black uppercase tracking-widest shadow-xl hover:bg-primary-dark transition-all">Save & Manifest</button>
+                    </div>
+                </div>
+
+                <!-- SHARE MODAL -->
+                <div x-show="showShareModal" style="display: none;" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+                    <div class="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-blue-500"></div>
+                        <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tighter mb-2">Identity Manifest <span class="text-primary">Shared!</span></h3>
+                        <p class="text-slate-500 font-bold mb-8 text-sm uppercase tracking-widest">Share these unique links with anyone.</p>
+                        
+                        <div class="space-y-6">
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-primary mb-2 block">Collaborative Editor Link (Playground)</label>
+                                <div class="flex items-center gap-3">
+                                    <input readonly x-model="editorUrl" class="flex-1 bg-transparent border-none text-xs font-mono text-slate-600 focus:ring-0">
+                                    <button @click="copyToClipboard(editorUrl)" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Copy</button>
+                                </div>
+                            </div>
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100">
+                                <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 block">Professional Manifest Link (PDF View)</label>
+                                <div class="flex items-center gap-3">
+                                    <input readonly x-model="manifestUrl" class="flex-1 bg-transparent border-none text-xs font-mono text-slate-600 focus:ring-0">
+                                    <button @click="copyToClipboard(manifestUrl)" class="bg-slate-900 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase">Copy</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button @click="showShareModal = false" class="w-full mt-8 bg-slate-100 text-slate-400 py-4 rounded-2xl font-black uppercase text-xs tracking-widest hover:bg-slate-200 transition-all">Close Playground</button>
                     </div>
                 </div>
 
@@ -53,13 +79,39 @@
                 mode: @json(isset($resume_model) ? 'latex' : null), 
                 currentStep: 0, roleSelected: false, steps: ['Basic Details', 'Projects', 'Skills'],
                 roleTemplates: @json($roleTemplates), resume: @json($initialData), latexCode: @json($defaultLatex),
+                showShareModal: false, editorUrl: '', manifestUrl: '',
                 init() { setTimeout(() => this.recompile(), 500); },
 
-                copyEditorLink() {
-                    const url = window.location.origin + '/resume/edit/{{ $resume_model->slug ?? '' }}';
-                    navigator.clipboard.writeText(url).then(() => {
-                        alert('🚀 Shareable Editor Link Copied!');
+                copyToClipboard(text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('🚀 Link Copied!');
                     });
+                },
+
+                async generateAndShare() {
+                    let title = prompt("Name this Identity Manifest:", "Collaborative Resume");
+                    if (!title) return;
+                    
+                    try {
+                        const res = await fetch('{{ route('resumes.store') }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ 
+                                title: title, 
+                                data: { raw_latex: this.latexCode }, 
+                                template_id: 'latex-classic' 
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            const slug = data.redirect.split('/').pop();
+                            this.manifestUrl = data.redirect;
+                            this.editorUrl = window.location.origin + '/resume/edit/' + slug;
+                            this.showShareModal = true;
+                        }
+                    } catch (e) {
+                        alert("Error generating playground link.");
+                    }
                 },
                 
                 recompile() {
