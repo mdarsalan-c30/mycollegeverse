@@ -12,6 +12,7 @@ class ResumeController extends Controller
 {
     public function index()
     {
+        // Show user's resumes if logged in, otherwise show a landing/empty state
         $resumes = Auth::check() 
             ? Auth::user()->resumes()->latest()->get() 
             : collect();
@@ -69,25 +70,23 @@ class ResumeController extends Controller
             ])->toArray(),
         ];
 
-        // Build Default LaTeX String safely in PHP
-        $userName = $user->name ?? 'Vanshika Singh';
+        // Build Default LaTeX String safely
+        $userName = $user->name ?? 'Guest User';
         $defaultLatex = "\\documentclass[letterpaper,10pt]{article}\n\n" .
             "% HEADER\n" .
             "\\huge \\textbf{{$userName}}\n" .
             "\\small Bachelor Of Technology (B.Tech)\n\n" .
             "Noida, India\n" .
-            "\\email{vanshikas117@gmail.com}\n" .
-            "\\phone{8076343451}\n\n" .
+            "\\email{your.email@example.com}\n" .
+            "\\phone{0000000000}\n\n" .
             "\\section{Professional Summary}\n" .
-            "Cloud Engineer with practical experience...\n\n" .
+            "Enter your summary here...\n\n" .
             "\\section{Education}\n" .
             "\\resumeSubheading{Bachelor of Technology (B.Tech)}{AKTU}\n\n" .
             "\\end{document}";
 
         return view('resumes.builder', compact('initialData', 'existingProjects', 'roleTemplates', 'defaultLatex'));
     }
-
-
 
     public function store(Request $request)
     {
@@ -98,7 +97,7 @@ class ResumeController extends Controller
         ]);
 
         $resume = Resume::create([
-            'user_id' => Auth::id(),
+            'user_id' => Auth::id(), // Will be null for guests
             'title' => $request->title,
             'slug' => (string) \Illuminate\Support\Str::uuid(),
             'template_id' => $request->template_id,
@@ -111,6 +110,7 @@ class ResumeController extends Controller
             'redirect' => route('resumes.show', $resume->slug)
         ]);
     }
+
 
     public function show($slug)
     {
