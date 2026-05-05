@@ -13,15 +13,11 @@ class MakeUserIdNullableInResumesTable extends Migration
      */
     public function up()
     {
-        Schema::table('resumes', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable()->change();
-        });
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE resumes MODIFY user_id BIGINT UNSIGNED NULL');
     }
 
     public function down()
     {
-        Schema::table('resumes', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->nullable(false)->change();
-        });
+        \Illuminate\Support\Facades\DB::statement('ALTER TABLE resumes MODIFY user_id BIGINT UNSIGNED NOT NULL');
     }
 }
