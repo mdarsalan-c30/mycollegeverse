@@ -47,9 +47,9 @@ class ResumeController extends Controller
 
         $initialData = [
             'personal' => [
-                'name' => $user->name ?? '',
-                'email' => $user->email ?? '',
-                'phone' => $user->mobile ?? '',
+                'name' => $user?->name ?? '',
+                'email' => $user?->email ?? '',
+                'phone' => $user?->mobile ?? '',
                 'location' => '',
                 'role' => '',
                 'summary' => ''
@@ -62,7 +62,7 @@ class ResumeController extends Controller
                 ]
             ],
             'experience' => [],
-            'skills' => $user->skills ?? [],
+            'skills' => $user?->skills ?? [],
             'projects' => $existingProjects->map(fn($p) => [
                 'title' => $p->title,
                 'link' => $p->live_url ?? $p->github_url ?? '',
@@ -71,7 +71,7 @@ class ResumeController extends Controller
         ];
 
         // Build Default LaTeX String safely
-        $userName = $user->name ?? 'Guest User';
+        $userName = $user?->name ?? 'Guest User';
         $defaultLatex = "\\documentclass[letterpaper,10pt]{article}\n\n" .
             "% HEADER\n" .
             "\\huge \\textbf{{$userName}}\n" .

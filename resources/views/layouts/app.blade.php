@@ -485,7 +485,7 @@
                                     <h4 class="font-black text-slate-900 text-[10px] uppercase tracking-widest mb-6">Platform</h4>
                                     <ul class="space-y-3 text-[10px] font-black uppercase tracking-widest text-slate-400">
                                         <li><a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Notes Repo</a></li>
-                                        <li><a href="{{ route('resumes.build') }}" class="hover:text-primary transition-colors">Resume Maker</a></li>
+                                        <li><a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors">Resume Maker</a></li>
                                         <li><a href="/blog" class="hover:text-primary transition-colors">Editorial</a></li>
                                         <li><a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community</a></li>
                                         <li><a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Campus Hubs</a></li>
