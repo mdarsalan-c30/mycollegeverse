@@ -56,7 +56,6 @@
             @php
                 $raw = $data['raw_latex'];
                 $raw = preg_replace('/%.*$/m', '', $raw); 
-                
                 preg_match_all('/\\\\newcommand\{\\\\([^}]+)\}\{([^}]+)\}/', $raw, $commands);
                 $vars = [];
                 if(isset($commands[1])) { foreach($commands[1] as $i => $key) { $vars[$key] = $commands[2][$i]; } }
@@ -65,7 +64,7 @@
                 preg_match('/\\\\huge \\\\textbf\{([^}]+)\}/', $raw, $nameM);
                 preg_match('/\\\\small ([^}]+)\}/', $raw, $roleM);
                 $name = $nameM[1] ?? ($vars['name'] ?? $resume->title);
-                $role = $roleM[1] ?? 'Student';
+                $role = $roleM[1] ?? 'Professional Profile';
                 
                 $contactLines = [];
                 if (preg_match('/([^\\\\n\r\t{}&]+, India)/', $raw, $loc)) $contactLines[] = trim($loc[1]);
@@ -96,7 +95,6 @@
                             $content = trim($sections[2][$index]);
                             $content = preg_replace('/\\\\resumeSubheading\s*\{([^}]+)\}\s*\{([^}]+)\}/', '<div class="item-row"><span>$1</span><span>$2</span></div>', $content);
                             $content = preg_replace('/\\\\textbf\{([^}]+)\}/', '<strong>$1</strong>', $content);
-
                             if (strpos($content, '\\item') !== false) {
                                 preg_match_all('/\\\\item\s+([\s\S]*?)(?=\\\\item|\\\\end\{itemize\})/', $content, $items);
                                 echo '<ul class="bullet-list">';
@@ -114,6 +112,66 @@
                     </div>
                 </div>
             @endforeach
+        @else
+            <!-- GUIDED MODE RENDER -->
+            <div class="flex justify-between items-start mb-8">
+                <div>
+                    <h1 class="text-[38px] font-bold tracking-tight leading-none mb-1">{{ $data['personal']['name'] ?? 'Your Name' }}</h1>
+                    <p class="text-[14.5px] font-bold text-slate-800 uppercase tracking-wide">{{ $data['personal']['role'] ?? 'Professional Profile' }}</p>
+                </div>
+                <div class="header-text font-medium mt-2">
+                    <p>{{ $data['personal']['location'] ?? 'Your City, India' }}</p>
+                    <p><a href="mailto:{{ $data['personal']['email'] ?? '' }}" class="underline">{{ $data['personal']['email'] ?? '' }}</a></p>
+                    <p>+91-{{ $data['personal']['phone'] ?? '' }}</p>
+                </div>
+            </div>
+
+            @if(!empty($data['personal']['summary']))
+            <div class="mb-5">
+                <div class="section-title">Professional Summary</div>
+                <div class="body-text">{{ $data['personal']['summary'] }}</div>
+            </div>
+            @endif
+
+            @if(!empty($data['education']))
+            <div class="mb-5">
+                <div class="section-title">Education</div>
+                @foreach($data['education'] as $edu)
+                <div class="item-row">
+                    <span>{{ $edu['institution'] }} — {{ $edu['degree'] }}</span>
+                    <span>{{ $edu['year'] }}</span>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            @if(!empty($data['projects']))
+            <div class="mb-5">
+                <div class="section-title">Projects</div>
+                @foreach($data['projects'] as $proj)
+                <div class="mb-3">
+                    <div class="item-row">
+                        <span>{{ $proj['title'] }}</span>
+                        <span><a href="{{ $proj['link'] }}" class="underline text-xs">{{ $proj['link'] }}</a></span>
+                    </div>
+                    <div class="body-text mt-1 italic">{{ $proj['description'] }}</div>
+                </div>
+                @endforeach
+            </div>
+            @endif
+
+            @if(!empty($data['skills']))
+            <div class="mb-5">
+                <div class="section-title">Skills</div>
+                <div class="body-text">
+                    @if(is_array($data['skills']))
+                        {{ implode(', ', $data['skills']) }}
+                    @else
+                        {{ $data['skills'] }}
+                    @endif
+                </div>
+            </div>
+            @endif
         @endif
     </div>
 </body>
