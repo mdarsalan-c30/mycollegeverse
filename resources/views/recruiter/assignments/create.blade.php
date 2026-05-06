@@ -1,6 +1,12 @@
 <x-recruiter-layout>
     <x-slot name="title">Manifest Assessment | TaskFlow Builder</x-slot>
 
+    @push('head')
+        <!-- SimpleMDE Markdown Editor ✍️ -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+        <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    @endpush
+
     <div class="max-w-4xl mx-auto">
         <div class="mb-10 flex items-center gap-4">
             <a href="{{ route('recruiter.assessments.index') }}" class="w-12 h-12 glass rounded-2xl flex items-center justify-center text-slate-400 hover:text-primary transition-all">
@@ -56,10 +62,22 @@
 
                 <div class="space-y-2">
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Task Instructions (Markdown Support)</label>
-                    <textarea name="instructions" rows="6" placeholder="Describe the task in detail. What are the deliverables?" required
+                    <div class="prose max-w-none">
+                        <textarea id="markdown-editor" name="instructions" placeholder="Describe the task in detail. What are the deliverables?" required
                               class="w-full bg-slate-50 border border-slate-100 rounded-3xl p-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"></textarea>
+                    </div>
                 </div>
             </div>
+
+            <script>
+                var simplemde = new SimpleMDE({ 
+                    element: document.getElementById("markdown-editor"),
+                    spellChecker: false,
+                    placeholder: "Detail the task nodes... Support for headings, bullets, and links manifested.",
+                    status: false,
+                    autosave: { enabled: true, uniqueId: "mcv_assess_builder", delay: 1000 },
+                });
+            </script>
 
             <!-- Submission Logistics 📥 -->
             <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-10 space-y-8">

@@ -10,6 +10,8 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
         .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); }
     </style>
+    <!-- Marked.js Markdown Engine ⚙️ -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="antialiased text-slate-900">
     <div class="min-h-screen flex flex-col">
@@ -55,10 +57,17 @@
 
                 <div class="prose prose-slate max-w-none">
                     <h3 class="text-lg font-black text-slate-900 uppercase tracking-widest mb-4">Instructions</h3>
-                    <div class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed whitespace-pre-line">
+                    <div id="instructions-content" class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed overflow-hidden">
                         {{ $assignment->instructions }}
                     </div>
                 </div>
+
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const content = document.getElementById('instructions-content');
+                        content.innerHTML = marked.parse(content.innerText);
+                    });
+                </script>
 
                 <div class="p-8 bg-blue-600 rounded-[2rem] text-white space-y-4 shadow-xl shadow-blue-200">
                     <h3 class="text-sm font-black uppercase tracking-widest">Recruiter's Vision</h3>

@@ -47,8 +47,8 @@ class AssignmentController extends Controller
             'task_type' => 'required|string',
             'instructions' => 'required|string',
             'submission_types' => 'required|array',
-            'deadline' => 'nullable|date',
-            'is_public' => 'boolean',
+            'deadline' => 'nullable',
+            'is_public' => 'nullable',
         ]);
 
         $assignment = Assignment::create([
@@ -57,14 +57,15 @@ class AssignmentController extends Controller
             'title' => $validated['title'],
             'role' => $validated['role'],
             'task_type' => $validated['task_type'],
+            'description' => $validated['instructions'], // Syncing description and instructions for redundancy
             'instructions' => $validated['instructions'],
             'submission_types' => $validated['submission_types'],
-            'deadline' => $validated['deadline'],
+            'deadline' => $validated['deadline'] ? \Carbon\Carbon::parse($validated['deadline']) : null,
             'is_public' => $request->has('is_public'),
             'status' => 'active',
         ]);
 
-        return redirect()->route('recruiter.assignments.index')->with('success', 'Assignment Verse created! Share the link with candidates.');
+        return redirect()->route('recruiter.assessments.index')->with('success', 'Assignment Verse created! Share the link with candidates.');
     }
 
     /**

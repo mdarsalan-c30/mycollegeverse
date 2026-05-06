@@ -1,6 +1,11 @@
 <x-recruiter-layout>
     <x-slot name="title">Review Work | {{ $assignment->title }}</x-slot>
 
+    @push('head')
+        <!-- Marked.js Markdown Engine ⚙️ -->
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    @endpush
+
     <div class="space-y-10">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -84,10 +89,16 @@
                                 @if($submission->submission_text)
                                     <div class="p-6 bg-white rounded-2xl border border-slate-100">
                                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Written Submission</p>
-                                        <div class="text-sm font-medium text-slate-700 leading-relaxed italic whitespace-pre-line">
-                                            "{{ $submission->submission_text }}"
+                                        <div id="submission-text-{{ $submission->id }}" class="text-sm font-medium text-slate-700 leading-relaxed overflow-hidden prose-sm max-w-none">
+                                            {{ $submission->submission_text }}
                                         </div>
                                     </div>
+                                    <script>
+                                        document.addEventListener('DOMContentLoaded', function() {
+                                            const target = document.getElementById('submission-text-{{ $submission->id }}');
+                                            target.innerHTML = marked.parse(target.innerText);
+                                        });
+                                    </script>
                                 @endif
                             </div>
 
