@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <form action="{{ route('recruiter.assessments.store') }}" method="POST" class="space-y-8">
+        <form id="assignment-form" action="{{ route('recruiter.assessments.store') }}" method="POST" class="space-y-8">
             @csrf
             
             <!-- Core Configuration ⚙️ -->
@@ -72,27 +72,6 @@
                 </div>
             </div>
 
-            <script>
-                var quill = new Quill('#editor-container', {
-                    modules: {
-                        toolbar: [
-                            [{ header: [1, 2, 3, false] }],
-                            ['bold', 'italic', 'underline'],
-                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                            ['link', 'clean']
-                        ]
-                    },
-                    placeholder: 'Paste your assignment details from Google Docs or ChatGPT here...',
-                    theme: 'snow'
-                });
-
-                // Sync Quill content to hidden input
-                document.querySelector('form').onsubmit = function() {
-                    var instructions = document.querySelector('#instructions-input');
-                    instructions.value = quill.root.innerHTML;
-                };
-            </script>
-
             <!-- Submission Logistics 📥 -->
             <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-10 space-y-8">
                 <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest">Submission Logistics</h3>
@@ -135,11 +114,55 @@
                 </div>
             </div>
 
-            <div class="flex justify-end pt-4">
-                <button type="submit" class="h-16 px-12 bg-slate-900 text-white rounded-[1.5rem] font-black text-[10px] uppercase tracking-[0.2em] flex items-center gap-3 hover:bg-primary hover:scale-105 transition-all shadow-xl shadow-slate-200">
-                    Manifest Task node 🛰️
+            <!-- Create Button 🚀 -->
+            <div class="flex flex-col items-center gap-4">
+                @if ($errors->any())
+                    <div class="w-full bg-rose-50 border border-rose-100 p-4 rounded-2xl">
+                        <ul class="list-disc list-inside text-rose-500 text-[10px] font-black uppercase tracking-widest">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                <button type="submit" id="manifest-btn" class="h-20 w-full bg-primary text-white rounded-[2.5rem] font-black text-xs uppercase tracking-[0.3em] hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/30 transition-all active:scale-95">
+                    Manifest Assessment Task 🛰️
                 </button>
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var quill = new Quill('#editor-container', {
+                modules: {
+                    toolbar: [
+                        [{ header: [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'clean']
+                    ]
+                },
+                placeholder: 'Paste your assignment details from Google Docs or ChatGPT here...',
+                theme: 'snow'
+            });
+
+            // Handle Form Submission with Deep Sync
+            const form = document.getElementById('assignment-form');
+            const instructionsInput = document.getElementById('instructions-input');
+
+            form.addEventListener('submit', function(e) {
+                // Get Quill HTML
+                const html = quill.root.innerHTML;
+                
+                // If it's just an empty paragraph, consider it empty
+                if (html === '<p><br></p>' || quill.getText().trim().length === 0) {
+                    instructionsInput.value = '';
+                } else {
+                    instructionsInput.value = html;
+                }
+            });
+        });
+    </script>
 </x-recruiter-layout>
