@@ -25,14 +25,14 @@
             <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm p-10 space-y-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Task Title</label>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Task Title</label>
                         <input type="text" name="title" placeholder="e.g. Content Writing Intern Test" required
-                               class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
+                               class="w-full h-14 bg-white border border-slate-300 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all placeholder:text-slate-300 shadow-sm">
                     </div>
                     
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Linked Job (Optional)</label>
-                        <select name="job_id" class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Linked Job (Optional)</label>
+                        <select name="job_id" class="w-full h-14 bg-white border border-slate-300 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm">
                             <option value="">Independent Assessment</option>
                             @foreach($jobs as $job)
                                 <option value="{{ $job->id }}">{{ $job->title }}</option>
@@ -43,14 +43,14 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Candidate Role</label>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Candidate Role</label>
                         <input type="text" name="role" placeholder="e.g. Video Editor"
-                               class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
+                               class="w-full h-14 bg-white border border-slate-300 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all placeholder:text-slate-300 shadow-sm">
                     </div>
                     
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Task Category</label>
-                        <select name="task_type" class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Task Category</label>
+                        <select name="task_type" class="w-full h-14 bg-white border border-slate-300 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm">
                             <option value="General">General Assessment</option>
                             <option value="Blog">✍️ Blog / Content Writing</option>
                             <option value="Video">🎬 Video Editing / Creative</option>
@@ -104,9 +104,9 @@
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Submission Deadline</label>
+                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Submission Deadline</label>
                         <input type="datetime-local" name="deadline"
-                               class="w-full h-14 bg-slate-50 border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all">
+                               class="w-full h-14 bg-white border border-slate-300 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm">
                     </div>
                 </div>
 

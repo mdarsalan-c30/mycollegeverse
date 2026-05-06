@@ -14,6 +14,7 @@ class AssignmentSubmission extends Model
         'user_id',
         'candidate_name',
         'candidate_email',
+        'candidate_phone',
         'submission_link',
         'file_path',
         'submission_text',

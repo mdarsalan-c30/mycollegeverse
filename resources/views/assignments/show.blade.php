@@ -80,57 +80,67 @@
             <!-- Right Side: Submission Form -->
             <div class="lg:col-span-1">
                 <div class="sticky top-10">
-                    <form action="{{ route('assignments.submit', $assignment->slug) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-[2.5rem] border border-slate-100 shadow-2xl p-8 space-y-8">
+                    <form action="{{ route('assignments.submit', $assignment->slug) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-[2.5rem] border border-slate-200 shadow-2xl p-6 lg:p-8 space-y-8">
                         @csrf
                         <div class="text-center space-y-2">
-                            <h2 class="text-xl font-black text-slate-900">Submit Work</h2>
+                            <h2 class="text-xl lg:text-2xl font-black text-slate-900">Submit Work</h2>
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Secure Submission Protocol</p>
                         </div>
 
-                        @guest
                         <div class="space-y-4">
+                            @guest
                             <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-                                <input type="text" name="candidate_name" required class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 transition-all">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                                <input type="text" name="candidate_name" required placeholder="Your full name"
+                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                                <input type="email" name="candidate_email" required class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 transition-all">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
+                                <input type="email" name="candidate_email" required placeholder="you@example.com"
+                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
+                            </div>
+                            @endguest
+                            
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number (WhatsApp Preferred)</label>
+                                <input type="text" name="candidate_phone" placeholder="+91 00000 00000"
+                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                         </div>
-                        @endguest
 
                         <div class="space-y-6">
                             @if(in_array('link', $assignment->submission_types))
                             <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Work Link (Drive/Portfolio)</label>
-                                <input type="url" name="submission_link" placeholder="https://drive.google.com/..." class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 transition-all">
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Work Link (Drive/Portfolio)</label>
+                                <input type="url" name="submission_link" placeholder="https://drive.google.com/..."
+                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             @endif
 
                             @if(in_array('file', $assignment->submission_types))
                             <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Upload Asset</label>
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Upload Asset</label>
                                 <div class="relative group">
                                     <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                                    <div class="h-24 bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center group-hover:border-blue-400 transition-all">
+                                    <div class="h-24 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center group-hover:border-blue-400 group-hover:bg-blue-50/30 transition-all">
                                         <span class="text-2xl">📁</span>
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Click to select file</span>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Select submission file</span>
                                     </div>
                                 </div>
-                                <p class="text-[9px] text-slate-400 text-center font-medium mt-2">Max size: 20MB. Auto-deletes in 10 days.</p>
+                                <p class="text-[9px] text-slate-400 text-center font-medium mt-2">Max 20MB. Nodes purged after 10 days.</p>
                             </div>
                             @endif
 
                             @if(in_array('text', $assignment->submission_types))
                             <div class="space-y-1">
-                                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Written Deliverable / Notes</label>
-                                <textarea name="submission_text" rows="4" class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 transition-all"></textarea>
+                                <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Written Deliverable / Notes</label>
+                                <textarea name="submission_text" rows="5" placeholder="Paste your article or notes here..."
+                                          class="w-full bg-white border border-slate-300 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300"></textarea>
                             </div>
                             @endif
                         </div>
 
-                        <button type="submit" class="w-full h-14 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 transition-all shadow-lg shadow-blue-100">
+                        <button type="submit" class="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95">
                             Beam Submission 🚀
                         </button>
                     </form>

@@ -92,6 +92,7 @@ class AssignmentController extends Controller
         $rules = [
             'candidate_name' => Auth::check() ? 'nullable' : 'required|string|max:255',
             'candidate_email' => Auth::check() ? 'nullable' : 'required|email|max:255',
+            'candidate_phone' => 'nullable|string|max:20',
             'submission_text' => 'nullable|string',
             'submission_link' => 'nullable|url',
             'file' => 'nullable|file|max:20480', // 20MB
@@ -130,6 +131,7 @@ class AssignmentController extends Controller
             'user_id' => Auth::id(),
             'candidate_name' => Auth::user()->name ?? $request->candidate_name,
             'candidate_email' => Auth::user()->email ?? $request->candidate_email,
+            'candidate_phone' => $request->candidate_phone,
             'submission_link' => $request->submission_link,
             'submission_text' => $request->submission_text,
             'file_path' => $filePath,

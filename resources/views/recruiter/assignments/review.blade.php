@@ -35,7 +35,11 @@
                             </div>
                             <div>
                                 <h4 class="text-lg font-black text-slate-900">{{ $submission->candidate_name }}</h4>
-                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ $submission->candidate_email }} • Submitted {{ $submission->created_at->diffForHumans() }}</p>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    {{ $submission->candidate_email }} 
+                                    @if($submission->candidate_phone) • {{ $submission->candidate_phone }} @endif
+                                    • Submitted {{ $submission->created_at->diffForHumans() }}
+                                </p>
                             </div>
                         </div>
 
@@ -119,14 +123,15 @@
                                     </div>
 
                                     <div class="space-y-2 pt-4">
-                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Overall Score (0-100)</label>
-                                        <input type="number" name="score" value="{{ $submission->score ?? '' }}" required
-                                               class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-sm font-bold">
+                                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Overall Score (0-100)</label>
+                                        <input type="number" name="score" value="{{ $submission->score ?? '' }}" required placeholder="e.g. 85"
+                                               class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:border-primary transition-all">
                                     </div>
 
                                     <div class="space-y-2">
-                                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Review Feedback</label>
-                                        <textarea name="feedback" rows="3" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-bold">{{ $submission->recruiter_notes }}</textarea>
+                                        <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Review Feedback</label>
+                                        <textarea name="feedback" rows="3" placeholder="Add your notes here..."
+                                                  class="w-full bg-white border border-slate-300 rounded-xl p-4 text-sm font-bold focus:border-primary transition-all">{{ $submission->recruiter_notes }}</textarea>
                                     </div>
 
                                     <button type="submit" class="w-full h-12 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:shadow-lg hover:shadow-primary/20 transition-all">
