@@ -17,6 +17,18 @@
     <style>
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
         .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        
+        /* High-Fidelity Markdown Styling ✍️ */
+        .markdown-node h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; color: #0F172A; }
+        .markdown-node h2 { font-size: 1.4rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1E293B; }
+        .markdown-node h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #334155; }
+        .markdown-node p { margin-bottom: 1.25rem; line-height: 1.7; }
+        .markdown-node ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+        .markdown-node ol { list-style-type: decimal; margin-left: 1.5rem; margin-bottom: 1.5rem; }
+        .markdown-node li { margin-bottom: 0.5rem; }
+        .markdown-node strong { font-weight: 700; color: #0F172A; }
+        .markdown-node blockquote { border-left: 4px solid #3B82F6; padding-left: 1rem; italic; color: #64748B; margin-bottom: 1.5rem; }
+        .markdown-node code { background: #F1F5F9; padding: 0.2rem 0.4rem; rounded: 4px; font-family: monospace; font-size: 0.9rem; }
     </style>
     <!-- Marked.js Markdown Engine ⚙️ -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -65,15 +77,16 @@
 
                 <div class="prose prose-slate max-w-none">
                     <h3 class="text-lg font-black text-slate-900 uppercase tracking-widest mb-4">Instructions</h3>
-                    <div id="instructions-content" class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed overflow-hidden">
-                        {{ $assignment->instructions }}
+                    <div id="instructions-content" class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed overflow-hidden markdown-node">
+                        {!! $assignment->instructions !!}
                     </div>
                 </div>
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const content = document.getElementById('instructions-content');
-                        content.innerHTML = marked.parse(content.innerText);
+                        const rawText = content.textContent.trim();
+                        content.innerHTML = marked.parse(rawText);
                     });
                 </script>
 

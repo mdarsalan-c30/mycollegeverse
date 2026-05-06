@@ -4,6 +4,18 @@
     @push('head')
         <!-- Marked.js Markdown Engine ⚙️ -->
         <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <style>
+            /* High-Fidelity Markdown Styling ✍️ */
+            .markdown-node h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; color: #0F172A; }
+            .markdown-node h2 { font-size: 1.4rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1E293B; }
+            .markdown-node h3 { font-size: 1.1rem; font-weight: 700; margin-top: 1.5rem; margin-bottom: 0.75rem; color: #334155; }
+            .markdown-node p { margin-bottom: 1.25rem; line-height: 1.7; }
+            .markdown-node ul { list-style-type: disc !important; margin-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
+            .markdown-node ol { list-style-type: decimal !important; margin-left: 1.5rem !important; margin-bottom: 1.5rem !important; }
+            .markdown-node li { margin-bottom: 0.5rem; display: list-item !important; }
+            .markdown-node strong { font-weight: 700; color: #0F172A; }
+            .markdown-node blockquote { border-left: 4px solid #3B82F6; padding-left: 1rem; italic; color: #64748B; margin-bottom: 1.5rem; }
+        </style>
     @endpush
 
     <div class="space-y-10">
@@ -93,14 +105,15 @@
                                 @if($submission->submission_text)
                                     <div class="p-6 bg-white rounded-2xl border border-slate-100">
                                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Written Submission</p>
-                                        <div id="submission-text-{{ $submission->id }}" class="text-sm font-medium text-slate-700 leading-relaxed overflow-hidden prose-sm max-w-none">
+                                        <div id="submission-text-{{ $submission->id }}" class="text-sm font-medium text-slate-700 leading-relaxed overflow-hidden markdown-node">
                                             {{ $submission->submission_text }}
                                         </div>
                                     </div>
                                     <script>
                                         document.addEventListener('DOMContentLoaded', function() {
                                             const target = document.getElementById('submission-text-{{ $submission->id }}');
-                                            target.innerHTML = marked.parse(target.innerText);
+                                            const rawText = target.textContent.trim();
+                                            target.innerHTML = marked.parse(rawText);
                                         });
                                     </script>
                                 @endif
