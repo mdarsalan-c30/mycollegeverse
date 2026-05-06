@@ -198,4 +198,35 @@ class AssignmentController extends Controller
         // Placeholder for bulk notification logic (Email/Signal)
         return back()->with('success', 'Notification blast sent to selected candidates!');
     }
+
+    /**
+     * Recruiter Action: Delete Assignment and Purge Nodes
+     */
+    public function destroy(Assignment $assignment)
+    {
+        if ($assignment->recruiter_id !== Auth::id()) abort(403);
+
+        // 🛡️ Deep Space Purge: Delete all submission files from Cloudinary
+        $submissions = $assignment->submissions;
+        $cloudName = env('CLOUDINARY_CLOUD_NAME');
+        $apiKey = env('CLOUDINARY_API_KEY');
+        $apiSecret = env('CLOUDINARY_API_SECRET');
+
+        foreach ($submissions as $submission) {
+            if ($submission->file_id) {
+                try {
+                    Http::withBasicAuth($apiKey, $apiSecret)
+                        ->post("https://api.cloudinary.com/v1_1/{$cloudName}/resources/image/upload", [
+                            'public_ids' => [$submission->file_id],
+                        ]);
+                } catch (\Exception $e) {
+                    \Log::error('Cloud Purge Failed during Delete: ' . $e->getMessage());
+                }
+            }
+        }
+
+        $assignment->delete(); // Cascading delete will handle DB records if constrained, else we do manually
+
+        return redirect()->route('recruiter.assessments.index')->with('success', 'Assignment and all associated work nodes purged from the multiverse.');
+    }
 }

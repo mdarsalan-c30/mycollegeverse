@@ -227,6 +227,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/{submission}/evaluate', [App\Http\Controllers\AssignmentController::class, 'evaluate'])->name('evaluate');
             Route::post('/{submission}/status', [App\Http\Controllers\AssignmentController::class, 'updateSubmissionStatus'])->name('submission.status');
             Route::post('/bulk-notify', [App\Http\Controllers\AssignmentController::class, 'bulkNotify'])->name('bulk-notify');
+            Route::delete('/{assignment}', [App\Http\Controllers\AssignmentController::class, 'destroy'])->name('destroy');
         });
     });
 });

@@ -57,6 +57,13 @@
                             <a href="{{ route('recruiter.assessments.review', $assignment->id) }}" class="h-12 px-8 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-primary transition-all">
                                 👁️ Review Work
                             </a>
+                            <form action="{{ route('recruiter.assessments.destroy', $assignment->id) }}" method="POST" onsubmit="return confirm('Purge this assignment and all its work nodes from the multiverse? This cannot be undone.')" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="w-12 h-12 flex items-center justify-center bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all" title="Purge Assessment">
+                                    🗑️
+                                </button>
+                            </form>
                         </div>
                     </div>
                     

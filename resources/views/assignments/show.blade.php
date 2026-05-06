@@ -3,7 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $assignment->title }} | MCV Assess</title>
+    <title>{{ $assignment->title }} | Free Candidate Assessment Node</title>
+    
+    <!-- SEO Optimization 🚀 -->
+    <meta name="description" content="Validate talent with {{ $assignment->title }}. Use MyCollegeVerse Assess (TaskFlow) to manage candidate assignments, reviews, and evaluations for free. Ideal for startups and fast-growing teams.">
+    <meta name="keywords" content="Free Assessment Tool, Candidate Task Management, Startup Hiring, Skill Validation, MyCollegeVerse, TaskFlow, {{ $assignment->role }}, {{ $assignment->task_type }} Test">
+    <meta property="og:title" content="{{ $assignment->title }} | Talent Validation Node">
+    <meta property="og:description" content="Complete the assessment for {{ $assignment->recruiter->company_name ?? 'MyCollegeVerse' }} and showcase your skills.">
+    <meta name="robots" content="index, follow">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
