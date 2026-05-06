@@ -19,6 +19,7 @@ class AssignmentSubmission extends Model
         'submission_text',
         'recruiter_notes',
         'score',
+        'file_id',
         'status',
         'expires_at',
     ];
