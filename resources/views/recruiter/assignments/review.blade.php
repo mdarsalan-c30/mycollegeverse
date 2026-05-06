@@ -106,14 +106,16 @@
                                     <div class="p-6 bg-white rounded-2xl border border-slate-100">
                                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Written Submission</p>
                                         <div id="submission-text-{{ $submission->id }}" class="text-sm font-medium text-slate-700 leading-relaxed overflow-hidden markdown-node">
-                                            {{ $submission->submission_text }}
+                                            <!-- Injected by Marked -->
                                         </div>
                                     </div>
                                     <script>
                                         document.addEventListener('DOMContentLoaded', function() {
                                             const target = document.getElementById('submission-text-{{ $submission->id }}');
-                                            const rawText = target.textContent.trim();
-                                            target.innerHTML = marked.parse(rawText);
+                                            const raw = @json($submission->submission_text);
+                                            if (raw) {
+                                                target.innerHTML = marked.parse(raw);
+                                            }
                                         });
                                     </script>
                                 @endif

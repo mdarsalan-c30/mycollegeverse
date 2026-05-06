@@ -78,15 +78,17 @@
                 <div class="prose prose-slate max-w-none">
                     <h3 class="text-lg font-black text-slate-900 uppercase tracking-widest mb-4">Instructions</h3>
                     <div id="instructions-content" class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed overflow-hidden markdown-node">
-                        {!! $assignment->instructions !!}
+                        <!-- Content will be injected here by Marked.js -->
                     </div>
                 </div>
 
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
-                        const content = document.getElementById('instructions-content');
-                        const rawText = content.textContent.trim();
-                        content.innerHTML = marked.parse(rawText);
+                        const target = document.getElementById('instructions-content');
+                        const raw = @json($assignment->instructions);
+                        if (raw) {
+                            target.innerHTML = marked.parse(raw);
+                        }
                     });
                 </script>
 
