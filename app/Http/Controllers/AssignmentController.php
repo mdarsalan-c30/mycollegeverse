@@ -129,8 +129,8 @@ class AssignmentController extends Controller
         $submission = AssignmentSubmission::create([
             'assignment_id' => $assignment->id,
             'user_id' => Auth::id(),
-            'candidate_name' => Auth::user()->name ?? $request->candidate_name,
-            'candidate_email' => Auth::user()->email ?? $request->candidate_email,
+            'candidate_name' => $request->candidate_name ?? Auth::user()->name,
+            'candidate_email' => $request->candidate_email ?? Auth::user()->email,
             'candidate_phone' => $request->candidate_phone,
             'submission_link' => $request->submission_link,
             'submission_text' => $request->submission_text,

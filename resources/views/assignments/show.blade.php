@@ -88,18 +88,18 @@
                         </div>
 
                         <div class="space-y-4">
-                            @guest
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
                                 <input type="text" name="candidate_name" required placeholder="Your full name"
+                                       value="{{ auth()->user()->name ?? '' }}"
                                        class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
                                 <input type="email" name="candidate_email" required placeholder="you@example.com"
+                                       value="{{ auth()->user()->email ?? '' }}"
                                        class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
-                            @endguest
                             
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number (WhatsApp Preferred)</label>
