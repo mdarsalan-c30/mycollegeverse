@@ -111,6 +111,11 @@ Route::get('/multiverse-post-slug-sync', function() {
 Route::get('/jobs', [App\Http\Controllers\JobBoardController::class, 'index'])->name('jobs.index');
 Route::get('/jobs/{job}', [App\Http\Controllers\JobBoardController::class, 'show'])->name('jobs.show');
 
+// MCV Assess (TaskFlow): Assessment Routes 🛰️
+Route::get('/task/{slug}', [App\Http\Controllers\AssignmentController::class, 'show'])->name('assignments.show');
+Route::post('/task/{slug}/submit', [App\Http\Controllers\AssignmentController::class, 'submit'])->name('assignments.submit');
+Route::get('/task/confirmation/{submission_id}', [App\Http\Controllers\AssignmentController::class, 'confirmation'])->name('assignments.confirmation');
+
 Route::get('/colleges', [App\Http\Controllers\CollegeController::class, 'index'])->name('colleges.index');
 Route::get('/colleges/{college:slug}', [App\Http\Controllers\CollegeController::class, 'show'])->name('colleges.show');
 
@@ -212,6 +217,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/recruiter/applications/{application}/status', [App\Http\Controllers\RecruiterController::class, 'updateApplicationStatus'])->name('recruiter.applications.status');
         Route::post('/recruiter/integration/initialize', [App\Http\Controllers\RecruiterController::class, 'initializeIntegration'])->name('recruiter.integration.initialize');
         Route::post('/recruiter/bulk-action', [App\Http\Controllers\RecruiterController::class, 'bulkAction'])->name('recruiter.bulk.action');
+
+        // TaskFlow: Assessment Management Hub
+        Route::prefix('recruiter/assessments')->name('recruiter.assessments.')->group(function() {
+            Route::get('/', [App\Http\Controllers\AssignmentController::class, 'index'])->name('index');
+            Route::get('/create', [App\Http\Controllers\AssignmentController::class, 'create'])->name('create');
+            Route::post('/store', [App\Http\Controllers\AssignmentController::class, 'store'])->name('store');
+            Route::get('/{assignment}', [App\Http\Controllers\AssignmentController::class, 'review'])->name('review');
+            Route::post('/{submission}/evaluate', [App\Http\Controllers\AssignmentController::class, 'evaluate'])->name('evaluate');
+            Route::post('/{submission}/status', [App\Http\Controllers\AssignmentController::class, 'updateSubmissionStatus'])->name('submission.status');
+            Route::post('/bulk-notify', [App\Http\Controllers\AssignmentController::class, 'bulkNotify'])->name('bulk-notify');
+        });
     });
 });
 
@@ -491,5 +507,22 @@ Route::get('/multiverse-teleport', function() {
         return "🌌 <b>Teleport Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
     } catch (\Exception $e) {
         return "Teleport Error: " . $e->getMessage();
+    }
+});
+Route::get('/multiverse-migrate', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
+        return "🌌 <b>Multiverse Schema Synchronized!</b><br><br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre><br><a href='/'>Return Home</a>";
+    } catch (\Exception $e) {
+        return "Migration Error: " . $e->getMessage();
+    }
+});
+
+Route::get('/multiverse-cleanup-sync', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('mcv:cleanup-submissions');
+        return "🌌 <b>Space Node Purged!</b><br><br><pre>" . \Illuminate\Support\Facades\Artisan::output() . "</pre><br><a href='/'>Return Home</a>";
+    } catch (\Exception $e) {
+        return "Purge Error: " . $e->getMessage();
     }
 });

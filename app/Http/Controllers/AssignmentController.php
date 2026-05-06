@@ -1,0 +1,198 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Assignment;
+use App\Models\AssignmentSubmission;
+use App\Models\AssignmentEvaluation;
+use App\Models\JobPosting;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+
+class AssignmentController extends Controller
+{
+    /**
+     * Recruiter View: List all assignments
+     */
+    public function index()
+    {
+        $assignments = Assignment::where('recruiter_id', Auth::id())
+            ->withCount('submissions')
+            ->latest()
+            ->get();
+
+        return view('recruiter.assignments.index', compact('assignments'));
+    }
+
+    /**
+     * Recruiter View: Create form
+     */
+    public function create()
+    {
+        $jobs = JobPosting::where('recruiter_id', Auth::id())->get();
+        return view('recruiter.assignments.create', compact('jobs'));
+    }
+
+    /**
+     * Recruiter Action: Store assignment
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'job_id' => 'nullable|exists:job_postings,id',
+            'role' => 'nullable|string|max:100',
+            'task_type' => 'required|string',
+            'instructions' => 'required|string',
+            'submission_types' => 'required|array',
+            'deadline' => 'nullable|date',
+            'is_public' => 'boolean',
+        ]);
+
+        $assignment = Assignment::create([
+            'recruiter_id' => Auth::id(),
+            'job_id' => $validated['job_id'],
+            'title' => $validated['title'],
+            'role' => $validated['role'],
+            'task_type' => $validated['task_type'],
+            'instructions' => $validated['instructions'],
+            'submission_types' => $validated['submission_types'],
+            'deadline' => $validated['deadline'],
+            'is_public' => $request->has('is_public'),
+            'status' => 'active',
+        ]);
+
+        return redirect()->route('recruiter.assignments.index')->with('success', 'Assignment Verse created! Share the link with candidates.');
+    }
+
+    /**
+     * Public View: Candidate landing page
+     */
+    public function show($slug)
+    {
+        $assignment = Assignment::where('slug', $slug)->firstOrFail();
+        
+        if ($assignment->status !== 'active') {
+            return view('assignments.closed', compact('assignment'));
+        }
+
+        return view('assignments.show', compact('assignment'));
+    }
+
+    /**
+     * Public Action: Candidate submission
+     */
+    public function submit(Request $request, $slug)
+    {
+        $assignment = Assignment::where('slug', $slug)->firstOrFail();
+
+        $rules = [
+            'candidate_name' => Auth::check() ? 'nullable' : 'required|string|max:255',
+            'candidate_email' => Auth::check() ? 'nullable' : 'required|email|max:255',
+            'submission_text' => 'nullable|string',
+            'submission_link' => 'nullable|url',
+            'file' => 'nullable|file|max:20480', // 20MB
+        ];
+
+        $request->validate($rules);
+
+        $filePath = null;
+        $fileId = null;
+        $expiresAt = now()->addDays(30); // Default for links/text
+
+        if ($request->hasFile('file')) {
+            try {
+                $file = $request->file('file');
+                $cloudName = env('CLOUDINARY_CLOUD_NAME');
+                $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+
+                $response = Http::attach(
+                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
+                    'upload_preset' => $uploadPreset,
+                ]);
+
+                if ($response->successful()) {
+                    $filePath = $response->json('secure_url');
+                    $fileId = $response->json('public_id');
+                    $expiresAt = now()->addDays(10); // MCV Upload: 10 days auto-delete
+                }
+            } catch (\Exception $e) {
+                \Log::error('Assignment Upload Failed: ' . $e->getMessage());
+            }
+        }
+
+        $submission = AssignmentSubmission::create([
+            'assignment_id' => $assignment->id,
+            'user_id' => Auth::id(),
+            'candidate_name' => Auth::user()->name ?? $request->candidate_name,
+            'candidate_email' => Auth::user()->email ?? $request->candidate_email,
+            'submission_link' => $request->submission_link,
+            'submission_text' => $request->submission_text,
+            'file_path' => $filePath,
+            'file_id' => $fileId,
+            'status' => 'pending',
+            'expires_at' => $expiresAt,
+        ]);
+
+        return redirect()->route('assignments.confirmation', $submission->id)->with('success', 'Work submitted successfully! Good luck.');
+    }
+
+    public function confirmation($id)
+    {
+        $submission = AssignmentSubmission::with('assignment')->findOrFail($id);
+        return view('assignments.confirmation', compact('submission'));
+    }
+
+    /**
+     * Recruiter View: Review submissions for a specific assignment
+     */
+    public function review(Assignment $assignment)
+    {
+        if ($assignment->recruiter_id !== Auth::id()) abort(403);
+
+        $submissions = $assignment->submissions()->latest()->get();
+        return view('recruiter.assignments.review', compact('assignment', 'submissions'));
+    }
+
+    /**
+     * Recruiter Action: Evaluate submission
+     */
+    public function evaluate(Request $request, AssignmentSubmission $submission)
+    {
+        $request->validate([
+            'score' => 'required|integer|min:0|max:100',
+            'feedback' => 'nullable|string',
+            'criteria' => 'required|array',
+        ]);
+
+        $submission->update([
+            'score' => $request->score,
+            'recruiter_notes' => $request->feedback,
+            'status' => 'reviewed',
+        ]);
+
+        foreach ($request->criteria as $criterion => $score) {
+            AssignmentEvaluation::updateOrCreate(
+                ['submission_id' => $submission->id, 'criteria' => $criterion],
+                ['score' => $score]
+            );
+        }
+
+        return back()->with('success', 'Evaluation recorded!');
+    }
+
+    public function updateSubmissionStatus(Request $request, AssignmentSubmission $submission)
+    {
+        $submission->update(['status' => $request->status]);
+        return back()->with('success', 'Candidate status updated to ' . ucfirst($request->status));
+    }
+
+    public function bulkNotify(Request $request)
+    {
+        // Placeholder for bulk notification logic (Email/Signal)
+        return back()->with('success', 'Notification blast sent to selected candidates!');
+    }
+}
