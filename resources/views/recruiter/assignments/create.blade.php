@@ -2,9 +2,14 @@
     <x-slot name="title">Manifest Assessment | TaskFlow Builder</x-slot>
 
     @push('head')
-        <!-- SimpleMDE Markdown Editor ✍️ -->
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
-        <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+        <!-- Quill Rich Text Editor ✍️ -->
+        <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+        <style>
+            .ql-editor { min-height: 300px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 600; color: #334155; }
+            .ql-container.ql-snow { border: 1px solid #E2E8F0 !important; border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem; background: white; }
+            .ql-toolbar.ql-snow { border: 1px solid #E2E8F0 !important; border-top-left-radius: 1.5rem; border-top-right-radius: 1.5rem; background: #F8FAFC; padding: 1rem; }
+        </style>
     @endpush
 
     <div class="max-w-4xl mx-auto">
@@ -61,22 +66,31 @@
                 </div>
 
                 <div class="space-y-2">
-                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Task Instructions (Markdown Support)</label>
-                    <div class="prose max-w-none">
-                        <textarea id="markdown-editor" name="instructions" placeholder="Describe the task in detail. What are the deliverables?" required
-                              class="w-full bg-slate-50 border border-slate-100 rounded-3xl p-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all"></textarea>
-                    </div>
+                    <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Task Instructions (Rich Text Support)</label>
+                    <div id="editor-container"></div>
+                    <input type="hidden" name="instructions" id="instructions-input">
                 </div>
             </div>
 
             <script>
-                var simplemde = new SimpleMDE({ 
-                    element: document.getElementById("markdown-editor"),
-                    spellChecker: false,
-                    placeholder: "Detail the task nodes... Support for headings, bullets, and links manifested.",
-                    status: false,
-                    autosave: { enabled: true, uniqueId: "mcv_assess_builder", delay: 1000 },
+                var quill = new Quill('#editor-container', {
+                    modules: {
+                        toolbar: [
+                            [{ header: [1, 2, 3, false] }],
+                            ['bold', 'italic', 'underline'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            ['link', 'clean']
+                        ]
+                    },
+                    placeholder: 'Paste your assignment details from Google Docs or ChatGPT here...',
+                    theme: 'snow'
                 });
+
+                // Sync Quill content to hidden input
+                document.querySelector('form').onsubmit = function() {
+                    var instructions = document.querySelector('#instructions-input');
+                    instructions.value = quill.root.innerHTML;
+                };
             </script>
 
             <!-- Submission Logistics 📥 -->

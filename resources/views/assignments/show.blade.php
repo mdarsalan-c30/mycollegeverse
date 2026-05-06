@@ -30,8 +30,6 @@
         .markdown-node blockquote { border-left: 4px solid #3B82F6; padding-left: 1rem; italic; color: #64748B; margin-bottom: 1.5rem; }
         .markdown-node code { background: #F1F5F9; padding: 0.2rem 0.4rem; rounded: 4px; font-family: monospace; font-size: 0.9rem; }
     </style>
-    <!-- Marked.js Markdown Engine ⚙️ -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body class="antialiased text-slate-900">
     <div class="min-h-screen flex flex-col">
@@ -78,19 +76,9 @@
                 <div class="prose prose-slate max-w-none">
                     <h3 class="text-lg font-black text-slate-900 uppercase tracking-widest mb-4">Instructions</h3>
                     <div id="instructions-content" class="bg-white rounded-[2rem] p-8 border border-slate-100 shadow-sm text-slate-600 leading-relaxed overflow-hidden markdown-node">
-                        <!-- Content will be injected here by Marked.js -->
+                        {!! $assignment->instructions !!}
                     </div>
                 </div>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const target = document.getElementById('instructions-content');
-                        const raw = @json($assignment->instructions);
-                        if (raw) {
-                            target.innerHTML = marked.parse(raw);
-                        }
-                    });
-                </script>
 
                 <div class="p-8 bg-blue-600 rounded-[2rem] text-white space-y-4 shadow-xl shadow-blue-200">
                     <h3 class="text-sm font-black uppercase tracking-widest">Recruiter's Vision</h3>

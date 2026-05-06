@@ -2,8 +2,6 @@
     <x-slot name="title">Review Work | {{ $assignment->title }}</x-slot>
 
     @push('head')
-        <!-- Marked.js Markdown Engine ⚙️ -->
-        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
         <style>
             /* High-Fidelity Markdown Styling ✍️ */
             .markdown-node h1 { font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; color: #0F172A; }
@@ -106,18 +104,9 @@
                                     <div class="p-6 bg-white rounded-2xl border border-slate-100">
                                         <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Written Submission</p>
                                         <div id="submission-text-{{ $submission->id }}" class="text-sm font-medium text-slate-700 leading-relaxed overflow-hidden markdown-node">
-                                            <!-- Injected by Marked -->
+                                            {!! $submission->submission_text !!}
                                         </div>
                                     </div>
-                                    <script>
-                                        document.addEventListener('DOMContentLoaded', function() {
-                                            const target = document.getElementById('submission-text-{{ $submission->id }}');
-                                            const raw = @json($submission->submission_text);
-                                            if (raw) {
-                                                target.innerHTML = marked.parse(raw);
-                                            }
-                                        });
-                                    </script>
                                 @endif
                             </div>
 
