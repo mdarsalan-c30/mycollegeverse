@@ -27,11 +27,11 @@
                 <div class="flex flex-wrap items-center gap-6">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-2xl bg-indigo-500 flex items-center justify-center text-white font-black text-sm shadow-lg shadow-indigo-200">
-                            {{ substr($guide->user->name, 0, 1) }}
+                            {{ substr($guide->user->name ?? 'A', 0, 1) }}
                         </div>
                         <div>
                             <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Archivist</p>
-                            <p class="text-xs font-bold text-slate-900">{{ $guide->user->name }}</p>
+                            <p class="text-xs font-bold text-slate-900">{{ $guide->user->name ?? 'Archivist' }}</p>
                         </div>
                     </div>
 

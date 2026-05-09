@@ -456,6 +456,27 @@ Route::get('/multiverse-academic-sync', function() {
     }
 });
 
+Route::get('/multiverse-debug-hub', function() {
+    try {
+        $guides = \App\Models\AcademicGuide::latest()->get();
+        return "🌌 Hub Debug: " . $guides->count() . " nodes found. <a href='/academic-hub'>Visit Hub</a>";
+    } catch (\Exception $e) {
+        return "🌌 <b>DEBUG ERROR:</b> " . $e->getMessage() . "<br><br><b>Trace:</b> " . $e->getTraceAsString();
+    }
+});
+
+Route::get('/multiverse-clear-all', function() {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \Illuminate\Support\Facades\Artisan::call('route:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        return "🌌 <b>All Multiverse Nodes Cleared & Synced!</b> <a href='/'>Return Home</a>";
+    } catch (\Exception $e) {
+        return "Clear Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-cleanup-sync', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('mcv:cleanup-submissions');

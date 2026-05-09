@@ -73,9 +73,9 @@
                 <div class="mt-auto pt-6 border-t border-slate-50 flex items-center justify-between">
                     <div class="flex items-center">
                         <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-xs mr-2">
-                            {{ substr($guide->user->name, 0, 1) }}
+                            {{ substr($guide->user->name ?? 'A', 0, 1) }}
                         </div>
-                        <span class="text-xs text-gray-500 font-medium">{{ $guide->user->name }}</span>
+                        <span class="text-xs text-gray-500 font-medium">{{ $guide->user->name ?? 'Archivist' }}</span>
                     </div>
                     <div class="flex items-center text-[10px] font-black text-slate-300 uppercase tracking-widest">
                         <span>{{ $guide->views }} Views</span>
