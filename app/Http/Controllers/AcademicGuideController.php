@@ -14,7 +14,7 @@ class AcademicGuideController extends Controller
      */
     public function index(Request $request)
     {
-        $query = AcademicGuide::published();
+        $query = AcademicGuide::query()->published();
 
         if ($request->has('category')) {
             $query->where('category', $request->category);
@@ -37,7 +37,6 @@ class AcademicGuideController extends Controller
      */
     public function create()
     {
-        // Only Students and Admins allowed
         if (Auth::user()->role === 'recruiter') {
             return redirect()->route('guides.index')->with('error', 'Recruiters cannot manifest academic guides.');
         }
@@ -66,15 +65,15 @@ class AcademicGuideController extends Controller
 
         $guide = AcademicGuide::create([
             'user_id' => Auth::id(),
-            'title' => $request->title,
-            'content' => $request->content,
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
             'file_path' => $filePath,
-            'category' => $request->category,
-            'target_university' => $request->target_university,
-            'target_course' => $request->target_course,
-            'meta_title' => $request->meta_title ?? $request->title,
-            'meta_description' => $request->meta_description ?? Str::limit(strip_tags($request->content), 160),
-            'meta_keywords' => $request->meta_keywords,
+            'category' => $request->input('category'),
+            'target_university' => $request->input('target_university'),
+            'target_course' => $request->input('target_course'),
+            'meta_title' => $request->input('meta_title') ?? $request->input('title'),
+            'meta_description' => $request->input('meta_description') ?? Str::limit(strip_tags($request->input('content')), 160),
+            'meta_keywords' => $request->input('meta_keywords'),
             'is_published' => true,
         ]);
 
@@ -101,8 +100,10 @@ class AcademicGuideController extends Controller
     /**
      * Edit Guide Node
      */
-    public function edit(AcademicGuide $guide)
+    public function edit($id)
     {
+        $guide = AcademicGuide::findOrFail($id);
+        
         if ($guide->user_id !== Auth::id() && Auth::user()->role !== 'admin') {
             abort(403);
         }
@@ -113,8 +114,10 @@ class AcademicGuideController extends Controller
     /**
      * Update Guide Node
      */
-    public function update(Request $request, AcademicGuide $guide)
+    public function update(Request $request, $id)
     {
+        $guide = AcademicGuide::findOrFail($id);
+        
         if ($guide->user_id !== Auth::id() && Auth::user()->role !== 'admin') abort(403);
 
         $request->validate([
@@ -125,14 +128,14 @@ class AcademicGuideController extends Controller
         ]);
 
         $data = [
-            'title' => $request->title,
-            'content' => $request->content,
-            'category' => $request->category,
-            'target_university' => $request->target_university,
-            'target_course' => $request->target_course,
-            'meta_title' => $request->meta_title,
-            'meta_description' => $request->meta_description,
-            'meta_keywords' => $request->meta_keywords,
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+            'category' => $request->input('category'),
+            'target_university' => $request->input('target_university'),
+            'target_course' => $request->input('target_course'),
+            'meta_title' => $request->input('meta_title'),
+            'meta_description' => $request->input('meta_description'),
+            'meta_keywords' => $request->input('meta_keywords'),
         ];
 
         if ($request->hasFile('pdf_file')) {
@@ -147,8 +150,10 @@ class AcademicGuideController extends Controller
     /**
      * Purge Guide Node
      */
-    public function destroy(AcademicGuide $guide)
+    public function destroy($id)
     {
+        $guide = AcademicGuide::findOrFail($id);
+        
         if ($guide->user_id !== Auth::id() && Auth::user()->role !== 'admin') abort(403);
         
         $guide->delete();
