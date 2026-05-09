@@ -625,12 +625,11 @@
                     <div>
                         <h4 class="font-black text-slate-900 text-xs uppercase tracking-[0.2em] mb-8 italic">Platform</h4>
                         <ul class="space-y-4 text-sm font-bold text-slate-500">
+                            <li><a href="{{ route('guides.index') }}" class="text-primary font-black">Academic Hub (New)</a></li>
                             <li><a href="{{ route('notes.index') }}" class="hover:text-primary transition-colors">Digital Identity Hub</a></li>
                             <li><a href="{{ route('resumes.create') }}" class="hover:text-primary transition-colors font-black text-primary">Build Free Resume</a></li>
                             <li><a href="/blog" class="hover:text-primary transition-colors">Editorial Hub</a></li>
                             <li><a href="{{ route('community.index') }}" class="hover:text-primary transition-colors">Community Verse</a></li>
-                            <li><a href="{{ route('colleges.index') }}" class="hover:text-primary transition-colors">Campus Nodes</a></li>
-                            <li><a href="{{ route('professors.index') }}" class="hover:text-primary transition-colors">Professor Intel</a></li>
                         </ul>
                     </div>
 

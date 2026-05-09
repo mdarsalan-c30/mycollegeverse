@@ -456,6 +456,7 @@ Route::get('/multiverse-academic-sync', function() {
             $table->string('title');
             $table->string('slug')->unique();
             $table->longText('content');
+            $table->string('file_path')->nullable();
             $table->string('category');
             $table->string('meta_title')->nullable();
             $table->text('meta_description')->nullable();

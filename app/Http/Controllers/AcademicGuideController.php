@@ -54,12 +54,19 @@ class AcademicGuideController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'required|string',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
+
+        $filePath = null;
+        if ($request->hasFile('pdf_file')) {
+            $filePath = $request->file('pdf_file')->store('academic-guides', 'public');
+        }
 
         $guide = AcademicGuide::create([
             'user_id' => Auth::id(),
             'title' => $request->title,
             'content' => $request->content,
+            'file_path' => $filePath,
             'category' => $request->category,
             'target_university' => $request->target_university,
             'target_course' => $request->target_course,
