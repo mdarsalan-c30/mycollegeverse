@@ -93,6 +93,7 @@
 
                     <div class="grid grid-cols-1 gap-6">
                         <input type="text" name="meta_title" value="{{ old('meta_title', $guide->meta_title) }}" placeholder="SEO Meta Title" class="w-full h-12 bg-slate-50 border-none rounded-xl px-6 text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/5 transition-all">
+                        <input type="text" name="meta_keywords" value="{{ old('meta_keywords', $guide->meta_keywords) }}" placeholder="SEO Meta Keywords" class="w-full h-12 bg-slate-50 border-none rounded-xl px-6 text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/5 transition-all">
                         <textarea name="meta_description" rows="2" class="w-full bg-slate-50 border-none rounded-xl px-6 py-4 text-[10px] font-black uppercase tracking-widest focus:ring-4 focus:ring-primary/5 transition-all">{{ old('meta_description', $guide->meta_description) }}</textarea>
                     </div>
                 </div>

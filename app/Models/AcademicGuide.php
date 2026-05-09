@@ -33,6 +33,7 @@ class AcademicGuide extends Model
         'title',
         'slug',
         'content',
+        'file_path',
         'category',
         'meta_title',
         'meta_description',
