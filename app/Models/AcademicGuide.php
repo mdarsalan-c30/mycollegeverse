@@ -6,6 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
+/**
+ * @property int $id
+ * @property int $user_id
+ * @property string $title
+ * @property string $slug
+ * @property string $content
+ * @property string|null $file_path
+ * @property string $category
+ * @property string|null $meta_title
+ * @property string|null $meta_description
+ * @property string|null $meta_keywords
+ * @property string|null $target_university
+ * @property string|null $target_course
+ * @property int $views
+ * @property bool $is_published
+ * @method static \Illuminate\Database\Eloquent\Builder|AcademicGuide published()
+ * @mixin \Eloquent
+ */
 class AcademicGuide extends Model
 {
     use HasFactory;

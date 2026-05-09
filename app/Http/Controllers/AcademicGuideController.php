@@ -21,8 +21,10 @@ class AcademicGuideController extends Controller
         }
 
         if ($request->has('q')) {
-            $query->where('title', 'like', '%' . $request->q . '%')
+            $query->where(function($q) use ($request) {
+                $q->where('title', 'like', '%' . $request->q . '%')
                   ->orWhere('content', 'like', '%' . $request->q . '%');
+            });
         }
 
         $guides = $query->latest()->paginate(12);
@@ -35,7 +37,7 @@ class AcademicGuideController extends Controller
      */
     public function create()
     {
-        // Only Students and Admins allowed (Recruiters locked out)
+        // Only Students and Admins allowed
         if (Auth::user()->role === 'recruiter') {
             return redirect()->route('guides.index')->with('error', 'Recruiters cannot manifest academic guides.');
         }
@@ -80,14 +82,13 @@ class AcademicGuideController extends Controller
     }
 
     /**
-     * View a Single Guide Node (SEO Entry Point) 👁️
+     * View a Single Guide Node 👁️
      */
     public function show($slug)
     {
         $guide = AcademicGuide::where('slug', $slug)->firstOrFail();
         $guide->increment('views');
 
-        // Related guides from same category
         $related = AcademicGuide::where('category', $guide->category)
                     ->where('id', '!=', $guide->id)
                     ->published()
@@ -135,7 +136,6 @@ class AcademicGuideController extends Controller
         ];
 
         if ($request->hasFile('pdf_file')) {
-            // Optional: delete old file
             $data['file_path'] = $request->file('pdf_file')->store('academic-guides', 'public');
         }
 
