@@ -449,7 +449,25 @@ Route::get('/multiverse-migrate', function() {
 Route::get('/multiverse-academic-sync', function() {
     try {
         \Illuminate\Support\Facades\Schema::dropIfExists('academic_guides');
-        \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
+        
+        \Illuminate\Support\Facades\Schema::create('academic_guides', function ($table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->string('title');
+            $table->string('slug')->unique();
+            $table->longText('content');
+            $table->string('category');
+            $table->string('meta_title')->nullable();
+            $table->text('meta_description')->nullable();
+            $table->text('meta_keywords')->nullable();
+            $table->string('target_university')->nullable();
+            $table->string('target_course')->nullable();
+            $table->string('featured_image')->nullable();
+            $table->boolean('is_published')->default(true);
+            $table->unsignedBigInteger('views')->default(0);
+            $table->timestamps();
+        });
+
         return "🌌 <b>Academic Hub Universal Hardening Complete!</b> Table force-recreated. <a href='/academic-hub'>Visit Hub Now</a>";
     } catch (\Exception $e) {
         return "Critical Sync Error: " . $e->getMessage();
