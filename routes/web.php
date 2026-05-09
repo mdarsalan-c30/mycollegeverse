@@ -468,3 +468,6 @@ Route::prefix('academic-hub')->name('guides.')->group(function () {
         Route::delete('/{guide}', [App\Http\Controllers\AcademicGuideController::class, 'destroy'])->name('destroy');
     });
 });
+
+require __DIR__.'/auth.php';
+Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
