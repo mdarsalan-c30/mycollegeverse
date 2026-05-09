@@ -448,13 +448,11 @@ Route::get('/multiverse-migrate', function() {
 
 Route::get('/multiverse-academic-sync', function() {
     try {
-        if (!\Illuminate\Support\Facades\Schema::hasTable('academic_guides')) {
-            \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
-            return "🌌 <b>Academic Hub Initialized!</b> Table created. <a href='/academic-hub'>Visit Hub</a>";
-        }
-        return "🌌 <b>Academic Hub already synced.</b> <a href='/academic-hub'>Visit Hub</a>";
+        \Illuminate\Support\Facades\Schema::dropIfExists('academic_guides');
+        \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
+        return "🌌 <b>Academic Hub Universal Hardening Complete!</b> Table force-recreated. <a href='/academic-hub'>Visit Hub Now</a>";
     } catch (\Exception $e) {
-        return "Sync Error: " . $e->getMessage();
+        return "Critical Sync Error: " . $e->getMessage();
     }
 });
 
