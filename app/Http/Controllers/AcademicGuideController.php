@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicGuide;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class AcademicGuideController extends Controller
@@ -60,7 +61,30 @@ class AcademicGuideController extends Controller
 
         $filePath = null;
         if ($request->hasFile('pdf_file')) {
-            $filePath = $request->file('pdf_file')->store('academic-guides', 'public');
+            try {
+                $file = $request->file('pdf_file');
+                $cloudName = env('CLOUDINARY_CLOUD_NAME');
+                $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+
+                if (!$cloudName || !$uploadPreset) {
+                    throw new \Exception('Cloudinary configuration missing.');
+                }
+
+                $response = Http::attach(
+                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
+                    'upload_preset' => $uploadPreset,
+                ]);
+
+                if ($response->successful()) {
+                    $filePath = $response->json('secure_url');
+                } else {
+                    \Log::error('Academic Guide Cloudinary Upload Failed: ' . $response->body());
+                    // Fallback to local if cloud fails? No, better to throw or handle.
+                }
+            } catch (\Exception $e) {
+                \Log::error('Academic Guide Upload Exception: ' . $e->getMessage());
+            }
         }
 
         $guide = AcademicGuide::create([
@@ -139,7 +163,23 @@ class AcademicGuideController extends Controller
         ];
 
         if ($request->hasFile('pdf_file')) {
-            $data['file_path'] = $request->file('pdf_file')->store('academic-guides', 'public');
+            try {
+                $file = $request->file('pdf_file');
+                $cloudName = env('CLOUDINARY_CLOUD_NAME');
+                $uploadPreset = env('CLOUDINARY_UPLOAD_PRESET');
+
+                $response = Http::attach(
+                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
+                    'upload_preset' => $uploadPreset,
+                ]);
+
+                if ($response->successful()) {
+                    $data['file_path'] = $response->json('secure_url');
+                }
+            } catch (\Exception $e) {
+                \Log::error('Academic Guide Update Upload Error: ' . $e->getMessage());
+            }
         }
 
         $guide->update($data);

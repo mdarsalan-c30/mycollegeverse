@@ -71,11 +71,14 @@
             <div class="mx-8 md:mx-20 mb-12 space-y-6">
                 <!-- PDF Viewer Node -->
                 <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
-                    <embed src="{{ asset('storage/' . $guide->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[3rem]" />
+                    @php
+                        $pdfUrl = Str::startsWith($guide->file_path, 'http') ? $guide->file_path : asset('storage/' . $guide->file_path);
+                    @endphp
+                    <embed src="{{ $pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[3rem]" />
                     
                     <!-- Premium Overlay -->
                     <div class="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <a href="{{ asset('storage/' . $guide->file_path) }}" target="_blank" class="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:bg-primary hover:text-white transition-all border border-slate-100">
+                        <a href="{{ $pdfUrl }}" target="_blank" class="bg-white text-slate-900 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:bg-primary hover:text-white transition-all border border-slate-100">
                             🔍 Full Screen Intel
                         </a>
                     </div>
@@ -91,7 +94,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3 w-full md:w-auto">
-                        <a href="{{ asset('storage/' . $guide->file_path) }}" download class="flex-1 md:flex-none px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
+                        <a href="{{ $pdfUrl }}" download="{{ $guide->title }}.pdf" class="flex-1 md:flex-none px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
                             Download Intel PDF ⬇️
                         </a>
                     </div>

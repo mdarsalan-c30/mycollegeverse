@@ -520,5 +520,18 @@ Route::prefix('academic-hub')->name('guides.')->group(function () {
 });
 
 require __DIR__.'/auth.php';
-require __DIR__.'/storage_fix.php';
+// require __DIR__.'/storage_fix.php';
+
+// 🛰️ Multiverse Storage Bridge (Fix for 404s on existing PDFs)
+Route::get('/storage/academic-guides/{file}', function ($file) {
+    $path = storage_path('app/public/academic-guides/' . $file);
+    if (!file_exists($path)) {
+        abort(404, "Intel node not found in the multiverse storage.");
+    }
+    return response()->file($path, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="'.$file.'"'
+    ]);
+});
+
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
