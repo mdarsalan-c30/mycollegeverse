@@ -120,9 +120,10 @@ class AcademicGuideController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'category' => 'required|string',
+            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
 
-        $guide->update([
+        $data = [
             'title' => $request->title,
             'content' => $request->content,
             'category' => $request->category,
@@ -131,7 +132,14 @@ class AcademicGuideController extends Controller
             'meta_title' => $request->meta_title,
             'meta_description' => $request->meta_description,
             'meta_keywords' => $request->meta_keywords,
-        ]);
+        ];
+
+        if ($request->hasFile('pdf_file')) {
+            // Optional: delete old file
+            $data['file_path'] = $request->file('pdf_file')->store('academic-guides', 'public');
+        }
+
+        $guide->update($data);
 
         return redirect()->route('guides.show', $guide->slug)->with('success', 'Guide node updated.');
     }
