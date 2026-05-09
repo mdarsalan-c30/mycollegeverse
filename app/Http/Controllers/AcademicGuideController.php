@@ -112,9 +112,19 @@ class AcademicGuideController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'required|string',
+            'category' => 'required|string',
         ]);
 
-        $guide->update($request->all());
+        $guide->update([
+            'title' => $request->title,
+            'content' => $request->content,
+            'category' => $request->category,
+            'target_university' => $request->target_university,
+            'target_course' => $request->target_course,
+            'meta_title' => $request->meta_title,
+            'meta_description' => $request->meta_description,
+            'meta_keywords' => $request->meta_keywords,
+        ]);
 
         return redirect()->route('guides.show', $guide->slug)->with('success', 'Guide node updated.');
     }

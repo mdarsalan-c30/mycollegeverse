@@ -7,7 +7,7 @@
             <p class="text-slate-500 font-bold text-sm uppercase tracking-widest opacity-60">Architecting the Academic Multiverse</p>
         </div>
 
-        <form action="{{ route('guides.store') }}" method="POST" class="space-y-8 pb-20">
+        <form action="{{ route('guides.store') }}" method="POST" id="manifest-form" class="space-y-8 pb-20">
             @csrf
             
             <div class="glass p-8 md:p-12 rounded-[3rem] border border-slate-100 shadow-xl space-y-10">
@@ -20,23 +20,21 @@
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Guide Title (e.g. B.Tech AKTU 2nd Year Syllabus)</label>
-                        <input type="text" name="title" required placeholder="Enter a descriptive title..." class="w-full h-14 bg-white border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm">
+                        <input type="text" name="title" value="{{ old('title') }}" required placeholder="Enter a descriptive title..." class="w-full h-14 bg-white border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 focus:border-primary transition-all shadow-sm">
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Category</label>
                             <select name="category" required class="w-full h-14 bg-white border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm">
-                                <option value="Syllabus">Syllabus</option>
-                                <option value="College Guide">College Guide</option>
-                                <option value="Admission">Admission</option>
-                                <option value="Career">Career</option>
-                                <option value="Notice">Notice</option>
+                                @foreach(['Syllabus', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
+                                    <option value="{{ $cat }}" {{ old('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="space-y-2">
                             <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Target Node (University/College)</label>
-                            <input type="text" name="target_university" placeholder="e.g. AKTU, Mumbai University" class="w-full h-14 bg-white border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 transition-all shadow-sm">
+                            <input type="text" name="target_university" value="{{ old('target_university') }}" placeholder="e.g. AKTU, Mumbai University" class="w-full h-14 bg-white border border-slate-100 rounded-2xl px-6 text-sm font-bold focus:ring-4 focus:ring-primary/5 transition-all shadow-sm">
                         </div>
                     </div>
                 </div>
@@ -50,9 +48,13 @@
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Content (Paste or Write detailed guide)</label>
-                        <!-- Quill Editor Container -->
-                        <div id="editor" class="h-96 bg-white rounded-2xl border border-slate-100 shadow-sm font-sans text-base"></div>
-                        <input type="hidden" name="content" id="content-input">
+                        <div id="editor-wrapper" class="rounded-2xl border border-slate-100 overflow-hidden shadow-sm">
+                            <div id="editor" class="h-96 bg-white font-sans text-base"></div>
+                        </div>
+                        <input type="hidden" name="content" id="content-input" value="{{ old('content') }}">
+                        @error('content')
+                            <p class="text-red-500 text-[10px] font-black uppercase mt-2 ml-4">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -65,26 +67,25 @@
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Meta Title (Max 60 chars)</label>
-                        <input type="text" name="meta_title" maxlength="60" placeholder="SEO Title for Google..." class="w-full h-12 bg-white border border-slate-100 rounded-xl px-6 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all">
+                        <input type="text" name="meta_title" value="{{ old('meta_title') }}" maxlength="60" placeholder="SEO Title for Google..." class="w-full h-12 bg-white border border-slate-100 rounded-xl px-6 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all">
                     </div>
 
                     <div class="space-y-2">
                         <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Meta Description (Max 160 chars)</label>
-                        <textarea name="meta_description" maxlength="160" rows="2" placeholder="Brief summary for search results..." class="w-full bg-white border border-slate-100 rounded-xl px-6 py-4 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all"></textarea>
+                        <textarea name="meta_description" maxlength="160" rows="2" placeholder="Brief summary for search results..." class="w-full bg-white border border-slate-100 rounded-xl px-6 py-4 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all">{{ old('meta_description') }}</textarea>
                     </div>
 
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Meta Keywords (Comma separated)</label>
-                        <input type="text" name="meta_keywords" placeholder="syllabus, guide, aktu, exams..." class="w-full h-12 bg-white border border-slate-100 rounded-xl px-6 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Meta Keywords</label>
+                        <input type="text" name="meta_keywords" value="{{ old('meta_keywords') }}" placeholder="syllabus, guide, aktu, exams..." class="w-full h-12 bg-white border border-slate-100 rounded-xl px-6 text-xs font-bold focus:ring-4 focus:ring-primary/5 transition-all">
                     </div>
                 </div>
 
                 <!-- Submit -->
                 <div class="pt-6">
-                    <button type="submit" class="w-full h-16 bg-primary text-white font-black text-xs uppercase tracking-[0.2em] rounded-[2rem] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
+                    <button type="submit" id="submit-btn" class="w-full h-16 bg-primary text-white font-black text-xs uppercase tracking-[0.2em] rounded-[2rem] shadow-2xl shadow-primary/30 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4">
                         Manifest Node to Hub 🛰️
                     </button>
-                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest text-center mt-6">By manifesting, you agree that this content is verified and purely academic.</p>
                 </div>
             </div>
         </form>
@@ -98,7 +99,6 @@
             background: #F8FAFC;
             padding: 1rem !important;
             border-bottom: 1px solid #F1F5F9 !important;
-            border-radius: 1rem 1rem 0 0;
         }
         .ql-container.ql-snow {
             border: none !important;
@@ -111,26 +111,44 @@
     @push('scripts')
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
-        var quill = new Quill('#editor', {
-            theme: 'snow',
-            placeholder: 'Architect your academic knowledge here...',
-            modules: {
-                toolbar: [
-                    [{ 'header': [1, 2, 3, false] }],
-                    ['bold', 'italic', 'underline', 'strike'],
-                    ['blockquote', 'code-block'],
-                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                    ['link', 'clean']
-                ]
-            }
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            var quill = new Quill('#editor', {
+                theme: 'snow',
+                placeholder: 'Architect your academic knowledge here...',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        ['blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        ['link', 'clean']
+                    ]
+                }
+            });
 
-        // Sync Quill content to hidden input
-        var form = document.querySelector('form');
-        form.onsubmit = function() {
-            var content = document.querySelector('#content-input');
-            content.value = quill.root.innerHTML;
-        };
+            // Restore old content if exists
+            var oldContent = document.querySelector('#content-input').value;
+            if (oldContent) {
+                quill.root.innerHTML = oldContent;
+            }
+
+            var form = document.getElementById('manifest-form');
+            form.addEventListener('submit', function(e) {
+                var contentInput = document.getElementById('content-input');
+                var html = quill.root.innerHTML;
+                
+                // If editor is empty or just contains empty tags
+                if (quill.getText().trim().length === 0 && html.indexOf('<img') === -1) {
+                    alert('Please enter some content before manifesting.');
+                    e.preventDefault();
+                    return false;
+                }
+
+                contentInput.value = html;
+                document.getElementById('submit-btn').innerHTML = 'Synchronizing Multiverse... 🛰️';
+                document.getElementById('submit-btn').disabled = true;
+            });
+        });
     </script>
     @endpush
 </x-app-layout>
