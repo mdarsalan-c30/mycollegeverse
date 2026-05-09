@@ -520,4 +520,5 @@ Route::prefix('academic-hub')->name('guides.')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+require __DIR__.'/storage_fix.php';
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
