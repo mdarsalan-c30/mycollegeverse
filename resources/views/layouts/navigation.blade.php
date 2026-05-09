@@ -27,6 +27,7 @@
         </div>
 
         <!-- Settings Dropdown -->
+        @auth
         <div class="hidden sm:flex sm:items-center sm:ml-6">
             <x-dropdown align="right" width="48">
                 <x-slot name="trigger">
@@ -55,6 +56,12 @@
                 </x-slot>
             </x-dropdown>
         </div>
+        @else
+        <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
+            <a href="{{ route('login') }}" class="text-sm font-medium text-slate-500 hover:text-primary transition">Log in</a>
+            <a href="{{ route('register') }}" class="text-sm font-medium bg-primary text-white px-4 py-2 rounded-xl shadow-lg shadow-primary/20 hover:bg-blue-600 transition">Join Hub</a>
+        </div>
+        @endauth
 
         <!-- Hamburger -->
         <div class="-mr-2 flex items-center sm:hidden">
@@ -79,6 +86,7 @@
         </div>
 
         <!-- Responsive Settings Options -->
+        @auth
         <div class="pt-4 pb-1 border-t border-slate-200">
             <div class="px-4">
                 <div class="font-medium text-base text-slate-800">{{ Auth::user()->name }}</div>
@@ -98,5 +106,11 @@
                 </form>
             </div>
         </div>
+        @else
+        <div class="pt-4 pb-1 border-t border-slate-200 space-y-1">
+            <x-responsive-nav-link :href="route('login')">Log in</x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('register')">Register</x-responsive-nav-link>
+        </div>
+        @endauth
     </div>
 </nav>
