@@ -420,79 +420,8 @@ Route::get('/multiverse-sync', function() {
     }
 });
 
-Route::get('/multiverse-migrate', function() {
-    try {
-        // 1. Establish Nexus Points (Clear Caches)
-        Artisan::call('optimize:clear');
-        
-        // 2. Run Migrations
-        Artisan::call('migrate', ['--force' => true]);
-        return "🌌 Multiverse Manifested! Database schema updated. You can now visit <a href='/multiverse-post-slug-sync'>/multiverse-post-slug-sync</a> to finalize the identity mapping.";
-    } catch (\Exception $e) {
-        return "Migration Error: " . $e->getMessage();
-    }
-});
-
-Route::get('/multiverse-seed', function() {
-    try {
-        Artisan::call('multiverse:seed-community');
-        return "🌱 Community SEO Goldmine Initialized! Content manifested in the Verse. Visit <a href='/community'>Community</a>.";
-    } catch (\Exception $e) {
-        return "Seeding Error: " . $e->getMessage();
-    }
-});
-
-Route::get('/multiverse-editorial-seed', function() {
-    try {
-        $categories = [
-            ['name' => 'Career Roadmap', 'description' => 'Deep strategic insights for your future profession.'],
-            ['name' => 'College Comparison', 'description' => 'Side-by-side analysis of institutional nodes.'],
-            ['name' => 'Exam Intelligence', 'description' => 'Mastering the academic multiverse entrance nodes.'],
-            ['name' => 'Campus Life', 'description' => 'Authentic reports from the citizen ground level.'],
-        ];
-
-        foreach($categories as $cat) {
-            \App\Models\BlogCategory::firstOrCreate(
-                ['slug' => \Illuminate\Support\Str::slug($cat['name'])],
-                ['name' => $cat['name'], 'description' => $cat['description']]
-            );
-        }
-        return "🌱 Editorial Taxonomy Initialized! Seeded " . count($categories) . " categories. Visit <a href='/blog'>Blog</a>.";
-    } catch (\Exception $e) {
-        return "Seeding Error: " . $e->getMessage();
-    }
-});
-
-Route::get('/multiverse-init', function() {
-    try {
-        Artisan::call('config:clear');
-        Artisan::call('cache:clear');
-        Artisan::call('view:clear');
-        Artisan::call('route:clear');
-        return "🌌 Multiverse Synchronized! All caches cleared. You can now visit the <a href='/'>Home Page</a>.";
-    } catch (\Exception $e) {
-        return "Initialization Error: " . $e->getMessage();
-    }
-});
-
-Route::get('/multiverse-academic-sync', function() {
-    try {
-        // 1. Force Manifest (Git Pull)
-        $pull = shell_exec('git pull origin master 2>&1') ?? 'Manifest attempt logged but no output.';
-        
-        // 2. Clear Residual Shadows
-        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        \Illuminate\Support\Facades\Artisan::call('view:clear');
-        
-        return "🌌 <b>Sync Output:</b><br><br><pre>" . $pull . "</pre><br><a href='/'>Return Home</a>";
-    } catch (\Exception $e) {
-        return "Sync Exception: " . $e->getMessage();
-    }
-});
-
 Route::get('/multiverse-teleport', function() {
     try {
-        // 🛡️ Safe Mode: First, check if we can even talk to the environment
         $disabled = explode(',', ini_get('disable_functions'));
         $can_shell = !in_array('shell_exec', $disabled);
         
@@ -500,16 +429,14 @@ Route::get('/multiverse-teleport', function() {
             return "🚫 <b>ERROR:</b> Hostinger has strictly disabled 'shell_exec'. Git commands cannot run via PHP.<br><br><b>FIX:</b> Please go to <b>Hostinger Panel -> Advanced -> GIT</b> and click <b>'Pull'</b> or <b>'Deploy'</b> manually. This is the only way to sync your code now.";
         }
 
-        // If not disabled, maybe it's just path issues? Let's try full path
         $output = shell_exec('/usr/bin/git pull origin master 2>&1') ?? 'No output signal.';
-        
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
-        
         return "🌌 <b>Teleport Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
     } catch (\Exception $e) {
         return "Teleport Error: " . $e->getMessage();
     }
 });
+
 Route::get('/multiverse-migrate', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
@@ -526,4 +453,18 @@ Route::get('/multiverse-cleanup-sync', function() {
     } catch (\Exception $e) {
         return "Purge Error: " . $e->getMessage();
     }
+});
+
+// Academic Hub & Guides 🏛️ (SEO Engine)
+Route::prefix('academic-hub')->name('guides.')->group(function () {
+    Route::get('/', [App\Http\Controllers\AcademicGuideController::class, 'index'])->name('index');
+    Route::get('/guide/{slug}', [App\Http\Controllers\AcademicGuideController::class, 'show'])->name('show');
+    
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/create', [App\Http\Controllers\AcademicGuideController::class, 'create'])->name('create');
+        Route::post('/store', [App\Http\Controllers\AcademicGuideController::class, 'store'])->name('store');
+        Route::get('/{guide}/edit', [App\Http\Controllers\AcademicGuideController::class, 'edit'])->name('edit');
+        Route::put('/{guide}', [App\Http\Controllers\AcademicGuideController::class, 'update'])->name('update');
+        Route::delete('/{guide}', [App\Http\Controllers\AcademicGuideController::class, 'destroy'])->name('destroy');
+    });
 });

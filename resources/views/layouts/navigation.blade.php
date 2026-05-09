@@ -20,6 +20,9 @@
                 <x-nav-link href="/blog" class="text-slate-600 hover:text-primary transition-colors">
                     {{ __('Blog') }}
                 </x-nav-link>
+                <x-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')" class="text-slate-600 hover:text-primary transition-colors">
+                    {{ __('Academic Hub') }}
+                </x-nav-link>
             </div>
         </div>
 
@@ -69,6 +72,9 @@
         <div class="space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('guides.index')" :active="request()->routeIs('guides.*')">
+                {{ __('Academic Hub') }}
             </x-responsive-nav-link>
         </div>
 
