@@ -446,6 +446,18 @@ Route::get('/multiverse-migrate', function() {
     }
 });
 
+Route::get('/multiverse-academic-sync', function() {
+    try {
+        if (!\Illuminate\Support\Facades\Schema::hasTable('academic_guides')) {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
+            return "🌌 <b>Academic Hub Initialized!</b> Table created. <a href='/academic-hub'>Visit Hub</a>";
+        }
+        return "🌌 <b>Academic Hub already synced.</b> <a href='/academic-hub'>Visit Hub</a>";
+    } catch (\Exception $e) {
+        return "Sync Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-cleanup-sync', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('mcv:cleanup-submissions');
