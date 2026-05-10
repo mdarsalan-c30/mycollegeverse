@@ -225,8 +225,8 @@ class NoteController extends Controller
                 // --- Optimized Premium Imagick Watermarking ---
                 try {
                     $imagick = new \Imagick();
-                    // Lowered resolution for faster processing (100 is good balance)
-                    $imagick->setResolution(100, 100);
+                    // Set resolution to 72 DPI (Standard Web Resolution) for maximum speed
+                    $imagick->setResolution(72, 72);
                     $imagick->readImage($file->getRealPath());
 
                     foreach ($imagick as $page) {

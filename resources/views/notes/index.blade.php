@@ -393,8 +393,7 @@
                                 </button>
                             </div>
 
-                            <!-- Step 2: Knowledge Asset Manifestation -->
-                            <div x-data="{ fileName: '', driveLink: '' }" x-show="uploadStep === 2" class="space-y-8" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
+                            <div x-data="{ fileName: '', driveLink: '', isUploading: false }" x-show="uploadStep === 2" class="space-y-8" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
                                 
                                 {{-- Option A: File Upload --}}
                                 <div class="relative group flex justify-center px-10 pt-10 pb-12 border-2 border-slate-200 border-dashed rounded-3xl hover:border-primary/50 transition-all bg-white/30"
@@ -433,11 +432,20 @@
                                 </div>
 
                                 <div class="flex gap-4">
-                                    <button type="button" @click="uploadStep = 1" class="flex-1 h-16 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Back</button>
+                                    <button type="button" @click="uploadStep = 1" :disabled="isUploading" class="flex-1 h-16 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50">Back</button>
                                     <button type="submit" 
-                                            :disabled="!fileName && !driveLink"
-                                            class="flex-[2] h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all outline-none disabled:opacity-30">
-                                        Share with the Verse
+                                            @click="isUploading = true"
+                                            :disabled="(!fileName && !driveLink) || isUploading"
+                                            class="flex-[2] h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all outline-none disabled:opacity-50 flex items-center justify-center gap-3">
+                                        <template x-if="!isUploading">
+                                            <span>Share with the Verse</span>
+                                        </template>
+                                        <template x-if="isUploading">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                                <span>Branding Node...</span>
+                                            </div>
+                                        </template>
                                     </button>
                                 </div>
                             </div>

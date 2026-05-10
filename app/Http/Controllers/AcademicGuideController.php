@@ -76,7 +76,7 @@ class AcademicGuideController extends Controller
                 // --- Optimized Premium Imagick Watermarking ---
                 try {
                     $imagick = new \Imagick();
-                    $imagick->setResolution(100, 100);
+                    $imagick->setResolution(72, 72);
                     $imagick->readImage($file->getRealPath());
 
                     foreach ($imagick as $page) {
