@@ -144,7 +144,11 @@
                 window.dispatchEvent(new CustomEvent('mcv:instant-sync'));
             });
             // Force Flush: Prevents old cache lingering during manifest shifts
-            window.addEventListener('load', () => Turbo.clearCache());
+            window.addEventListener('load', () => {
+                if (window.Turbo) {
+                    Turbo.clearCache();
+                }
+            });
         </script>
         
         <!-- Alpine.js Engineering ⚙️ -->
