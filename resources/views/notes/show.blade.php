@@ -188,7 +188,13 @@
                         </div>
                     @else
                         {{-- Standard PDF/Cloudinary Embed --}}
-                        <embed src="{{ filter_var($note->file_path, FILTER_VALIDATE_URL) ? $note->file_path : asset('storage/' . $note->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
+                        @php
+                            $pdfUrl = $note->getWatermarkedPdfUrl();
+                            if (!Str::contains($pdfUrl, 'http')) {
+                                $pdfUrl = asset('storage/' . $note->file_path);
+                            }
+                        @endphp
+                        <embed src="{{ $pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
                     @endif
                     
                     <!-- Fallback for legacy environments -->

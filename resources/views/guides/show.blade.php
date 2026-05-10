@@ -72,7 +72,13 @@
                 <!-- PDF Viewer Node -->
                 <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
                     @php
-                        $pdfUrl = Str::startsWith($guide->file_path, 'http') ? $guide->file_path : asset('storage/' . $guide->file_path);
+                        $pdfUrl = $guide->getWatermarkedPdfUrl();
+                        $downloadUrl = $guide->getWatermarkedPdfUrl(true);
+                        // Fallback for local files
+                        if (!Str::contains($pdfUrl, 'http')) {
+                            $pdfUrl = asset('storage/' . $guide->file_path);
+                            $downloadUrl = $pdfUrl;
+                        }
                     @endphp
                     <embed src="{{ $pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[3rem]" />
                     
@@ -83,7 +89,7 @@
                         </a>
                     </div>
                 </div>
-
+ 
                 <!-- Download Bar -->
                 <div class="p-6 bg-slate-900 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl shadow-primary/20">
                     <div class="flex items-center gap-4">
@@ -94,7 +100,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3 w-full md:w-auto">
-                        <a href="{{ $pdfUrl }}" download="{{ $guide->title }}.pdf" class="flex-1 md:flex-none px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
+                        <a href="{{ $downloadUrl }}" download="{{ $guide->title }}.pdf" class="flex-1 md:flex-none px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
                             Download Intel PDF ⬇️
                         </a>
                     </div>
