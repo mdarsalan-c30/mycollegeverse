@@ -70,23 +70,10 @@ class AcademicGuideController extends Controller
                     throw new \Exception('Cloudinary configuration missing.');
                 }
 
-                $authorName = Auth::user()->name ?? 'MCV Archivist';
-                $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
-                $authorText = rawurlencode("Verified Author: " . $safeName);
-                $siteText = rawurlencode("Downloaded from mycollegeverse.in");
-
-                $siteText = rawurlencode("MyCollegeVerse.in");
-
-                // Minimal safe transformation for testing
-                $transformation = "l_text:Arial_20_bold:{$siteText},g_south,y_50,co_rgb:94a3b8";
-
                 $response = Http::attach(
                     'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
                     'upload_preset' => $uploadPreset,
-                    'transformation' => $transformation,
-                    'resource_type' => 'image',
-                    'flags' => 'pg_all'
                 ]);
 
                 if ($response->successful()) {
