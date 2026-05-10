@@ -70,17 +70,29 @@ class AcademicGuideController extends Controller
                     throw new \Exception('Cloudinary configuration missing.');
                 }
 
+                $authorName = Auth::user()->name ?? 'MCV Archivist';
+                $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
+                $authorText = rawurlencode("Verified Author: " . $safeName);
+                $siteText = rawurlencode("Downloaded from mycollegeverse.in");
+
+                // Permanent Bake-in Transformation String
+                $transformation = "l_mcv_watermark_logo,o_15,w_500,g_center/" .
+                                  "l_text:Arial_16_bold:{$siteText},g_south_west,x_40,y_40,co_rgb:94a3b8/" .
+                                  "l_text:Arial_16_bold:{$authorText},g_south_east,x_40,y_40,co_rgb:94a3b8";
+
                 $response = Http::attach(
                     'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
                     'upload_preset' => $uploadPreset,
+                    'transformation' => $transformation,
+                    'resource_type' => 'auto',
+                    'flags' => 'pg_all'
                 ]);
 
                 if ($response->successful()) {
                     $filePath = $response->json('secure_url');
                 } else {
                     \Log::error('Academic Guide Cloudinary Upload Failed: ' . $response->body());
-                    // Fallback to local if cloud fails? No, better to throw or handle.
                 }
             } catch (\Exception $e) {
                 \Log::error('Academic Guide Upload Exception: ' . $e->getMessage());
