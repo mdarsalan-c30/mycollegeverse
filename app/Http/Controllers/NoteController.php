@@ -266,8 +266,8 @@ class NoteController extends Controller
             return redirect()->route('notes.print', $note->slug);
         }
 
-        if (Str::contains($note->file_path, 'cloudinary.com')) {
-            return redirect()->away($note->getWatermarkedPdfUrl(true));
+        if (str_contains($note->file_path, 'cloudinary.com')) {
+            return redirect()->away($note->file_path);
         }
 
         return Storage::disk('public')->download($note->file_path);

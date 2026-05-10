@@ -26,7 +26,6 @@ use Illuminate\Support\Str;
  */
 class AcademicGuide extends Model
 {
-    use \App\Traits\Watermarkable;
     use HasFactory;
 
     protected $fillable = [

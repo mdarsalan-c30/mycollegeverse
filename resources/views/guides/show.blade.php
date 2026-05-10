@@ -72,13 +72,11 @@
                 <!-- PDF Viewer Node -->
                 <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
                     @php
-                        $pdfUrl = $guide->getWatermarkedPdfUrl();
-                        $downloadUrl = $guide->getWatermarkedPdfUrl(true);
-                        // Fallback for local files
+                        $pdfUrl = $guide->file_path;
                         if (!Str::contains($pdfUrl, 'http')) {
                             $pdfUrl = asset('storage/' . $guide->file_path);
-                            $downloadUrl = $pdfUrl;
                         }
+                        $downloadUrl = $pdfUrl;
                     @endphp
                     <embed src="{{ $pdfUrl }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[3rem]" />
                     
