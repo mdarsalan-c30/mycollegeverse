@@ -28,7 +28,8 @@ trait Watermarkable
         $authorText = urlencode("Verified Author: " . $safeName);
         $siteText = urlencode("Downloaded from mycollegeverse.in");
 
-        $transformations = "l_mcv_watermark_logo,o_15,w_500,g_center/" .
+        // Simplified but robust transformation chain for PDFs
+        $transformations = "pg_all/l_mcv_watermark_logo,o_15,w_500,g_center/" .
                           "l_text:Arial_16_bold:{$siteText},g_south_west,x_30,y_30,co_rgb:94a3b8/" .
                           "l_text:Arial_16_bold:{$authorText},g_south_east,x_30,y_30,co_rgb:94a3b8/";
 
@@ -36,9 +37,12 @@ trait Watermarkable
             $transformations .= "fl_attachment/";
         }
 
-        // Inject into the URL
+        // Inject into the URL after /upload/
         if (Str::contains($url, '/upload/')) {
-            return Str::replace('/upload/', "/upload/{$transformations}", $url);
+            // Ensure we don't double inject if called twice
+            if (!Str::contains($url, 'l_mcv_watermark_logo')) {
+                return Str::replace('/upload/', "/upload/{$transformations}", $url);
+            }
         }
 
         return $url;
