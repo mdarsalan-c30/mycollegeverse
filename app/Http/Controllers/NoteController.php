@@ -225,19 +225,18 @@ class NoteController extends Controller
                 $authorText = rawurlencode("Verified Author: " . $safeName);
                 $siteText = rawurlencode("Downloaded from mycollegeverse.in");
 
-                // Permanent Bake-in Transformation String
-                // We use '/' to separate layers. Each layer is applied permanently.
-                $transformation = "l_mcv_watermark_logo,o_15,w_500,g_center/" .
-                                  "l_text:Arial_16_bold:{$siteText},g_south_west,x_40,y_40,co_rgb:94a3b8/" .
-                                  "l_text:Arial_16_bold:{$authorText},g_south_east,x_40,y_40,co_rgb:94a3b8";
+                $siteText = rawurlencode("MyCollegeVerse.in");
+
+                // Minimal safe transformation for testing
+                $transformation = "l_text:Arial_20_bold:{$siteText},g_south,y_50,co_rgb:94a3b8";
 
                 $response = Http::attach(
                     'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
                     'upload_preset' => $uploadPreset,
                     'transformation' => $transformation,
-                    'resource_type' => 'auto',
-                    'flags' => 'pg_all' // Apply to all pages
+                    'resource_type' => 'image', // Critical for PDF transformations
+                    'flags' => 'pg_all'
                 ]);
 
                 if (!$response->successful()) {
