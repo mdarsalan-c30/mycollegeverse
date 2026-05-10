@@ -70,11 +70,45 @@ class AcademicGuideController extends Controller
                     throw new \Exception('Cloudinary configuration missing.');
                 }
 
+                $authorName = Auth::user()->name ?? 'MCV Archivist';
+                $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
+
+                // --- Imagick Watermarking Logic ---
+                try {
+                    $imagick = new \Imagick();
+                    $imagick->setResolution(150, 150);
+                    $imagick->readImage($file->getRealPath());
+
+                    foreach ($imagick as $page) {
+                        $draw = new \ImagickDraw();
+                        $draw->setFillColor(new \ImagickPixel('#94a3b8'));
+                        $draw->setFontSize(30);
+                        $draw->setFillOpacity(0.15);
+                        $page->annotateImage($draw, 100, 400, 45, "MYCOLLEGEVERSE.IN");
+
+                        $draw->setFillOpacity(0.7);
+                        $draw->setFontSize(12);
+                        $page->annotateImage($draw, 20, $page->getImageHeight() - 20, 0, "Downloaded from mycollegeverse.in | Author: {$safeName}");
+                    }
+
+                    $tempPath = storage_path('app/temp_' . time() . '.pdf');
+                    $imagick->writeImages($tempPath, true);
+                    $uploadFile = $tempPath;
+                } catch (\Exception $e) {
+                    \Log::warning("Imagick Watermarking failed: " . $e->getMessage());
+                    $uploadFile = $file->getRealPath();
+                }
+                // ----------------------------------
+
                 $response = Http::attach(
-                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                    'file', file_get_contents($uploadFile), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
                     'upload_preset' => $uploadPreset,
                 ]);
+
+                if (isset($tempPath) && file_exists($tempPath)) {
+                    unlink($tempPath);
+                }
 
                 if ($response->successful()) {
                     $filePath = $response->json('secure_url');

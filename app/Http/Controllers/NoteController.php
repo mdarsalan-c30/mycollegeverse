@@ -219,11 +219,51 @@ class NoteController extends Controller
                     throw new \Exception('Cloudinary configuration missing.');
                 }
 
+                $authorName = Auth::user()->name ?? 'MCV Archivist';
+                $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
+
+                // --- Imagick Watermarking Logic ---
+                try {
+                    $imagick = new \Imagick();
+                    // Read PDF with higher resolution for quality
+                    $imagick->setResolution(150, 150);
+                    $imagick->readImage($file->getRealPath());
+
+                    foreach ($imagick as $page) {
+                        $draw = new \ImagickDraw();
+                        $draw->setFillColor(new \ImagickPixel('#94a3b8'));
+                        $draw->setFontSize(30);
+                        $draw->setFillOpacity(0.15);
+                        
+                        // Main Diagonal Watermark
+                        $page->annotateImage($draw, 100, 400, 45, "MYCOLLEGEVERSE.IN");
+
+                        // Footer Branding
+                        $draw->setFillOpacity(0.7);
+                        $draw->setFontSize(12);
+                        $page->annotateImage($draw, 20, $page->getImageHeight() - 20, 0, "Downloaded from mycollegeverse.in | Author: {$safeName}");
+                    }
+
+                    // Save the branded PDF to a temporary path
+                    $tempPath = storage_path('app/temp_' . time() . '.pdf');
+                    $imagick->writeImages($tempPath, true);
+                    $uploadFile = $tempPath;
+                } catch (\Exception $e) {
+                    \Log::warning("Imagick Watermarking failed: " . $e->getMessage() . " - Proceeding with original file.");
+                    $uploadFile = $file->getRealPath();
+                }
+                // ----------------------------------
+
                 $response = Http::attach(
-                    'file', file_get_contents($file->getRealPath()), $file->getClientOriginalName()
+                    'file', file_get_contents($uploadFile), $file->getClientOriginalName()
                 )->post("https://api.cloudinary.com/v1_1/{$cloudName}/upload", [
                     'upload_preset' => $uploadPreset,
                 ]);
+
+                // Cleanup temp file if created
+                if (isset($tempPath) && file_exists($tempPath)) {
+                    unlink($tempPath);
+                }
 
                 if (!$response->successful()) {
                     throw new \Exception('Failed to upload to cloud storage.');
