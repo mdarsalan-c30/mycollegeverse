@@ -28,10 +28,9 @@ trait Watermarkable
         $authorText = urlencode("Verified Author: " . $safeName);
         $siteText = urlencode("Downloaded from mycollegeverse.in");
 
-        // Simplified but robust transformation chain for PDFs
-        $transformations = "pg_all/l_mcv_watermark_logo,o_15,w_500,g_center/" .
-                          "l_text:Arial_16_bold:{$siteText},g_south_west,x_30,y_30,co_rgb:94a3b8/" .
-                          "l_text:Arial_16_bold:{$authorText},g_south_east,x_30,y_30,co_rgb:94a3b8/";
+        // Simplified text-only branding (Slate-400 color)
+        $transformations = "pg_all/l_text:Arial_16_bold:{$siteText},g_south_west,x_40,y_40,co_rgb:94a3b8/" .
+                          "l_text:Arial_16_bold:{$authorText},g_south_east,x_40,y_40,co_rgb:94a3b8/";
 
         if ($asDownload) {
             $transformations .= "fl_attachment/";

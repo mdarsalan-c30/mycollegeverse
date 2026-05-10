@@ -11,6 +11,7 @@ use App\Models\NoteReview;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use App\Traits\GeneratesAiContent;
 
 class NoteController extends Controller
