@@ -73,14 +73,18 @@ class AcademicGuideController extends Controller
                 $authorName = Auth::user()->name ?? 'MCV Archivist';
                 $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
 
-                // --- Optimized Premium Imagick Watermarking ---
+                // --- High-Quality Premium Imagick Watermarking ---
                 try {
-                    // Check file size (If > 5MB, skip branding to prevent server timeout)
-                    if ($file->getSize() < 5242880) {
+                    // Check file size (If > 10MB, skip branding to prevent server timeout)
+                    if ($file->getSize() < 10485760) {
                         $imagick = new \Imagick();
+                        $imagick->setResolution(150, 150);
                         $imagick->readImage($file->getRealPath());
 
                         foreach ($imagick as $page) {
+                            $page->setImageFormat('pdf');
+                            $page->setImageCompressionQuality(90);
+
                             $width = $page->getImageWidth();
                             $height = $page->getImageHeight();
 
@@ -88,7 +92,7 @@ class AcademicGuideController extends Controller
                             $draw = new \ImagickDraw();
                             $draw->setFillColor(new \ImagickPixel('#cbd5e1'));
                             $draw->setFontSize($width / 10);
-                            $draw->setFillOpacity(0.35);
+                            $draw->setFillOpacity(0.3);
                             $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
                             $draw->setFontWeight(700);
                             $page->annotateImage($draw, $width / 2, $height / 2, -45, "MYCOLLEGEVERSE.IN");
