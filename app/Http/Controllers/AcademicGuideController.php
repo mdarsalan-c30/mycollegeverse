@@ -73,22 +73,35 @@ class AcademicGuideController extends Controller
                 $authorName = Auth::user()->name ?? 'MCV Archivist';
                 $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
 
-                // --- Imagick Watermarking Logic ---
+                // --- Premium Imagick Watermarking Logic ---
                 try {
                     $imagick = new \Imagick();
                     $imagick->setResolution(150, 150);
                     $imagick->readImage($file->getRealPath());
 
                     foreach ($imagick as $page) {
-                        $draw = new \ImagickDraw();
-                        $draw->setFillColor(new \ImagickPixel('#94a3b8'));
-                        $draw->setFontSize(30);
-                        $draw->setFillOpacity(0.15);
-                        $page->annotateImage($draw, 100, 400, 45, "MYCOLLEGEVERSE.IN");
+                        $width = $page->getImageWidth();
+                        $height = $page->getImageHeight();
 
-                        $draw->setFillOpacity(0.7);
-                        $draw->setFontSize(12);
-                        $page->annotateImage($draw, 20, $page->getImageHeight() - 20, 0, "Downloaded from mycollegeverse.in | Author: {$safeName}");
+                        // 1. Center Diagonal Watermark
+                        $draw = new \ImagickDraw();
+                        $draw->setFillColor(new \ImagickPixel('#cbd5e1')); // Slate-300
+                        $draw->setFontSize($width / 10);
+                        $draw->setFillOpacity(0.35);
+                        $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+                        $page->annotateImage($draw, $width / 2, $height / 2, -45, "MYCOLLEGEVERSE.IN");
+
+                        // 2. Professional Footer
+                        $footerDraw = new \ImagickDraw();
+                        $footerDraw->setFillColor(new \ImagickPixel('#64748b')); // Slate-500
+                        $footerDraw->setFontSize(14);
+                        $footerDraw->setFillOpacity(0.9);
+                        
+                        $footerDraw->setTextAlignment(\Imagick::ALIGN_LEFT);
+                        $page->annotateImage($footerDraw, 40, $height - 40, 0, "Downloaded from MyCollegeVerse.in");
+
+                        $footerDraw->setTextAlignment(\Imagick::ALIGN_RIGHT);
+                        $page->annotateImage($footerDraw, $width - 40, $height - 40, 0, "Author: {$safeName}");
                     }
 
                     $tempPath = storage_path('app/temp_' . time() . '.pdf');
@@ -98,7 +111,7 @@ class AcademicGuideController extends Controller
                     \Log::warning("Imagick Watermarking failed: " . $e->getMessage());
                     $uploadFile = $file->getRealPath();
                 }
-                // ----------------------------------
+                // ------------------------------------------
 
                 $response = Http::attach(
                     'file', file_get_contents($uploadFile), $file->getClientOriginalName()

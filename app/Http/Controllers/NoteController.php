@@ -222,37 +222,49 @@ class NoteController extends Controller
                 $authorName = Auth::user()->name ?? 'MCV Archivist';
                 $safeName = preg_replace('/[^A-Za-z0-9 ]/', '', $authorName);
 
-                // --- Imagick Watermarking Logic ---
+                // --- Premium Imagick Watermarking Logic ---
                 try {
                     $imagick = new \Imagick();
-                    // Read PDF with higher resolution for quality
                     $imagick->setResolution(150, 150);
                     $imagick->readImage($file->getRealPath());
 
                     foreach ($imagick as $page) {
-                        $draw = new \ImagickDraw();
-                        $draw->setFillColor(new \ImagickPixel('#94a3b8'));
-                        $draw->setFontSize(30);
-                        $draw->setFillOpacity(0.15);
-                        
-                        // Main Diagonal Watermark
-                        $page->annotateImage($draw, 100, 400, 45, "MYCOLLEGEVERSE.IN");
+                        $width = $page->getImageWidth();
+                        $height = $page->getImageHeight();
 
-                        // Footer Branding
-                        $draw->setFillOpacity(0.7);
-                        $draw->setFontSize(12);
-                        $page->annotateImage($draw, 20, $page->getImageHeight() - 20, 0, "Downloaded from mycollegeverse.in | Author: {$safeName}");
+                        // 1. Center Diagonal Watermark
+                        $draw = new \ImagickDraw();
+                        $draw->setFillColor(new \ImagickPixel('#cbd5e1')); // Slate-300
+                        $draw->setFontSize($width / 10); // Dynamic sizing
+                        $draw->setFillOpacity(0.35); // Higher visibility
+                        $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+                        
+                        // Diagonal from bottom-left to top-right (-45 degrees)
+                        $page->annotateImage($draw, $width / 2, $height / 2, -45, "MYCOLLEGEVERSE.IN");
+
+                        // 2. Professional Footer
+                        $footerDraw = new \ImagickDraw();
+                        $footerDraw->setFillColor(new \ImagickPixel('#64748b')); // Slate-500
+                        $footerDraw->setFontSize(14);
+                        $footerDraw->setFillOpacity(0.9);
+                        
+                        // Footer Left: Site Link
+                        $footerDraw->setTextAlignment(\Imagick::ALIGN_LEFT);
+                        $page->annotateImage($footerDraw, 40, $height - 40, 0, "Downloaded from MyCollegeVerse.in");
+
+                        // Footer Right: Author Credit
+                        $footerDraw->setTextAlignment(\Imagick::ALIGN_RIGHT);
+                        $page->annotateImage($footerDraw, $width - 40, $height - 40, 0, "Author: {$safeName}");
                     }
 
-                    // Save the branded PDF to a temporary path
                     $tempPath = storage_path('app/temp_' . time() . '.pdf');
                     $imagick->writeImages($tempPath, true);
                     $uploadFile = $tempPath;
                 } catch (\Exception $e) {
-                    \Log::warning("Imagick Watermarking failed: " . $e->getMessage() . " - Proceeding with original file.");
+                    \Log::warning("Imagick Watermarking failed: " . $e->getMessage());
                     $uploadFile = $file->getRealPath();
                 }
-                // ----------------------------------
+                // ------------------------------------------
 
                 $response = Http::attach(
                     'file', file_get_contents($uploadFile), $file->getClientOriginalName()
