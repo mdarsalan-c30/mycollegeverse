@@ -171,7 +171,45 @@ class AcademicGuideController extends Controller
                     ->limit(5)
                     ->get();
 
-        return view('guides.show', compact('guide', 'related'));
+        // High-Velocity SEO Injection 🛰️
+        $seoTitle = "{$guide->title} | Academic Guide & Resources PDF | MyCollegeVerse";
+        $seoDescription = $guide->meta_description ?? Str::limit(strip_tags($guide->content), 160);
+        
+        $schema = [
+            "@context" => "https://schema.org",
+            "@graph" => [
+                [
+                    "@type" => "Article",
+                    "headline" => $guide->title,
+                    "description" => $seoDescription,
+                    "datePublished" => $guide->created_at->toIso8601String(),
+                    "author" => ["@type" => "Person", "name" => $guide->user->name ?? 'MyCollegeVerse Team'],
+                ],
+                [
+                    "@type" => "FAQPage",
+                    "mainEntity" => [
+                        [
+                            "@type" => "Question",
+                            "name" => "How to download {$guide->title} PDF?",
+                            "acceptedAnswer" => [
+                                "@type" => "Answer",
+                                "text" => "You can download the PDF by clicking the 'Download Node' button on the MyCollegeVerse platform."
+                            ]
+                        ],
+                        [
+                            "@type" => "Question",
+                            "name" => "Is this academic guide verified?",
+                            "acceptedAnswer" => [
+                                "@type" => "Answer",
+                                "text" => "Yes, all guides in the Academic Hub are reviewed for accuracy and relevance."
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return view('guides.show', compact('guide', 'related', 'seoTitle', 'seoDescription', 'schema'));
     }
 
     /**

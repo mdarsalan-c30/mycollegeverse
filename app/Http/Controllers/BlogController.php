@@ -64,7 +64,28 @@ class BlogController extends Controller
                 $recommendedColleges = $blog->colleges();
             }
 
-            return view('blogs.show', compact('blog', 'recommendedColleges'));
+            // SEO Intelligence Injection 🧬
+            $seoTitle = $blog->title . " | Insights & Analysis | MyCollegeVerse";
+            $seoDescription = $blog->meta_description ?? Str::limit(strip_tags($blog->content), 160);
+            
+            $schema = [
+                "@context" => "https://schema.org",
+                "@type" => "BlogPosting",
+                "headline" => $blog->title,
+                "description" => $seoDescription,
+                "author" => [
+                    "@type" => "Person",
+                    "name" => $blog->author->name ?? "MyCollegeVerse Editorial"
+                ],
+                "datePublished" => $blog->created_at->toIso8601String(),
+                "publisher" => [
+                    "@type" => "Organization",
+                    "name" => "MyCollegeVerse",
+                    "logo" => asset('images/logo.png')
+                ]
+            ];
+
+            return view('blogs.show', compact('blog', 'recommendedColleges', 'seoTitle', 'seoDescription', 'schema'));
         } catch (\Exception $e) {
             \Log::error("Blog Show Error: " . $e->getMessage());
             abort(404, "Article node lost in the multiverse transition.");

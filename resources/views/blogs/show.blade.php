@@ -1,6 +1,12 @@
 <x-blog-layout>
-    @section('title', $blog->meta_title ?? ($blog->title . ' | Editorial Hub'))
-    @section('meta_description', $blog->meta_description)
+    @section('title', $seoTitle ?? $blog->meta_title ?? ($blog->title . ' | Editorial Hub'))
+    @section('meta_description', $seoDescription ?? $blog->meta_description)
+
+    @push('structured-data')
+    <script type="application/ld+json">
+        {!! json_encode($schema) !!}
+    </script>
+    @endpush
 
     @push('head')
     <style>

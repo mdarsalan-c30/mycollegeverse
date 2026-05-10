@@ -108,30 +108,42 @@ class NoteController extends Controller
             ->take(3)
             ->get();
 
-        // SEO Expert Injection 🔍
-        $seoTitle = "Download {$note->title} - {$note->subject->name} Notes | {$note->college->name}";
-        $seoDescription = "Access high-fidelity academic notes for {$note->subject->name} at {$note->college->name}. Shared by {$note->user->name}. Verified exam-ready knowledge.";
+        // SEO Hyper-Optimization 🔍 (Targeting: PDF Download, AKTU, Semester Notes)
+        $university = $note->college->name;
+        $subject = $note->subject->name;
+        $seoTitle = "{$note->title} - {$subject} ({$university}) Notes PDF Download | MyCollegeVerse";
         
-        // JSON-LD Structured Data
+        // Dynamic description with keyword injection
+        $seoDescription = "Download verified {$subject} notes for {$university}. High-quality PDF assets for exam preparation, shared by {$note->user->name}. Access the best academic manifests in the Verse.";
+        
+        // JSON-LD Structured Data (EducationalResource & Article)
         $schema = [
             "@context" => "https://schema.org",
-            "@type" => "Article",
-            "headline" => $note->title,
-            "description" => $seoDescription,
-            "author" => [
-                "@type" => "Person",
-                "name" => $note->user->name
-            ],
-            "publisher" => [
-                "@type" => "Organization",
-                "name" => "MyCollegeVerse",
-                "logo" => asset('images/logo.png')
-            ],
-            "datePublished" => $note->created_at->toIso8601String(),
-            "aggregateRating" => [
-                "@type" => "AggregateRating",
-                "ratingValue" => $note->avg_rating,
-                "reviewCount" => max(1, $note->reviews()->count())
+            "@graph" => [
+                [
+                    "@type" => "CreativeWork",
+                    "educationalLevel" => "College",
+                    "name" => $note->title,
+                    "description" => $seoDescription,
+                    "author" => ["@type" => "Person", "name" => $note->user->name],
+                    "publisher" => [
+                        "@type" => "Organization",
+                        "name" => "MyCollegeVerse",
+                        "logo" => asset('images/logo.png')
+                    ],
+                    "datePublished" => $note->created_at->toIso8601String(),
+                    "genre" => "Educational Notes",
+                    "interactivityType" => "informational",
+                    "learningResourceType" => "Lecture Notes"
+                ],
+                [
+                    "@type" => "BreadcrumbList",
+                    "itemListElement" => [
+                        ["@type" => "ListItem", "position" => 1, "name" => "Notes", "item" => route('notes.index')],
+                        ["@type" => "ListItem", "position" => 2, "name" => $university, "item" => route('notes.index', ['college_id' => $note->college_id])],
+                        ["@type" => "ListItem", "position" => 3, "name" => $subject, "item" => url()->current()]
+                    ]
+                ]
             ]
         ];
 

@@ -1,8 +1,14 @@
 @extends('layouts.hub')
 
-@section('title', $guide->meta_title ?? $guide->title . ' | Academic Hub')
-@section('meta_description', $guide->meta_description)
+@section('title', $seoTitle ?? $guide->meta_title ?? $guide->title . ' | Academic Hub')
+@section('meta_description', $seoDescription ?? $guide->meta_description)
 @section('meta_keywords', $guide->meta_keywords)
+
+@push('structured-data')
+<script type="application/ld+json">
+    {!! json_encode($schema) !!}
+</script>
+@endpush
 
 @section('content')
     <div class="max-w-5xl mx-auto px-6 py-12">
