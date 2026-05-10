@@ -187,8 +187,15 @@
                             </a>
                         </div>
                     @else
-                        {{-- Standard PDF/Cloudinary Embed --}}
-                        <embed src="{{ asset('storage/' . $note->file_path) }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
+                        @php
+                            $pdfPath = $note->file_path;
+                            if (\Illuminate\Support\Str::contains($pdfPath, 'http')) {
+                                $pdfPath = $pdfPath;
+                            } else {
+                                $pdfPath = asset('storage/' . $pdfPath);
+                            }
+                        @endphp
+                        <embed src="{{ $pdfPath }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
                     @endif
                     
                     <!-- Fallback for legacy environments -->

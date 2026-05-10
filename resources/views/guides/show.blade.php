@@ -73,8 +73,10 @@
                 <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
                     @php
                         $pdfUrl = $guide->file_path;
-                        if (!Str::contains($pdfUrl, 'http')) {
-                            $pdfUrl = asset('storage/' . $guide->file_path);
+                        if (\Illuminate\Support\Str::contains($pdfUrl, 'http')) {
+                            $pdfUrl = $pdfUrl;
+                        } else {
+                            $pdfUrl = asset('storage/' . $pdfUrl);
                         }
                         $downloadUrl = $pdfUrl;
                     @endphp
