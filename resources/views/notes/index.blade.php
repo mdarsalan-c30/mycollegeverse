@@ -282,7 +282,10 @@
                             </button>
                         </div>
 
-                        <form action="{{ route('notes.store') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                        <form action="{{ route('notes.store') }}" method="POST" enctype="multipart/form-data" 
+                              @submit="isUploading = true" 
+                              data-turbo="false"
+                              class="space-y-12">
                             @csrf
                             
                             <!-- Step 1: Core Selection -->

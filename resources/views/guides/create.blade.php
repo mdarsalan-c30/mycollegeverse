@@ -9,7 +9,9 @@
             <p class="text-slate-400 font-bold text-sm uppercase tracking-[0.3em] opacity-80">Architecting the Academic Multiverse Node</p>
         </div>
 
-        <form action="{{ route('guides.store') }}" method="POST" id="manifest-form" enctype="multipart/form-data" class="space-y-10 pb-32">
+        <form action="{{ route('guides.store') }}" method="POST" id="manifest-form" enctype="multipart/form-data" 
+              data-turbo="false"
+              class="space-y-10 pb-32">
             @csrf
             
             <div class="glass p-10 md:p-16 rounded-[4rem] border border-slate-100 shadow-2xl space-y-12">

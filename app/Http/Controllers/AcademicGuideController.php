@@ -75,41 +75,45 @@ class AcademicGuideController extends Controller
 
                 // --- Optimized Premium Imagick Watermarking ---
                 try {
-                    $imagick = new \Imagick();
-                    $imagick->setResolution(72, 72);
-                    $imagick->readImage($file->getRealPath());
+                    // Check file size (If > 5MB, skip branding to prevent server timeout)
+                    if ($file->getSize() < 5242880) {
+                        $imagick = new \Imagick();
+                        $imagick->readImage($file->getRealPath());
 
-                    foreach ($imagick as $page) {
-                        $width = $page->getImageWidth();
-                        $height = $page->getImageHeight();
+                        foreach ($imagick as $page) {
+                            $width = $page->getImageWidth();
+                            $height = $page->getImageHeight();
 
-                        // 1. Center Diagonal Watermark
-                        $draw = new \ImagickDraw();
-                        $draw->setFillColor(new \ImagickPixel('#cbd5e1'));
-                        $draw->setFontSize($width / 10);
-                        $draw->setFillOpacity(0.35);
-                        $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
-                        $draw->setFontWeight(700);
-                        $page->annotateImage($draw, $width / 2, $height / 2, -45, "MYCOLLEGEVERSE.IN");
+                            // 1. Center Diagonal Watermark
+                            $draw = new \ImagickDraw();
+                            $draw->setFillColor(new \ImagickPixel('#cbd5e1'));
+                            $draw->setFontSize($width / 10);
+                            $draw->setFillOpacity(0.35);
+                            $draw->setTextAlignment(\Imagick::ALIGN_CENTER);
+                            $draw->setFontWeight(700);
+                            $page->annotateImage($draw, $width / 2, $height / 2, -45, "MYCOLLEGEVERSE.IN");
 
-                        // 2. Professional Footer
-                        $footerDraw = new \ImagickDraw();
-                        $footerDraw->setFillColor(new \ImagickPixel('#475569'));
-                        $footerDraw->setFontSize(14);
-                        $footerDraw->setFontWeight(800);
-                        $footerDraw->setFillOpacity(1.0);
-                        
-                        $margin = 60;
-                        $footerDraw->setTextAlignment(\Imagick::ALIGN_LEFT);
-                        $page->annotateImage($footerDraw, $margin, $height - 40, 0, "Downloaded from MyCollegeVerse.in");
+                            // 2. Professional Footer
+                            $footerDraw = new \ImagickDraw();
+                            $footerDraw->setFillColor(new \ImagickPixel('#475569'));
+                            $footerDraw->setFontSize(14);
+                            $footerDraw->setFontWeight(800);
+                            $footerDraw->setFillOpacity(1.0);
+                            
+                            $margin = 60;
+                            $footerDraw->setTextAlignment(\Imagick::ALIGN_LEFT);
+                            $page->annotateImage($footerDraw, $margin, $height - 40, 0, "Downloaded from MyCollegeVerse.in");
 
-                        $footerDraw->setTextAlignment(\Imagick::ALIGN_RIGHT);
-                        $page->annotateImage($footerDraw, $width - $margin, $height - 40, 0, "Author: {$safeName}");
+                            $footerDraw->setTextAlignment(\Imagick::ALIGN_RIGHT);
+                            $page->annotateImage($footerDraw, $width - $margin, $height - 40, 0, "Author: {$safeName}");
+                        }
+
+                        $tempPath = storage_path('app/temp_' . time() . '.pdf');
+                        $imagick->writeImages($tempPath, true);
+                        $uploadFile = $tempPath;
+                    } else {
+                        $uploadFile = $file->getRealPath();
                     }
-
-                    $tempPath = storage_path('app/temp_' . time() . '.pdf');
-                    $imagick->writeImages($tempPath, true);
-                    $uploadFile = $tempPath;
                 } catch (\Exception $e) {
                     \Log::warning("Imagick Watermarking failed: " . $e->getMessage());
                     $uploadFile = $file->getRealPath();
