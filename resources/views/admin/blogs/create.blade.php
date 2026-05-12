@@ -176,29 +176,37 @@
 
             function updateSeo(content) {
                 let score = 0;
-                
-                // 1. Title Analysis (20 pts)
-                const title = document.querySelector('input[name="title"]').value;
-                if (title.length >= 30 && title.length <= 60) score += 20;
-
-                // 2. Meta Description (20 pts)
-                const metaDesc = document.querySelector('textarea[name="meta_description"]').value;
-                if (metaDesc.length >= 120 && metaDesc.length <= 160) score += 20;
-
-                // 3. Word Count (20 pts)
                 const text = content.replace(/<[^>]*>/g, '');
                 const words = text.split(/\s+/).filter(w => w.length > 0).length;
+
+                // 1. Title Analysis (20 pts) - Progressive
+                const title = document.querySelector('input[name="title"]').value;
+                const tl = title.length;
+                if (tl >= 30 && tl <= 60) score += 20;
+                else if (tl > 0) score += Math.min(15, (tl / 30) * 20);
+
+                // 2. Meta Description (20 pts) - Progressive
+                const metaDesc = document.querySelector('textarea[name="meta_description"]').value;
+                const dl = metaDesc.length;
+                if (dl >= 120 && dl <= 160) score += 20;
+                else if (dl > 0) score += Math.min(15, (dl / 120) * 20);
+
+                // 3. Word Count (20 pts) - Linear
                 if (words >= 300) score += 20;
                 else if (words > 0) score += (words / 300) * 20;
 
-                // 4. Keyword Density (30 pts)
+                // 4. Keyword Density (30 pts) - Robust
                 const keywordInput = document.querySelector('input[name="meta_keywords"]').value;
-                const firstKeyword = keywordInput.split(',')[0].trim().toLowerCase();
-                if (firstKeyword && words > 0) {
-                    const regex = new RegExp(firstKeyword, 'gi');
-                    const count = (text.toLowerCase().match(regex) || []).length;
-                    const density = (count / words) * 100;
-                    if (density >= 0.5 && density <= 2.5) score += 30;
+                if (keywordInput.trim() && words > 0) {
+                    const firstKeyword = keywordInput.split(',')[0].trim().toLowerCase();
+                    if (firstKeyword) {
+                        const escaped = firstKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(escaped, 'gi');
+                        const count = (text.toLowerCase().match(regex) || []).length;
+                        const density = (count / words) * 100;
+                        if (density >= 0.5 && density <= 3.0) score += 30;
+                        else if (density > 0) score += 15; // Partial credit for presence
+                    }
                 }
 
                 // 5. Structure (10 pts)
