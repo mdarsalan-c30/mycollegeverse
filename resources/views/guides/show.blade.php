@@ -10,6 +10,37 @@
 </script>
 @endpush
 
+@push('head')
+<style>
+    /* Premium Editorial Typography for Academic Hub 🏛️ */
+    .guide-content { 
+        font-size: 1.125rem; 
+        line-height: 1.8; 
+        color: #334155; 
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .guide-content h2 { font-size: 2.25rem; font-weight: 800; color: #0f172a; margin-top: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.025em; line-height: 1.2; }
+    .guide-content h3 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-top: 2.5rem; margin-bottom: 1rem; line-height: 1.3; }
+    .guide-content h4, .guide-content h5, .guide-content h6 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; }
+    .guide-content p { margin-bottom: 1.5rem; display: block; }
+    .guide-content ul { list-style-type: disc; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .guide-content ol { list-style-type: decimal; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+    .guide-content li { margin-bottom: 0.75rem; padding-left: 0.5rem; }
+    .guide-content strong, .guide-content b { font-weight: 700; color: #0f172a; }
+    .guide-content blockquote { 
+        border-left: 4px solid #3B82F6; 
+        background: #F8FAFC; 
+        padding: 2rem; 
+        border-radius: 0 1.5rem 1.5rem 0; 
+        font-style: italic; 
+        margin: 2.5rem 0;
+        color: #475569;
+    }
+    .guide-content img { border-radius: 2rem; margin: 3rem 0; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+    .guide-content a { color: #3B82F6; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+</style>
+@endpush
+
 @section('content')
     <div class="max-w-5xl mx-auto px-6 py-12">
         <!-- Breadcrumbs -->
@@ -115,7 +146,7 @@
             @endif
 
             <!-- Content Area -->
-            <div class="px-8 md:px-20 py-16 prose prose-slate max-w-none prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-p:text-slate-600 prose-p:font-medium prose-p:leading-relaxed prose-strong:text-slate-900 prose-a:text-primary prose-a:font-bold hover:prose-a:underline">
+            <div class="px-8 md:px-20 py-16 guide-content">
                 {!! $guide->content !!}
             </div>
 
