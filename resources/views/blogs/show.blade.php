@@ -11,6 +11,30 @@
     @push('head')
     <style>
         .progress-bar { position: fixed; top: 0; left: 0; height: 4px; background: #3B82F6; z-index: 100; transition: width 0.1s ease; }
+        
+        /* Premium Editorial Typography ✍️ */
+        .blog-content { 
+            font-size: 1.125rem; 
+            line-height: 1.8; 
+            color: #334155; 
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .blog-content h2 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-top: 3rem; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
+        .blog-content h3 { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 2.5rem; margin-bottom: 1rem; }
+        .blog-content p { margin-bottom: 1.5rem; }
+        .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .blog-content li { margin-bottom: 0.5rem; }
+        .blog-content blockquote { 
+            border-left: 4px solid #3B82F6; 
+            background: #F8FAFC; 
+            padding: 2rem; 
+            border-radius: 0 1.5rem 1.5rem 0; 
+            font-style: italic; 
+            margin: 2.5rem 0;
+            color: #475569;
+        }
+        .blog-content img { border-radius: 2rem; margin: 3rem 0; box-shadow: 0 20px 50px rgba(0,0,0,0.05); }
+        .blog-content a { color: #3B82F6; font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
     </style>
     @endpush
 
