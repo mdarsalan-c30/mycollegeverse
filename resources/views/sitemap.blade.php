@@ -9,6 +9,42 @@
         <loc>{{ url('/colleges') }}</loc>
         <priority>0.9</priority>
     </url>
+    <url>
+        <loc>{{ url('/notes') }}</loc>
+        <priority>0.9</priority>
+    </url>
+    <url>
+        <loc>{{ url('/resumes') }}</loc>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{{ url('/blog') }}</loc>
+        <priority>0.8</priority>
+    </url>
+    <url>
+        <loc>{{ url('/jobs') }}</loc>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Faculty Nodes -->
+    @foreach ($professors as $professor)
+        <url>
+            <loc>{{ route('professors.show', $professor->slug) }}</loc>
+            <lastmod>{{ $professor->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.6</priority>
+        </url>
+    @endforeach
+
+    <!-- Academic Resources (Notes) -->
+    @foreach ($notes as $note)
+        <url>
+            <loc>{{ route('notes.show', $note->slug ?? $note->id) }}</loc>
+            <lastmod>{{ $note->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+            <changefreq>weekly</changefreq>
+            <priority>0.7</priority>
+        </url>
+    @endforeach
 
     <!-- Institutional Nodes (Colleges) -->
     @foreach ($colleges as $college)

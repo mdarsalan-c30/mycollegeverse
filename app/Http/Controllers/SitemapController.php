@@ -14,12 +14,15 @@ class SitemapController extends Controller
     public function index()
     {
         $colleges = College::all();
-        // Assuming Blogs might be called 'Blog' or similar, we'll check common published status
         $blogs = Blog::where('status', 'published')->latest()->get();
+        $notes = \App\Models\Note::latest()->get();
+        $professors = \App\Models\Professor::all();
 
         return response()->view('sitemap', [
             'colleges' => $colleges,
             'blogs' => $blogs,
+            'notes' => $notes,
+            'professors' => $professors,
         ])->header('Content-Type', 'text/xml');
     }
 }
