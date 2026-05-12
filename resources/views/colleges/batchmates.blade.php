@@ -27,15 +27,19 @@
                         Invite Classmates
                     </button>
                     @auth
-                        @if(!Auth::user()->is_batch_visible)
                         <form action="{{ route('profile.batch.toggle') }}" method="POST">
                             @csrf
-                            <input type="hidden" name="visible" value="1">
-                            <button type="submit" class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all">
-                                Reveal My Profile to Batch
-                            </button>
+                            @if(Auth::user()->is_batch_visible)
+                                <button type="submit" class="bg-emerald-500 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-105 transition-all">
+                                    🟢 Profile Visible (Hide?)
+                                </button>
+                            @else
+                                <input type="hidden" name="visible" value="1">
+                                <button type="submit" class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white/20 transition-all">
+                                    Reveal My Profile to Batch
+                                </button>
+                            @endif
                         </form>
-                        @endif
                     @endauth
                 </div>
             </div>
