@@ -50,9 +50,15 @@
                     </div>
                     
                     <div class="pb-4">
-                        <button @click="toggleReviewForm()" class="bg-white text-slate-900 px-12 py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl hover:bg-primary hover:text-white hover:scale-105 transition-all flex items-center gap-3">
+                        @auth
+                        <button @click="tab = 'reviews'; showReviewForm = true; $nextTick(() => { document.getElementById('review-form-section')?.scrollIntoView({ behavior: 'smooth' }); })" class="bg-white text-slate-900 px-12 py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl hover:bg-primary hover:text-white hover:scale-105 transition-all flex items-center gap-3">
                             Write Review ✍️
                         </button>
+                        @else
+                        <a href="{{ route('login') }}" class="bg-white text-slate-900 px-12 py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl hover:bg-primary hover:text-white hover:scale-105 transition-all flex items-center gap-3">
+                            Login to Review ✍️
+                        </a>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -175,7 +181,7 @@
 
                         <!-- REVIEW FORM (INTEGRATED) -->
                         @auth
-                        <div x-show="showReviewForm" x-collapse>
+                        <div id="review-form-section" x-show="showReviewForm" x-collapse>
                             <div class="bg-slate-900 rounded-[4rem] p-12 space-y-10 relative overflow-hidden shadow-2xl mb-16">
                                 <div class="relative z-10">
                                     <div class="flex justify-between items-start mb-12">
