@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <!-- Metric Grid (Stitch High-Fidelity Mirror) -->
+        <!-- Metric Grid (Editorial & Knowledge Flux) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Total Citizens -->
             <div class="glass p-8 rounded-[2rem] border-white/50 shadow-xl shadow-slate-200/50 group hover:bg-white transition-all">
@@ -25,56 +25,48 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                         </svg>
                     </div>
-                    <span class="text-[10px] font-black text-green-500 bg-green-500/10 px-3 py-1 rounded-full uppercase tracking-tighter">+{{ round(($stats['total_users']/100)*10) }}%</span>
                 </div>
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Citizens</p>
                 <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_users']) }}</h3>
             </div>
 
-            <!-- Knowledge Assets -->
-            <div class="glass p-8 rounded-[2rem] border-white/50 shadow-xl shadow-slate-200/50 group hover:bg-white transition-all">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 bg-indigo-500/10 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                    </div>
-                    <span class="text-[10px] font-black text-indigo-500 bg-indigo-500/10 px-3 py-1 rounded-full uppercase tracking-tighter">{{ $stats['pending_notes'] }} Pending</span>
-                </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Knowledge Assets</p>
-                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_notes']) }}</h3>
-            </div>
-
-            <!-- Active Hubs -->
+            <!-- Editorial Nodes (Blogs) -->
             <div class="glass p-8 rounded-[2rem] border-white/50 shadow-xl shadow-slate-200/50 group hover:bg-white transition-all">
                 <div class="flex items-center justify-between mb-6">
                     <div class="w-12 h-12 bg-emerald-500/10 text-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                         </svg>
                     </div>
                 </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Campus Hubs</p>
-                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_colleges']) }}</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Editorial Nodes</p>
+                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_blogs']) }}</h3>
             </div>
 
-            <!-- Security Reports -->
+            <!-- Academic Intel (Guides) -->
             <div class="glass p-8 rounded-[2rem] border-white/50 shadow-xl shadow-slate-200/50 group hover:bg-white transition-all">
                 <div class="flex items-center justify-between mb-6">
-                    <div class="w-12 h-12 bg-red-500/10 text-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <div class="w-12 h-12 bg-indigo-500/10 text-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                         </svg>
                     </div>
-                    @if($stats['pending_reports'] > 0)
-                        <span class="flex h-3 w-3 relative">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                        </span>
-                    @endif
                 </div>
-                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Open Reports</p>
-                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['pending_reports']) }}</h3>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Academic Intel Hub</p>
+                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_guides']) }}</h3>
+            </div>
+
+            <!-- Knowledge Assets (Notes) -->
+            <div class="glass p-8 rounded-[2rem] border-white/50 shadow-xl shadow-slate-200/50 group hover:bg-white transition-all">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-12 h-12 bg-amber-500/10 text-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Knowledge Assets</p>
+                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_notes']) }}</h3>
             </div>
         </div>
 

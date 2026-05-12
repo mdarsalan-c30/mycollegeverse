@@ -19,12 +19,13 @@ class DashboardController extends Controller
     {
         // High-Fidelity Pulse Metrics 📡 — wrapped in try/catch for missing tables on production
         $stats = [
-            'total_users'    => $this->safeCount(fn() => User::count()),
-            'active_today'   => $this->safeCount(fn() => User::whereDate('updated_at', Carbon::today())->count()),
-            'total_notes'    => $this->safeCount(fn() => Note::count()),
-            'pending_notes'  => $this->safeCount(fn() => Note::where('is_verified', false)->count()),
-            'pending_reports'=> $this->safeCount(fn() => DB::table('reports')->where('status', 'pending')->count()),
-            'total_colleges' => $this->safeCount(fn() => College::count()),
+            'total_users'      => $this->safeCount(fn() => User::count()),
+            'active_today'     => $this->safeCount(fn() => User::whereDate('updated_at', Carbon::today())->count()),
+            'total_notes'      => $this->safeCount(fn() => Note::count()),
+            'total_blogs'      => $this->safeCount(fn() => DB::table('blogs')->count()),
+            'total_guides'     => $this->safeCount(fn() => DB::table('academic_guides')->count()),
+            'total_colleges'   => $this->safeCount(fn() => College::count()),
+            'pending_reports'  => $this->safeCount(fn() => DB::table('reports')->where('status', 'pending')->count()),
         ];
 
         // Growth Trends (Last 7 Days) 📈

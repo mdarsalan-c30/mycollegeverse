@@ -13,6 +13,41 @@
             @csrf
             
             <div class="glass p-10 md:p-16 rounded-[4rem] border border-slate-100 shadow-2xl space-y-12">
+                <!-- SEO Status Node (Mirroring Blog Engine) -->
+                <div class="bg-slate-900 rounded-[2.5rem] p-8 text-white mb-10 overflow-hidden relative">
+                    <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-bl-[5rem] -mr-16 -mt-16"></div>
+                    <div class="relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-primary mb-1">SEO Health Node</h4>
+                                <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest">Live Multiverse Synchronization</p>
+                            </div>
+                            <div class="text-right">
+                                <span id="seo-score" class="text-3xl font-black text-white">0%</span>
+                            </div>
+                        </div>
+                        <div class="w-full h-1.5 bg-white/5 rounded-full mb-8">
+                            <div id="seo-progress" class="h-full bg-primary rounded-full transition-all duration-700" style="width: 0%"></div>
+                        </div>
+                        
+                        <!-- Checklist Mirror -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="seo-checklist">
+                            <div class="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-slate-400" data-rule="title">
+                                <span class="status-icon text-slate-600">⚪</span> Title Range (30-60)
+                            </div>
+                            <div class="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-slate-400" data-rule="meta">
+                                <span class="status-icon text-slate-600">⚪</span> Meta Description
+                            </div>
+                            <div class="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-slate-400" data-rule="depth">
+                                <span class="status-icon text-slate-600">⚪</span> Content Depth
+                            </div>
+                            <div class="flex items-center gap-3 text-[9px] font-black uppercase tracking-widest text-slate-400" data-rule="keywords">
+                                <span class="status-icon text-slate-600">⚪</span> Keyword Sync
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Basic Intel -->
                 <div class="space-y-8">
                     <div class="flex items-center gap-4">
@@ -128,6 +163,59 @@
                 var el = document.getElementById('file-name');
                 if(name) { el.textContent = 'Attached: ' + name; el.classList.remove('hidden'); }
             });
+
+            // --- Aggressive SEO Engine ---
+            function updateSeo() {
+                const title = document.querySelector('input[name="title"]').value;
+                const metaTitle = document.querySelector('input[name="meta_title"]').value;
+                const metaDesc = document.querySelector('textarea[name="meta_description"]').value;
+                const content = quill.getText();
+                const keywords = document.querySelector('input[name="meta_keywords"]').value;
+
+                let score = 0;
+                let rules = { title: false, meta: false, depth: false, keywords: false };
+
+                // 1. Title/Meta Title Sync
+                const mainTitle = metaTitle || title;
+                if (mainTitle.length >= 30 && mainTitle.length <= 60) { score += 25; rules.title = true; }
+
+                // 2. Meta Description
+                if (metaDesc.length >= 120 && metaDesc.length <= 160) { score += 25; rules.meta = true; }
+
+                // 3. Content Depth
+                const words = content.trim().split(/\s+/).length;
+                if (words >= 300) { score += 25; rules.depth = true; }
+
+                // 4. Keyword presence
+                if (keywords.length > 3) {
+                    const firstKeyword = keywords.split(',')[0].trim().toLowerCase();
+                    if (content.toLowerCase().includes(firstKeyword)) { score += 25; rules.keywords = true; }
+                }
+
+                // UI Update
+                document.getElementById('seo-score').innerText = score + '%';
+                document.getElementById('seo-progress').style.width = score + '%';
+
+                // Checklist UI
+                Object.keys(rules).forEach(rule => {
+                    const el = document.querySelector(`[data-rule="${rule}"]`);
+                    const icon = el.querySelector('.status-icon');
+                    if (rules[rule]) {
+                        icon.innerText = '✅';
+                        el.classList.remove('text-slate-400');
+                        el.classList.add('text-primary');
+                    } else {
+                        icon.innerText = '⚪';
+                        el.classList.remove('text-primary');
+                        el.classList.add('text-slate-400');
+                    }
+                });
+            }
+
+            // Real-time Pulse
+            quill.on('text-change', updateSeo);
+            document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', updateSeo));
+            updateSeo(); // Init
 
             var form = document.getElementById('manifest-form');
             form.addEventListener('submit', function(e) {
