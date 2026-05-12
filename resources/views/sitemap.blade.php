@@ -1,4 +1,4 @@
-<?php echo '<?xml version="1.0" encoding="UTF-8"?>'; ?>
+{!! '<' . '?xml version="1.0" encoding="UTF-8"?' . '>' !!}
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <!-- Main Nodes -->
     <url>
@@ -28,41 +28,41 @@
 
     <!-- Faculty Nodes -->
     @foreach ($professors as $professor)
-        <url>
-            <loc>{{ route('professors.show', $professor->slug) }}</loc>
-            <lastmod>{{ $professor->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.6</priority>
-        </url>
+    <url>
+        <loc>{{ route('professors.show', $professor->slug) }}</loc>
+        <lastmod>{{ $professor->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
     @endforeach
 
     <!-- Academic Resources (Notes) -->
     @foreach ($notes as $note)
-        <url>
-            <loc>{{ route('notes.show', $note->slug ?? $note->id) }}</loc>
-            <lastmod>{{ $note->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.7</priority>
-        </url>
+    <url>
+        <loc>{{ route('notes.show', $note->slug ?? $note->id) }}</loc>
+        <lastmod>{{ $note->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.7</priority>
+    </url>
     @endforeach
 
     <!-- Institutional Nodes (Colleges) -->
     @foreach ($colleges as $college)
-        <url>
-            <loc>{{ route('colleges.show', $college->slug) }}</loc>
-            <lastmod>{{ $college->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-            <changefreq>weekly</changefreq>
-            <priority>0.8</priority>
-        </url>
+    <url>
+        <loc>{{ route('colleges.show', $college->slug) }}</loc>
+        <lastmod>{{ $college->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
     @endforeach
 
     <!-- Knowledge Artifacts (Blogs) -->
     @foreach ($blogs as $blog)
-        <url>
-            <loc>{{ route('blogs.show', $blog->slug) }}</loc>
-            <lastmod>{{ $blog->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-            <changefreq>monthly</changefreq>
-            <priority>0.7</priority>
-        </url>
+    <url>
+        <loc>{{ route('blogs.show', $blog->slug) }}</loc>
+        <lastmod>{{ $blog->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
     @endforeach
 </urlset>
