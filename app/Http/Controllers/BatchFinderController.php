@@ -16,15 +16,16 @@ class BatchFinderController extends Controller
     {
         $batchmates = User::where('college_id', $college->id)
             ->where(function($q) use ($year) {
+                // Exact match or partial match (e.g. "2024")
                 $q->where('year', $year)
                   ->orWhere('year', 'LIKE', '%' . $year . '%');
                 
-                // Smart mapping for common year labels if year is numeric
+                // Flexible mapping for testing and common labels
                 if(is_numeric($year)) {
-                    $currentYear = date('Y');
-                    $diff = (int)$year - (int)$currentYear;
-                    if($diff == 0) $q->orWhere('year', 'Final Year')->orWhere('year', '4');
-                    if($diff == 1) $q->orWhere('year', '3rd Year')->orWhere('year', '3');
+                    // If user is "Final Year" or "4th Year", show them in the batch
+                    $q->orWhere('year', 'Final Year')
+                      ->orWhere('year', '4th Year')
+                      ->orWhere('year', '4');
                 }
             })
             ->where('is_batch_visible', true)
