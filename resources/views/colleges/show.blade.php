@@ -207,6 +207,22 @@
                                             @endforeach
                                         </div>
 
+                                        <!-- PLACEMENT INTEL INPUTS 💰 -->
+                                        <div class="grid md:grid-cols-3 gap-10 bg-white/5 p-10 rounded-[3rem] border border-white/10">
+                                            <div class="space-y-4">
+                                                <label class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] ml-2">Avg Package (LPA)</label>
+                                                <input type="number" step="0.1" name="average_package" placeholder="e.g. 6.5" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs outline-none focus:border-emerald-500">
+                                            </div>
+                                            <div class="space-y-4">
+                                                <label class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] ml-2">Highest Package (LPA)</label>
+                                                <input type="number" step="0.1" name="highest_package" placeholder="e.g. 45.0" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs outline-none focus:border-emerald-500">
+                                            </div>
+                                            <div class="space-y-4">
+                                                <label class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em] ml-2">Lowest Package (LPA)</label>
+                                                <input type="number" step="0.1" name="lowest_package" placeholder="e.g. 3.2" class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-white text-xs outline-none focus:border-emerald-500">
+                                            </div>
+                                        </div>
+
                                         <div class="bg-white/5 p-12 rounded-[3.5rem] border border-white/10 space-y-10">
                                             <div class="flex items-center gap-4">
                                                 <span class="text-2xl">🧬</span>
