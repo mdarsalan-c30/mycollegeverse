@@ -14,4 +14,4 @@ Disallow: /login
 Disallow: /register
 Disallow: /forgot-password
 
-Sitemap: https://mycollegeverse.com/sitemap.xml
+Sitemap: https://mycollegeverse.in/sitemap.xml
