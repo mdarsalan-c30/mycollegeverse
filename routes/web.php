@@ -445,6 +445,9 @@ Route::get('/multiverse-teleport', function() {
 
 Route::get('/multiverse-harden', function() {
     try {
+        if (!function_exists('shell_exec')) {
+            return "🚫 <b>ERROR:</b> 'shell_exec' is completely removed. Manual pull required.";
+        }
         $output = shell_exec('/usr/bin/git fetch --all 2>&1 && /usr/bin/git reset --hard origin/master 2>&1') ?? 'No output signal.';
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         return "🛡️ <b>Hardened Sync Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
