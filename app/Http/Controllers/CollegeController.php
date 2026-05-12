@@ -120,7 +120,7 @@ class CollegeController extends Controller
             }
         }
 
-        CollegeReview::updateOrCreate(
+        $review = CollegeReview::updateOrCreate(
             [
                 'user_id' => $user->id,
                 'college_id' => $college->id
@@ -138,6 +138,9 @@ class CollegeController extends Controller
                 'status' => 'pending' // Always reset to pending for verification
             ]
         );
+
+        // DEBUG: Force log to verify if save happened
+        \Log::info('College Review Created/Updated:', ['id' => $review->id, 'status' => $review->status]);
 
         return back()->with('success', 'Your review has been submitted for institutional verification. It will be live once approved!');
     }

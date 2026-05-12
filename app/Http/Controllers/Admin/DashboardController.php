@@ -26,6 +26,7 @@ class DashboardController extends Controller
             'total_guides'     => $this->safeCount(fn() => DB::table('academic_guides')->count()),
             'total_colleges'   => $this->safeCount(fn() => College::count()),
             'pending_reports'  => $this->safeCount(fn() => DB::table('reports')->where('status', 'pending')->count()),
+            'pending_reviews'  => $this->safeCount(fn() => \App\Models\CollegeReview::where('status', 'pending')->count() + \App\Models\Review::where('status', 'pending')->count()),
         ];
 
         // Growth Trends (Last 7 Days) 📈
@@ -56,7 +57,11 @@ class DashboardController extends Controller
             Note::with(['user', 'college'])->latest()->take(5)->get()
         );
 
-        return view('admin.index', compact('stats', 'userGrowth', 'latestReports', 'latestNotes'));
+        $latestReviews = $this->safeFetch(fn() =>
+            \App\Models\CollegeReview::with(['user', 'college'])->latest()->take(5)->get()
+        );
+
+        return view('admin.index', compact('stats', 'userGrowth', 'latestReports', 'latestNotes', 'latestReviews'));
     }
 
     /** Safely run a count query — returns 0 if table missing. */

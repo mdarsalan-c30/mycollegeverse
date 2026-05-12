@@ -68,6 +68,20 @@
                 <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Total Knowledge Assets</p>
                 <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['total_notes']) }}</h3>
             </div>
+
+            <!-- Pending Reviews (New 💎) -->
+            <div class="glass p-8 rounded-[2rem] border-admin-primary/20 bg-admin-primary/5 shadow-xl shadow-admin-primary/5 group hover:bg-white transition-all">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="w-12 h-12 bg-admin-primary/10 text-admin-primary rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <span class="px-3 py-1 bg-admin-primary text-white text-[8px] font-black rounded-full animate-bounce">PENDING</span>
+                </div>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Feedback Verification</p>
+                <h3 class="text-4xl font-black text-admin-secondary mt-1">{{ number_format($stats['pending_reviews']) }}</h3>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -112,6 +126,48 @@
                                     <a href="{{ route('admin.notes', ['search' => $note->title]) }}" class="p-2 text-slate-400 hover:text-admin-primary transition-all rounded-xl inline-block" title="Deep Scan Asset">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Latest Institutional Feedback 💎 -->
+                <div class="flex items-center justify-between mt-12">
+                    <h3 class="text-xl font-extrabold text-admin-secondary">Institutional Feedback Flux</h3>
+                    <a href="{{ route('admin.reviews') }}" class="text-[10px] font-black text-admin-primary uppercase tracking-widest hover:underline">Verification Hub</a>
+                </div>
+
+                <div class="bg-white border border-admin-border rounded-[2.5rem] overflow-hidden shadow-sm">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr class="bg-slate-50/50 border-b border-admin-border">
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">User</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Target</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Status</th>
+                                <th class="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-widest italic text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-50 italic">
+                            @foreach($latestReviews as $review)
+                            <tr class="hover:bg-slate-50/30 transition-colors">
+                                <td class="px-8 py-5">
+                                    <p class="text-xs font-black text-admin-dark">{{ optional($review->user)->name }}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 uppercase">{{ $review->created_at->diffForHumans() }}</p>
+                                </td>
+                                <td class="px-8 py-5 text-[10px] font-bold text-slate-500 uppercase">{{ optional($review->college)->name }}</td>
+                                <td class="px-8 py-5">
+                                    <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter {{ $review->status == 'approved' ? 'bg-green-500/10 text-green-600' : 'bg-amber-500/10 text-amber-600' }}">
+                                        {{ ucfirst($review->status) }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-5 text-right">
+                                    <a href="{{ route('admin.reviews', ['type' => 'college']) }}" class="p-2 text-slate-400 hover:text-admin-primary transition-all rounded-xl inline-block">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7" />
                                         </svg>
                                     </a>
                                 </td>
