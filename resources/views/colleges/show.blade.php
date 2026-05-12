@@ -23,6 +23,12 @@
     }">
         <!-- Hero Section: Premium Institutional Branding -->
         <div class="relative h-[65vh] overflow-hidden">
+            <!-- Back Navigation Node -->
+            <a href="{{ route('colleges.index') }}" class="absolute top-8 left-8 z-30 bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-slate-900 transition-all shadow-2xl flex items-center gap-3 group">
+                <svg class="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Back to Nexus
+            </a>
+
             <img src="{{ $college->thumbnail_url ?? 'https://images.unsplash.com/photo-1541339907198-e08756ebafe3?q=80&w=1200' }}" class="w-full h-full object-cover" alt="{{ $college->name }}">
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
             
