@@ -46,6 +46,8 @@ class BlogController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|string',
+            'featured_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'featured_image_alt' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
@@ -53,6 +55,20 @@ class BlogController extends Controller
             'college_ids' => 'nullable|array',
             'is_published' => 'nullable',
         ]);
+
+        // Handle Intelligent Image Upload 🛰️
+        $featuredImage = $validated['featured_image'];
+        if ($request->hasFile('featured_image_file')) {
+            $imageKit = app(\App\Services\ImageKitService::class);
+            $upload = $imageKit->upload(
+                $request->file('featured_image_file'),
+                Str::slug($validated['title']) . '-' . time(),
+                '/blogs'
+            );
+            if ($upload) {
+                $featuredImage = $upload->filePath;
+            }
+        }
 
         // Automated SEO Scan 🧠
         $seoReport = $this->seoAnalyzer->analyze(
@@ -69,12 +85,13 @@ class BlogController extends Controller
             'slug' => Str::slug($validated['title']),
             'content' => $validated['content'],
             'excerpt' => $validated['excerpt'],
-            'featured_image' => $validated['featured_image'],
+            'featured_image' => $featuredImage,
+            'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
             'meta_title' => $validated['meta_title'] ?? $validated['title'],
             'meta_description' => $validated['meta_description'],
             'meta_keywords' => $validated['meta_keywords'],
             'seo_score' => $seoReport['score'],
-            'ai_score' => 100, // Automated AI Originality Score Node
+            'ai_score' => 100, 
             'is_published' => $request->has('is_published'),
             'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
             'college_ids' => $validated['college_ids'] ?? [],
@@ -99,6 +116,8 @@ class BlogController extends Controller
             'content' => 'required',
             'excerpt' => 'nullable|string|max:500',
             'featured_image' => 'nullable|string',
+            'featured_image_file' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'featured_image_alt' => 'nullable|string|max:255',
             'meta_title' => 'nullable|string|max:255',
             'meta_description' => 'nullable|string',
             'meta_keywords' => 'nullable|string',
@@ -106,6 +125,20 @@ class BlogController extends Controller
             'college_ids' => 'nullable|array',
             'is_published' => 'nullable',
         ]);
+
+        // Handle Image Transformation 🛰️
+        $featuredImage = $validated['featured_image'];
+        if ($request->hasFile('featured_image_file')) {
+            $imageKit = app(\App\Services\ImageKitService::class);
+            $upload = $imageKit->upload(
+                $request->file('featured_image_file'),
+                Str::slug($validated['title']) . '-' . time(),
+                '/blogs'
+            );
+            if ($upload) {
+                $featuredImage = $upload->filePath;
+            }
+        }
 
         $seoReport = $this->seoAnalyzer->analyze(
             $validated['title'],
@@ -118,7 +151,8 @@ class BlogController extends Controller
             'title' => $validated['title'],
             'content' => $validated['content'],
             'excerpt' => $validated['excerpt'],
-            'featured_image' => $validated['featured_image'],
+            'featured_image' => $featuredImage,
+            'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
             'meta_title' => $validated['meta_title'] ?? $validated['title'],
             'meta_description' => $validated['meta_description'],
             'meta_keywords' => $validated['meta_keywords'],

@@ -1,7 +1,7 @@
 <x-admin-layout>
     @section('title', 'Reconfigure Article | Editorial Hub')
 
-    <form action="{{ route('admin.blogs.update', $blog) }}" method="POST" class="space-y-8" id="blog-form">
+    <form action="{{ route('admin.blogs.update', $blog) }}" method="POST" enctype="multipart/form-data" class="space-y-8" id="blog-form">
         @csrf
         @method('PATCH')
         
@@ -115,10 +115,33 @@
                         </div>
                     </label>
 
-                    <div>
-                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Discovery Illustration (Featured Image)</label>
-                        <input type="text" name="featured_image" value="{{ $blog->featured_image }}"
-                               class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold focus:border-slate-900 transition-all">
+                    <div class="space-y-4 pt-4 border-t border-slate-50">
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Upload New Illustration (Compressed)</label>
+                            <input type="file" name="featured_image_file" accept="image/*"
+                                   class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:bg-slate-900 file:text-white hover:file:bg-slate-800 transition-all">
+                        </div>
+                        
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                <div class="w-full border-t border-slate-100"></div>
+                            </div>
+                            <div class="relative flex justify-center text-[8px] font-black uppercase tracking-widest">
+                                <span class="bg-white px-2 text-slate-300">OR UPDATE URL</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Discovery URL</label>
+                            <input type="text" name="featured_image" value="{{ $blog->featured_image }}" placeholder="Remote image link..." 
+                                   class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold focus:border-slate-900 transition-all">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 px-1">Image ALT Text (SEO)</label>
+                            <input type="text" name="featured_image_alt" value="{{ $blog->featured_image_alt }}" placeholder="Describe the image..." 
+                                   class="w-full h-12 bg-slate-50 border border-slate-100 rounded-xl px-4 text-xs font-bold focus:border-slate-900 transition-all">
+                        </div>
                     </div>
                 </div>
             </div>

@@ -54,8 +54,8 @@
     @if($blog->featured_image)
     <div class="max-w-7xl mx-auto px-6 mb-20">
         <div class="aspect-[21/9] rounded-[3rem] overflow-hidden shadow-2xl shadow-slate-900/10">
-            <img src="{{ str_contains($blog->featured_image, 'http') ? $blog->featured_image : 'https://ik.imagekit.io/studycubsfranchise/' . $blog->featured_image }}" 
-                 class="w-full h-full object-cover" alt="{{ $blog->title }}">
+            <img src="{{ $blog->featured_image_url }}" 
+                 class="w-full h-full object-cover" alt="{{ $blog->featured_image_alt ?? $blog->title }}">
         </div>
     </div>
     @endif

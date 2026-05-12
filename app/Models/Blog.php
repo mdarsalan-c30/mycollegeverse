@@ -22,6 +22,7 @@ class Blog extends Model
         'content',
         'excerpt',
         'featured_image',
+        'featured_image_alt',
         'meta_title',
         'meta_description',
         'meta_keywords',
