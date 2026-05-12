@@ -131,6 +131,33 @@
                     </div>
                 </div>
 
+                <!-- Nexus Linker: Internal SEO 🧬 -->
+                <div class="bg-indigo-50 border border-indigo-100 p-8 rounded-[2rem] space-y-6" x-data="{ search: '' }">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">🧬</span>
+                        <h4 class="text-sm font-black text-indigo-900 uppercase tracking-widest">Nexus Linker</h4>
+                    </div>
+                    <p class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Internal Linking Accelerator</p>
+                    
+                    <input type="text" x-model="search" placeholder="Search Colleges..." 
+                           class="w-full h-12 bg-white border border-indigo-100 rounded-xl px-4 text-xs font-bold focus:ring-4 focus:ring-indigo-100 transition-all outline-none">
+                    
+                    <div class="max-h-60 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
+                        @foreach($colleges as $college)
+                        <div x-show="search === '' || '{{ strtolower($college->name) }}'.includes(search.toLowerCase())"
+                             class="flex items-center justify-between p-3 bg-white rounded-xl border border-indigo-50 hover:border-indigo-200 transition-all group">
+                            <span class="text-[10px] font-bold text-slate-700 truncate max-w-[140px]">{{ $college->name }}</span>
+                            <button type="button" 
+                                    @click="navigator.clipboard.writeText('{{ route('colleges.show', $college->slug) }}'); $el.innerText = 'Copied!';"
+                                    class="text-[8px] font-black text-indigo-500 uppercase tracking-widest hover:text-indigo-700 transition-colors">
+                                Link
+                            </button>
+                        </div>
+                        @endforeach
+                    </div>
+                    <p class="text-[9px] text-indigo-400 font-medium italic">Click 'Link' to copy URL, then paste in Article Body.</p>
+                </div>
+
                 <!-- Public Status -->
                 <div class="bg-white border border-slate-100 p-8 rounded-[2rem] space-y-6">
                     <label class="flex items-center justify-between cursor-pointer group">

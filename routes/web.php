@@ -117,6 +117,9 @@ Route::post('/task/{slug}/submit', [App\Http\Controllers\AssignmentController::c
 Route::get('/task/confirmation/{submission_id}', [App\Http\Controllers\AssignmentController::class, 'confirmation'])->name('assignments.confirmation');
 
 Route::get('/colleges', [App\Http\Controllers\CollegeController::class, 'index'])->name('colleges.index');
+Route::get('/colleges/demo-premium', function() {
+    return view('colleges.demo_premium');
+})->name('colleges.demo-premium');
 Route::get('/colleges/{college:slug}', [App\Http\Controllers\CollegeController::class, 'show'])->name('colleges.show');
 
 Route::get('/leaderboard', [App\Http\Controllers\LeaderboardController::class, 'index'])->name('leaderboard.index');
