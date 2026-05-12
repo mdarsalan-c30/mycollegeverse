@@ -86,8 +86,27 @@
                     </div>
                     <div>
                         <div class="text-6xl font-black mb-2" id="seo-score">{{ $blog->seo_score }}%</div>
-                        <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
+                        <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden mb-6">
                             <div class="h-full bg-emerald-500 transition-all duration-500" id="seo-bar" style="width: {{ $blog->seo_score }}%"></div>
+                        </div>
+
+                        <!-- SEO Checklist 📋 -->
+                        <div id="seo-checklist" class="space-y-3">
+                            <div data-check="title" class="flex items-center gap-3 text-[10px] font-black text-white/30 transition-all">
+                                <span class="status-icon">⚪</span> <span>Title Range (30-60)</span>
+                            </div>
+                            <div data-check="desc" class="flex items-center gap-3 text-[10px] font-black text-white/30 transition-all">
+                                <span class="status-icon">⚪</span> <span>Meta Description (120-160)</span>
+                            </div>
+                            <div data-check="words" class="flex items-center gap-3 text-[10px] font-black text-white/30 transition-all">
+                                <span class="status-icon">⚪</span> <span>Content Depth (300+ words)</span>
+                            </div>
+                            <div data-check="density" class="flex items-center gap-3 text-[10px] font-black text-white/30 transition-all">
+                                <span class="status-icon">⚪</span> <span>Keyword Density (0.5-2.5%)</span>
+                            </div>
+                            <div data-check="structure" class="flex items-center gap-3 text-[10px] font-black text-white/30 transition-all">
+                                <span class="status-icon">⚪</span> <span>Heading Hierarchy (H2/H3)</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -177,44 +196,71 @@
                 let score = 0;
                 const text = content.replace(/<[^>]*>/g, '');
                 const words = text.split(/\s+/).filter(w => w.length > 0).length;
+                const checks = { title: false, desc: false, words: false, density: false, structure: false };
 
-                // 1. Title Analysis (20 pts) - Progressive
-                const title = document.querySelector('input[name="title"]').value;
-                const tl = title.length;
-                if (tl >= 30 && tl <= 60) score += 20;
-                else if (tl > 0) score += Math.min(15, (tl / 30) * 20);
+                // 1. Title Analysis (20 pts)
+                const titleInput = document.querySelector('input[name="title"]');
+                const title = titleInput ? titleInput.value : '';
+                if (title.length >= 30 && title.length <= 60) {
+                    score += 20;
+                    checks.title = true;
+                }
 
-                // 2. Meta Description (20 pts) - Progressive
-                const metaDesc = document.querySelector('textarea[name="meta_description"]').value;
-                const dl = metaDesc.length;
-                if (dl >= 120 && dl <= 160) score += 20;
-                else if (dl > 0) score += Math.min(15, (dl / 120) * 20);
+                // 2. Meta Description (20 pts)
+                const metaDescInput = document.querySelector('textarea[name="meta_description"]');
+                const metaDesc = metaDescInput ? metaDescInput.value : '';
+                if (metaDesc.length >= 120 && metaDesc.length <= 160) {
+                    score += 20;
+                    checks.desc = true;
+                }
 
-                // 3. Word Count (20 pts) - Linear
-                if (words >= 300) score += 20;
-                else if (words > 0) score += (words / 300) * 20;
+                // 3. Word Count (20 pts)
+                if (words >= 300) {
+                    score += 20;
+                    checks.words = true;
+                }
 
-                // 4. Keyword Density (30 pts) - Robust
-                const keywordInput = document.querySelector('input[name="meta_keywords"]').value;
-                if (keywordInput.trim() && words > 0) {
-                    const firstKeyword = keywordInput.split(',')[0].trim().toLowerCase();
+                // 4. Keyword Density (30 pts)
+                const keywordInput = document.querySelector('input[name="meta_keywords"]');
+                if (keywordInput && keywordInput.value.trim() && words > 0) {
+                    const firstKeyword = keywordInput.value.split(',')[0].trim().toLowerCase();
                     if (firstKeyword) {
                         const escaped = firstKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                         const regex = new RegExp(escaped, 'gi');
                         const count = (text.toLowerCase().match(regex) || []).length;
                         const density = (count / words) * 100;
-                        if (density >= 0.5 && density <= 3.0) score += 30;
-                        else if (density > 0) score += 15; // Partial credit for presence
+                        if (density >= 0.5 && density <= 2.5) {
+                            score += 30;
+                            checks.density = true;
+                        }
                     }
                 }
 
                 // 5. Structure (10 pts)
                 const headings = (content.match(/<h[2-6]/g) || []).length;
-                if (headings > 0) score += 10;
+                if (headings > 0) {
+                    score += 10;
+                    checks.structure = true;
+                }
 
                 const rounded = Math.round(score);
                 document.getElementById('seo-score').innerText = rounded + '%';
                 document.getElementById('seo-bar').style.width = rounded + '%';
+
+                // Update Checklist UI
+                Object.keys(checks).forEach(key => {
+                    const el = document.querySelector(`[data-check="${key}"]`);
+                    if (el) {
+                        const icon = el.querySelector('.status-icon');
+                        if (checks[key]) {
+                            el.classList.replace('text-white/30', 'text-emerald-400');
+                            icon.innerText = '✅';
+                        } else {
+                            el.classList.replace('text-emerald-400', 'text-white/30');
+                            icon.innerText = '⚪';
+                        }
+                    }
+                });
             }
 
             // Trigger update on meta changes too
