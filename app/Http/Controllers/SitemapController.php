@@ -14,7 +14,7 @@ class SitemapController extends Controller
     public function index()
     {
         $colleges = College::all();
-        $blogs = Blog::where('status', 'published')->latest()->get();
+        $blogs = Blog::where('is_published', true)->latest()->get();
         $notes = \App\Models\Note::latest()->get();
         $professors = \App\Models\Professor::all();
 
