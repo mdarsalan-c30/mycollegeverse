@@ -13,9 +13,11 @@ class AddFilePathToAcademicGuidesTable extends Migration
      */
     public function up()
     {
-        Schema::table('academic_guides', function (Blueprint $table) {
-            $table->string('file_path')->nullable()->after('content');
-        });
+        if (!Schema::hasColumn('academic_guides', 'file_path')) {
+            Schema::table('academic_guides', function (Blueprint $table) {
+                $table->string('file_path')->nullable()->after('content');
+            });
+        }
     }
 
     public function down()

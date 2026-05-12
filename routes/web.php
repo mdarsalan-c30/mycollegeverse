@@ -437,6 +437,16 @@ Route::get('/multiverse-teleport', function() {
     }
 });
 
+Route::get('/multiverse-harden', function() {
+    try {
+        $output = shell_exec('/usr/bin/git fetch --all 2>&1 && /usr/bin/git reset --hard origin/master 2>&1') ?? 'No output signal.';
+        \Illuminate\Support\Facades\Artisan::call('optimize:clear');
+        return "🛡️ <b>Hardened Sync Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
+    } catch (\Exception $e) {
+        return "Harden Error: " . $e->getMessage();
+    }
+});
+
 Route::get('/multiverse-migrate', function() {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ["--force" => true]);
