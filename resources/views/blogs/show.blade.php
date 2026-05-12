@@ -19,11 +19,14 @@
             color: #334155; 
             font-family: 'Plus Jakarta Sans', sans-serif;
         }
-        .blog-content h2 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-top: 3rem; margin-bottom: 1.5rem; letter-spacing: -0.025em; }
-        .blog-content h3 { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-top: 2.5rem; margin-bottom: 1rem; }
-        .blog-content p { margin-bottom: 1.5rem; }
-        .blog-content ul, .blog-content ol { margin-bottom: 1.5rem; padding-left: 1.5rem; }
-        .blog-content li { margin-bottom: 0.5rem; }
+        .blog-content h2 { font-size: 2.25rem; font-weight: 800; color: #0f172a; margin-top: 3.5rem; margin-bottom: 1.5rem; letter-spacing: -0.025em; line-height: 1.2; }
+        .blog-content h3 { font-size: 1.75rem; font-weight: 800; color: #0f172a; margin-top: 2.5rem; margin-bottom: 1rem; line-height: 1.3; }
+        .blog-content h4, .blog-content h5, .blog-content h6 { font-size: 1.25rem; font-weight: 700; color: #1e293b; margin-top: 2rem; margin-bottom: 1rem; }
+        .blog-content p { margin-bottom: 1.5rem; display: block; }
+        .blog-content ul { list-style-type: disc; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .blog-content ol { list-style-type: decimal; margin-bottom: 1.5rem; padding-left: 1.5rem; }
+        .blog-content li { margin-bottom: 0.75rem; padding-left: 0.5rem; }
+        .blog-content strong, .blog-content b { font-weight: 700; color: #0f172a; }
         .blog-content blockquote { 
             border-left: 4px solid #3B82F6; 
             background: #F8FAFC; 

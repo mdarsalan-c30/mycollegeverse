@@ -158,6 +158,12 @@
                     toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', 'insertTable', 'undo', 'redo']
                 })
                 .then(editor => {
+                    const form = document.querySelector('#blog-form');
+                    form.addEventListener('submit', (e) => {
+                        const data = editor.getData();
+                        document.querySelector('#editor').value = data;
+                    });
+                    
                     editor.model.document.on('change:data', () => {
                         updateSeo(editor.getData());
                     });
