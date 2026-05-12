@@ -373,7 +373,7 @@
                                         <p class="text-xs font-black text-slate-900">{{ $prof->strictness_rating }}/5</p>
                                     </div>
                                 </div>
-                                <a href="{{ route('professors.show', $prof->id) }}" class="block w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] text-center uppercase tracking-widest hover:bg-primary transition-all">View Intel 🛡️</a>
+                                <a href="{{ route('professors.show', $prof->slug) }}" class="block w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] text-center uppercase tracking-widest hover:bg-primary transition-all">View Intel 🛡️</a>
                             </div>
                             @empty
                             <div class="col-span-full text-center py-20 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200">
