@@ -42,9 +42,9 @@
                     <div class="flex flex-wrap items-center gap-8 text-white/70 font-bold text-sm">
                         <span class="flex items-center gap-2">📍 {{ Str::limit($college->location, 30) }}</span>
                         <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
-                        <span class="flex items-center gap-2">👨‍🎓 {{ number_format($college->users_count) }}+ Active Students</span>
+                        <span class="flex items-center gap-2">👨‍🎓 {{ number_format($college->users_count) }}+ Active Nodes</span>
                         <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
-                        <span class="text-amber-400">★ {{ number_format($college->average_rating, 1) }} Rating</span>
+                        <span class="text-amber-400">★ {{ is_numeric($college->average_rating) ? number_format($college->average_rating, 1) : 'Yet to Review' }} Rating</span>
                     </div>
                 </div>
             </div>
@@ -154,7 +154,7 @@
                         <div class="bg-white p-12 rounded-[4rem] border border-slate-100 shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
                             <div class="flex items-center gap-8">
                                 <div class="w-24 h-24 bg-slate-900 rounded-[2rem] flex flex-col items-center justify-center text-white">
-                                    <span class="text-4xl font-black italic">{{ number_format($college->average_rating, 1) }}</span>
+                                    <span class="text-4xl font-black italic">{{ is_numeric($college->average_rating) ? number_format($college->average_rating, 1) : '0.0' }}</span>
                                     <span class="text-[9px] font-black uppercase tracking-widest text-primary">Rating</span>
                                 </div>
                                 <div>
@@ -282,6 +282,35 @@
                         </div>
                     </div>
 
+                    <!-- TAB: NOTES (Restored 📚) -->
+                    <div x-show="tab === 'notes'" x-transition class="space-y-12">
+                        <div class="grid sm:grid-cols-2 gap-8">
+                            @forelse($college->notes as $note)
+                            <div class="bg-white p-10 rounded-[3rem] border border-slate-100 shadow-xl space-y-6 group hover:scale-[1.02] transition-all">
+                                <div class="flex justify-between items-start">
+                                    <div class="w-14 h-14 bg-primary/10 text-primary rounded-2xl flex items-center justify-center text-2xl group-hover:bg-primary group-hover:text-white transition-colors">📄</div>
+                                    <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest">{{ $note->subject->code ?? 'GEN' }}</span>
+                                </div>
+                                <div>
+                                    <h4 class="text-lg font-black text-slate-900 leading-tight mb-2">{{ $note->title }}</h4>
+                                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">{{ $note->subject->name ?? 'General Resource' }}</p>
+                                </div>
+                                <div class="pt-6 border-t border-slate-50 flex items-center justify-between">
+                                    <div class="flex items-center gap-3">
+                                        <img src="{{ $note->user->profile_photo_url }}" class="w-8 h-8 rounded-full">
+                                        <span class="text-[10px] font-bold text-slate-500">{{ $note->user->name }}</span>
+                                    </div>
+                                    <a href="{{ route('notes.show', $note->slug) }}" class="text-primary text-[10px] font-black uppercase tracking-widest">Access Node ⚡</a>
+                                </div>
+                            </div>
+                            @empty
+                            <div class="col-span-full text-center py-20 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200">
+                                <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">Archive is currently empty...</p>
+                            </div>
+                            @endforelse
+                        </div>
+                    </div>
+
                     <!-- TAB: COMMUNITY -->
                     <div x-show="tab === 'community'" x-transition class="space-y-12">
                         @auth
@@ -311,6 +340,38 @@
                                 <p class="text-slate-500 font-medium leading-relaxed">{{ $post->content }}</p>
                             </div>
                             @endforeach
+                        </div>
+                    </div>
+
+                    <!-- TAB: PROFESSORS (Restored 👨‍🏫) -->
+                    <div x-show="tab === 'professors'" x-transition class="space-y-12">
+                        <div class="grid sm:grid-cols-2 gap-8">
+                            @forelse($college->professors as $prof)
+                            <div class="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-8 group">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-20 h-20 bg-slate-50 rounded-[2rem] flex items-center justify-center text-4xl group-hover:bg-primary/10 transition-colors">👨‍🏫</div>
+                                    <div>
+                                        <h4 class="text-xl font-black text-slate-900 italic">{{ $prof->name }}</h4>
+                                        <p class="text-[10px] font-black text-primary uppercase tracking-widest mt-1">{{ $prof->department }}</p>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="bg-slate-50 p-4 rounded-2xl">
+                                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Teaching</p>
+                                        <p class="text-xs font-black text-slate-900">{{ $prof->teaching_rating }}/5</p>
+                                    </div>
+                                    <div class="bg-slate-50 p-4 rounded-2xl">
+                                        <p class="text-[8px] font-black text-slate-400 uppercase mb-1">Strictness</p>
+                                        <p class="text-xs font-black text-slate-900">{{ $prof->strictness_rating }}/5</p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('professors.show', $prof->id) }}" class="block w-full bg-slate-900 text-white py-4 rounded-2xl font-black text-[10px] text-center uppercase tracking-widest hover:bg-primary transition-all">View Intel 🛡️</a>
+                            </div>
+                            @empty
+                            <div class="col-span-full text-center py-20 bg-slate-50 rounded-[4rem] border-2 border-dashed border-slate-200">
+                                <p class="text-slate-400 font-black uppercase tracking-widest text-xs italic">No faculty evaluations logged yet...</p>
+                            </div>
+                            @endforelse
                         </div>
                     </div>
 
