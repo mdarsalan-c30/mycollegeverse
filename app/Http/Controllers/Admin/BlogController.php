@@ -58,47 +58,53 @@ class BlogController extends Controller
 
         // Handle Intelligent Image Upload 🛰️
         $featuredImage = $validated['featured_image'];
-        if ($request->hasFile('featured_image_file')) {
-            $imageKit = app(\App\Services\ImageKitService::class);
-            $upload = $imageKit->upload(
-                $request->file('featured_image_file'),
-                Str::slug($validated['title']) . '-' . time(),
-                '/blogs'
-            );
-            if ($upload) {
-                $featuredImage = $upload->filePath;
+        
+        try {
+            if ($request->hasFile('featured_image_file')) {
+                $imageKit = app(\App\Services\ImageKitService::class);
+                $upload = $imageKit->upload(
+                    $request->file('featured_image_file'),
+                    Str::slug($validated['title']) . '-' . time(),
+                    '/blogs'
+                );
+                if ($upload && isset($upload->filePath)) {
+                    $featuredImage = $upload->filePath;
+                }
             }
+
+            // Automated SEO Scan 🧠
+            $seoReport = $this->seoAnalyzer->analyze(
+                $validated['title'],
+                $validated['content'],
+                $validated['meta_description'] ?? '',
+                explode(',', $validated['meta_keywords'] ?? '')
+            );
+
+            $blog = Blog::create([
+                'user_id' => Auth::id(),
+                'category_id' => $validated['category_id'],
+                'title' => $validated['title'],
+                'slug' => Str::slug($validated['title']),
+                'content' => $validated['content'],
+                'excerpt' => $validated['excerpt'],
+                'featured_image' => $featuredImage,
+                'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
+                'meta_title' => $validated['meta_title'] ?? $validated['title'],
+                'meta_description' => $validated['meta_description'],
+                'meta_keywords' => $validated['meta_keywords'],
+                'seo_score' => $seoReport['score'] ?? 0,
+                'ai_score' => 100, 
+                'is_published' => $request->has('is_published'),
+                'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
+                'college_ids' => $validated['college_ids'] ?? [],
+                'published_at' => $request->has('is_published') ? now() : null,
+            ]);
+
+            return redirect()->route('admin.blogs.index')->with('success', 'Blog manifested successfully!');
+        } catch (\Exception $e) {
+            \Log::error("Blog Store Error: " . $e->getMessage());
+            return back()->withInput()->with('error', 'Critical deployment error: ' . $e->getMessage());
         }
-
-        // Automated SEO Scan 🧠
-        $seoReport = $this->seoAnalyzer->analyze(
-            $validated['title'],
-            $validated['content'],
-            $validated['meta_description'] ?? '',
-            explode(',', $validated['meta_keywords'] ?? '')
-        );
-
-        $blog = Blog::create([
-            'user_id' => Auth::id(),
-            'category_id' => $validated['category_id'],
-            'title' => $validated['title'],
-            'slug' => Str::slug($validated['title']),
-            'content' => $validated['content'],
-            'excerpt' => $validated['excerpt'],
-            'featured_image' => $featuredImage,
-            'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
-            'meta_title' => $validated['meta_title'] ?? $validated['title'],
-            'meta_description' => $validated['meta_description'],
-            'meta_keywords' => $validated['meta_keywords'],
-            'seo_score' => $seoReport['score'],
-            'ai_score' => 100, 
-            'is_published' => $request->has('is_published'),
-            'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
-            'college_ids' => $validated['college_ids'] ?? [],
-            'published_at' => $request->has('is_published') ? now() : null,
-        ]);
-
-        return redirect()->route('admin.blogs.index')->with('success', 'Blog manifested successfully with an SEO score of ' . $seoReport['score'] . '%!');
     }
 
     public function edit(Blog $blog)
@@ -128,42 +134,48 @@ class BlogController extends Controller
 
         // Handle Image Transformation 🛰️
         $featuredImage = $validated['featured_image'];
-        if ($request->hasFile('featured_image_file')) {
-            $imageKit = app(\App\Services\ImageKitService::class);
-            $upload = $imageKit->upload(
-                $request->file('featured_image_file'),
-                Str::slug($validated['title']) . '-' . time(),
-                '/blogs'
-            );
-            if ($upload) {
-                $featuredImage = $upload->filePath;
+        
+        try {
+            if ($request->hasFile('featured_image_file')) {
+                $imageKit = app(\App\Services\ImageKitService::class);
+                $upload = $imageKit->upload(
+                    $request->file('featured_image_file'),
+                    Str::slug($validated['title']) . '-' . time(),
+                    '/blogs'
+                );
+                if ($upload && isset($upload->filePath)) {
+                    $featuredImage = $upload->filePath;
+                }
             }
+
+            $seoReport = $this->seoAnalyzer->analyze(
+                $validated['title'],
+                $validated['content'],
+                $validated['meta_description'] ?? '',
+                explode(',', $validated['meta_keywords'] ?? '')
+            );
+
+            $blog->update([
+                'title' => $validated['title'],
+                'content' => $validated['content'],
+                'excerpt' => $validated['excerpt'],
+                'featured_image' => $featuredImage,
+                'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
+                'meta_title' => $validated['meta_title'] ?? $validated['title'],
+                'meta_description' => $validated['meta_description'],
+                'meta_keywords' => $validated['meta_keywords'],
+                'seo_score' => $seoReport['score'] ?? 0,
+                'is_published' => $request->has('is_published'),
+                'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
+                'college_ids' => $validated['college_ids'] ?? [],
+                'published_at' => ($request->has('is_published') && !$blog->is_published) ? now() : $blog->published_at,
+            ]);
+
+            return redirect()->route('admin.blogs.index')->with('success', 'Blog resonance updated successfully!');
+        } catch (\Exception $e) {
+            \Log::error("Blog Update Error: " . $e->getMessage());
+            return back()->withInput()->with('error', 'Update failed: ' . $e->getMessage());
         }
-
-        $seoReport = $this->seoAnalyzer->analyze(
-            $validated['title'],
-            $validated['content'],
-            $validated['meta_description'] ?? '',
-            explode(',', $validated['meta_keywords'] ?? '')
-        );
-
-        $blog->update([
-            'title' => $validated['title'],
-            'content' => $validated['content'],
-            'excerpt' => $validated['excerpt'],
-            'featured_image' => $featuredImage,
-            'featured_image_alt' => $validated['featured_image_alt'] ?? $validated['title'],
-            'meta_title' => $validated['meta_title'] ?? $validated['title'],
-            'meta_description' => $validated['meta_description'],
-            'meta_keywords' => $validated['meta_keywords'],
-            'seo_score' => $seoReport['score'],
-            'is_published' => $request->has('is_published'),
-            'auto_recommend_colleges' => $request->has('auto_recommend_colleges'),
-            'college_ids' => $validated['college_ids'] ?? [],
-            'published_at' => ($request->has('is_published') && !$blog->published_at) ? now() : $blog->published_at,
-        ]);
-
-        return redirect()->route('admin.blogs.index')->with('success', 'Editorial updated. New SEO Score: ' . $seoReport['score'] . '%');
     }
 
     public function destroy(Blog $blog)

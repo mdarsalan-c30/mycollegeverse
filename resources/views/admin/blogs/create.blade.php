@@ -148,7 +148,6 @@
             </div>
         </div>
     </form>
-form>
 
     @push('scripts')
         <!-- CKEditor 5 Node 🛠️ -->
