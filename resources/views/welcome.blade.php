@@ -284,11 +284,7 @@
             <div class="max-w-7xl mx-auto w-full overflow-hidden">
                 <div class="flex flex-col lg:grid lg:grid-cols-2 gap-10 items-center">
                 <div class="space-y-8 text-center lg:text-left">
-                    <div class="inline-flex items-center gap-3 text-primary font-bold text-xs uppercase tracking-[0.2em] mx-auto lg:mx-0 opacity-80">
-                        <span class="relative flex h-2 w-2">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                        </span>
+                    <div class="text-primary font-black text-[10px] uppercase tracking-[0.4em] mx-auto lg:mx-0">
                         Academic Identity Platform
                     </div>
                     

@@ -422,17 +422,23 @@ Route::get('/multiverse-sync', function() {
 
 Route::get('/multiverse-teleport', function() {
     try {
-        $disabled = explode(',', ini_get('disable_functions'));
-        $can_shell = !in_array('shell_exec', $disabled);
-        
-        if (!$can_shell) {
-            return "🚫 <b>ERROR:</b> Hostinger has strictly disabled 'shell_exec'. Git commands cannot run via PHP.<br><br><b>FIX:</b> Please go to <b>Hostinger Panel -> Advanced -> GIT</b> and click <b>'Pull'</b> or <b>'Deploy'</b> manually. This is the only way to sync your code now.";
+        if (!function_exists('shell_exec')) {
+            return "🚫 <b>ERROR:</b> 'shell_exec' function is completely removed from PHP on this host. Git commands cannot run.<br><br><b>FIX:</b> Manual Pull required in Hostinger Panel.";
         }
 
-        $output = shell_exec('/usr/bin/git pull origin master 2>&1') ?? 'No output signal.';
+        $disabled = explode(',', ini_get('disable_functions'));
+        if (in_array('shell_exec', $disabled)) {
+            return "🚫 <b>ERROR:</b> 'shell_exec' is disabled via 'disable_functions' in php.ini.<br><br><b>FIX:</b> Manual Pull required in Hostinger Panel.";
+        }
+
+        $output = @shell_exec('/usr/bin/git pull origin master 2>&1');
+        if ($output === null) {
+            return "🚫 <b>ERROR:</b> Shell command failed to execute or returned no output.";
+        }
+
         \Illuminate\Support\Facades\Artisan::call('optimize:clear');
         return "🌌 <b>Teleport Attempted!</b><br><br><b>Signal:</b><br><pre>" . $output . "</pre><br><a href='/'>Return to Hub</a>";
-    } catch (\Exception $e) {
+    } catch (\Throwable $e) {
         return "Teleport Error: " . $e->getMessage();
     }
 });
