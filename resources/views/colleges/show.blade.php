@@ -27,24 +27,32 @@
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
             
             <div class="absolute bottom-0 left-0 right-0 p-8 md:p-20">
-                <div class="max-w-7xl mx-auto space-y-8">
-                    <div class="flex items-center gap-6">
-                        <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-4xl shadow-2xl shrink-0">🏛️</div>
-                        <div class="space-y-1">
-                            <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 backdrop-blur-md rounded-full border border-white/20 text-white text-[9px] font-black uppercase tracking-widest">
-                                ⭐ INSTITUTIONAL NODE
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-end gap-12">
+                    <div class="space-y-8">
+                        <div class="flex items-center gap-6">
+                            <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-4xl shadow-2xl shrink-0">🏛️</div>
+                            <div class="space-y-1">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/20 backdrop-blur-md rounded-full border border-white/20 text-white text-[9px] font-black uppercase tracking-widest">
+                                    ⭐ INSTITUTIONAL NODE
+                                </div>
+                                <h1 class="text-4xl md:text-7xl font-black text-white tracking-tighter leading-tight italic">
+                                    {{ $college->name }}
+                                </h1>
                             </div>
-                            <h1 class="text-4xl md:text-7xl font-black text-white tracking-tighter leading-tight italic">
-                                {{ $college->name }}
-                            </h1>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-8 text-white/70 font-bold text-sm">
+                            <span class="flex items-center gap-2">📍 {{ Str::limit($college->location, 30) }}</span>
+                            <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
+                            <span class="flex items-center gap-2">👨‍🎓 {{ number_format($college->users_count) }}+ Active Nodes</span>
+                            <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
+                            <span class="text-amber-400">★ {{ is_numeric($college->average_rating) ? number_format($college->average_rating, 1) : 'Yet to Review' }} Rating</span>
                         </div>
                     </div>
-                    <div class="flex flex-wrap items-center gap-8 text-white/70 font-bold text-sm">
-                        <span class="flex items-center gap-2">📍 {{ Str::limit($college->location, 30) }}</span>
-                        <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
-                        <span class="flex items-center gap-2">👨‍🎓 {{ number_format($college->users_count) }}+ Active Nodes</span>
-                        <span class="w-1.5 h-1.5 bg-white/30 rounded-full"></span>
-                        <span class="text-amber-400">★ {{ is_numeric($college->average_rating) ? number_format($college->average_rating, 1) : 'Yet to Review' }} Rating</span>
+                    
+                    <div class="pb-4">
+                        <button @click="toggleReviewForm()" class="bg-white text-slate-900 px-12 py-6 rounded-[2rem] font-black text-[12px] uppercase tracking-widest shadow-2xl hover:bg-primary hover:text-white hover:scale-105 transition-all flex items-center gap-3">
+                            Write Review ✍️
+                        </button>
                     </div>
                 </div>
             </div>
