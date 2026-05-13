@@ -6,6 +6,7 @@
     <script type="application/ld+json">
         {!! json_encode($schema) !!}
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     @endpush
 
     <div class="grid lg:grid-cols-3 gap-10 pb-20">
@@ -188,7 +189,6 @@
                                     Download PDF
                                 </button>
                                 
-                                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
                                 <script>
                                     async function downloadDigitalManuscript() {
                                         const btn = document.getElementById('download-btn');
@@ -242,7 +242,6 @@
                                     Download PDF
                                 </a>
                              @endif
-                             */ @endphp
                          @else
                          <a href="{{ route('login') }}" class="bg-slate-900 text-white px-8 py-4 rounded-3xl font-black flex items-center justify-center gap-3 hover:bg-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
