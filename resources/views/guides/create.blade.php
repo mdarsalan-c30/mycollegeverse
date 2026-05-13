@@ -109,7 +109,7 @@
                         </div>
 
                         <!-- Smart HTML Editor -->
-                        <div x-show="manifestMode === 'html'" x-transition class="transition-all">
+                        <div x-show="manifestMode === 'html'" x-cloak x-transition class="transition-all" style="display: none;" :style="manifestMode === 'html' ? 'display: block' : 'display: none'">
                             <textarea id="html-editor" placeholder="Paste your high-fidelity HTML/CSS code here... (e.g. PPS Smart Prep Node)" 
                                       class="w-full h-96 bg-slate-900 text-indigo-300 font-mono text-sm p-8 rounded-[2rem] border border-slate-800 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-2xl resize-none placeholder:text-slate-700"></textarea>
                         </div>

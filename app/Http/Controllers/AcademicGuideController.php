@@ -152,8 +152,8 @@ class AcademicGuideController extends Controller
             'category' => $request->input('category'),
             'target_university' => $request->input('target_university'),
             'target_course' => $request->input('target_course'),
-            'meta_title' => $request->input('meta_title') ?? $request->input('title'),
-            'meta_description' => $request->input('meta_description') ?? Str::limit(strip_tags($request->input('content')), 160),
+            'meta_title' => Str::limit($request->input('meta_title') ?? $request->input('title'), 200),
+            'meta_description' => Str::limit($request->input('meta_description') ?? strip_tags($request->input('content')), 160),
             'meta_keywords' => $request->input('meta_keywords'),
             'is_published' => true,
         ]);
