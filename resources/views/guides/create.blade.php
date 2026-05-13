@@ -11,6 +11,16 @@
 
         <form action="{{ route('guides.store') }}" method="POST" id="manifest-form" enctype="multipart/form-data" class="space-y-10 pb-32">
             @csrf
+
+            @if(session('error'))
+            <div class="bg-red-50 border border-red-100 p-8 rounded-[2.5rem] mb-10 flex items-center gap-6 animate-pulse">
+                <div class="text-3xl">⚠️</div>
+                <div>
+                    <h4 class="text-xs font-black text-red-900 uppercase tracking-widest mb-1">Manifestation Error</h4>
+                    <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest">{{ session('error') }}</p>
+                </div>
+            </div>
+            @endif
             
             <div class="glass p-10 md:p-16 rounded-[4rem] border border-slate-100 shadow-2xl space-y-12">
                 <!-- SEO Status Node (Mirroring Blog Engine) -->

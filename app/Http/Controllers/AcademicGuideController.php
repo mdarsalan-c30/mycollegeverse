@@ -53,11 +53,13 @@ class AcademicGuideController extends Controller
         if (Auth::user()->role === 'recruiter') abort(403);
 
         $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'required|string|max:200',
             'content' => 'required|string',
             'category' => 'required|string',
             'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
+
+        try {
 
         $filePath = null;
         if ($request->hasFile('pdf_file')) {
@@ -146,19 +148,23 @@ class AcademicGuideController extends Controller
 
         $guide = AcademicGuide::create([
             'user_id' => Auth::id(),
-            'title' => $request->input('title'),
+            'title' => Str::limit($request->input('title'), 190),
             'content' => $request->input('content'),
             'file_path' => $filePath,
             'category' => $request->input('category'),
-            'target_university' => $request->input('target_university'),
-            'target_course' => $request->input('target_course'),
+            'target_university' => Str::limit($request->input('target_university'), 100),
+            'target_course' => Str::limit($request->input('target_course'), 100),
             'meta_title' => Str::limit($request->input('meta_title') ?? $request->input('title'), 200),
             'meta_description' => Str::limit($request->input('meta_description') ?? strip_tags($request->input('content')), 160),
-            'meta_keywords' => $request->input('meta_keywords'),
+            'meta_keywords' => Str::limit($request->input('meta_keywords'), 200),
             'is_published' => true,
         ]);
 
         return redirect()->route('guides.show', $guide->slug)->with('success', 'Academic Guide manifested successfully! 🚀');
+        } catch (\Exception $e) {
+            \Log::error('Academic Hub Failure: ' . $e->getMessage());
+            return back()->withInput()->with('error', 'Bhai, error aa gaya: ' . $e->getMessage());
+        }
     }
 
     /**
