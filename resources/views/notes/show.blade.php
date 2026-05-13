@@ -199,25 +199,34 @@
                                         try {
                                             let element;
                                             @if($note->hasFullHtml())
+                                                // High-Fidelity Iframe Content Extraction
                                                 const frame = document.getElementById('manuscript-frame');
-                                                element = frame.contentDocument.body.cloneNode(true);
+                                                const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                                                element = frameDoc.body.cloneNode(true);
+                                                
+                                                // Resolve Internal Styles 🛰️
+                                                const styles = frameDoc.querySelectorAll('style, link[rel="stylesheet"]');
+                                                styles.forEach(s => element.prepend(s.cloneNode(true)));
                                             @else
+                                                // Standard Prose Container
                                                 element = document.querySelector('.ai-notes-display').cloneNode(true);
                                             @endif
 
+                                            // Institutional Watermark Injection 🛰️
                                             const watermark = document.createElement('div');
-                                            watermark.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 60px; color: rgba(0,0,0,0.05); font-weight: 900; z-index: -1; pointer-events: none; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.1em;";
-                                            watermark.innerText = 'MYCOLLEGEVERSE • ACADEMIC OS';
+                                            watermark.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 50px; color: rgba(0,0,0,0.08); font-weight: 900; z-index: 1000; pointer-events: none; white-space: nowrap; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.2em; width: 100%; text-align: center;";
+                                            watermark.innerText = 'MYCOLLEGEVERSE.IN • ACADEMIC OS';
                                             
                                             const pdfContainer = document.createElement('div');
                                             pdfContainer.style.padding = '40px';
                                             pdfContainer.style.background = 'white';
+                                            pdfContainer.style.position = 'relative';
                                             pdfContainer.appendChild(watermark);
                                             pdfContainer.appendChild(element);
 
                                             const opt = {
-                                                margin: [10, 10],
-                                                filename: '{{ $note->slug }}_verse_notes.pdf',
+                                                margin: [15, 15],
+                                                filename: '{{ $note->slug }}_premium_notes.pdf',
                                                 image: { type: 'jpeg', quality: 0.98 },
                                                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                                                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -225,7 +234,7 @@
 
                                             await html2pdf().set(opt).from(pdfContainer).save();
                                             
-                                            btn.innerHTML = '✅ Downloaded';
+                                            btn.innerHTML = '✅ Manifested';
                                             setTimeout(() => {
                                                 btn.innerHTML = originalText;
                                                 btn.disabled = false;
