@@ -28,10 +28,10 @@
             <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
                 @if($note->isDigital())
                     @if($note->hasFullHtml())
-                        {{-- Isolated High-Fidelity Render --}}
+                        {{-- Isolated High-Fidelity Render via Base64 Pipeline 🛰️ --}}
                         <div class="h-[900px] bg-white relative">
                             <iframe id="manuscript-frame" 
-                                    srcdoc="{{ $note->ai_content }}" 
+                                    src="data:text/html;base64,{{ base64_encode($note->ai_content) }}" 
                                     class="w-full h-full border-none" 
                                     sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
                             
@@ -61,6 +61,10 @@
                                 @if($note->isAiGenerated())
                                     <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
                                         🤖 AI Manifest
+                                    </div>
+                                @elseif($note->note_type === 'academic')
+                                    <div class="bg-indigo-100 text-indigo-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                        🎓 Academic Hub Digital
                                     </div>
                                 @else
                                     <div class="bg-emerald-100 text-emerald-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
@@ -94,53 +98,36 @@
                             </article>
                         </div>
                     @endif
-        </div>
                 @else
-                {{-- Knowledge Asset Viewer 🛰️ --}}
-                <div class="aspect-[3/4] bg-slate-100 relative">
-                    @if(\Illuminate\Support\Str::contains($note->file_path, 'drive.google.com'))
-                        {{-- Google Drive High-Fidelity Embed Node --}}
-                        <iframe src="{{ str_replace(['/view', '/edit', '/share'], '/preview', $note->file_path) }}" 
-                                width="100%" 
-                                height="100%" 
-                                class="rounded-[2.5rem] border-none shadow-inner" 
-                                allow="autoplay"></iframe>
+                    {{-- Knowledge Asset Viewer 🛰️ --}}
+                    <div class="aspect-[3/4] bg-slate-100 relative">
+                        @if(\Illuminate\Support\Str::contains($note->file_path, 'drive.google.com'))
+                            {{-- Google Drive High-Fidelity Embed Node --}}
+                            <iframe src="{{ str_replace(['/view', '/edit', '/share'], '/preview', $note->file_path) }}" 
+                                    width="100%" 
+                                    height="100%" 
+                                    class="rounded-[2.5rem] border-none shadow-inner" 
+                                    allow="autoplay"></iframe>
+                        @else
+                            @php
+                                $pdfPath = $note->file_path;
+                                if (!\Illuminate\Support\Str::contains($pdfPath, 'http')) {
+                                    $pdfPath = asset('storage/' . $pdfPath);
+                                }
+                            @endphp
+                            <embed src="{{ $pdfPath }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
+                        @endif
                         
-                        {{-- External Access Overlay (Hidden by default, shows if iframe fails) --}}
-                        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
-                            <a href="{{ $note->file_path }}" target="_blank" class="bg-white/90 backdrop-blur-md text-slate-800 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:bg-primary hover:text-white transition-all border border-slate-200">
-                                <span>🔗</span> Open Original Drive Node
-                            </a>
-                        </div>
-                    @else
-                        @php
-                            $pdfPath = $note->file_path;
-                            if (\Illuminate\Support\Str::contains($pdfPath, 'http')) {
-                                $pdfPath = $pdfPath;
-                            } else {
-                                $pdfPath = asset('storage/' . $pdfPath);
-                            }
-                        @endphp
-                        <embed src="{{ $pdfPath }}#toolbar=0&navpanes=0&scrollbar=1" type="application/pdf" width="100%" height="100%" class="rounded-[2.5rem]" />
-                    @endif
-                    
-                    <!-- Fallback for legacy environments -->
-                    <div class="absolute inset-0 flex items-center justify-center p-10 text-center bg-slate-50 z-[-1]">
-                        <div class="space-y-4">
-                            <div class="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <div class="absolute inset-0 flex items-center justify-center p-10 text-center bg-slate-50 z-[-1]">
+                            <div class="space-y-4">
+                                <div class="w-16 h-16 bg-primary/10 rounded-2xl mx-auto flex items-center justify-center text-primary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                                </div>
+                                <h3 class="font-black text-slate-800">Preview Hub Offline</h3>
+                                <p class="text-sm text-slate-500 font-medium">Your browser manifest doesn't support inline previews.</p>
                             </div>
-                            <h3 class="font-black text-slate-800">Preview Hub Offline</h3>
-                            <p class="text-sm text-slate-500 font-medium">Your browser manifest doesn't support inline previews.</p>
-                            
-                            @auth
-                            <a href="{{ route('notes.download', $note->id) }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Download Asset</a>
-                            @else
-                            <a href="{{ route('login') }}" class="inline-block bg-primary text-white px-6 py-2 rounded-xl font-bold text-sm">Sign in to Access</a>
-                            @endauth
                         </div>
                     </div>
-                </div>
                 @endif
             </div>
 
