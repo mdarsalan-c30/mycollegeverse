@@ -393,11 +393,23 @@
                                 </button>
                             </div>
 
-                            <div x-data="{ fileName: '', driveLink: '' }" x-show="uploadStep === 2" class="space-y-8" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
+                            <div x-data="{ uploadMode: 'file', fileName: '', driveLink: '', rawContent: '' }" x-show="uploadStep === 2" class="space-y-8" x-transition:enter="duration-300 transform" x-transition:enter-start="translate-x-4 opacity-0">
                                 
+                                <!-- Mode Switcher 🛰️ -->
+                                <div class="bg-slate-100 p-1.5 rounded-2xl flex gap-2 border border-slate-200">
+                                    <button type="button" @click="uploadMode = 'file'" :class="uploadMode === 'file' ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-slate-700'" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        📁 File
+                                    </button>
+                                    <button type="button" @click="uploadMode = 'link'" :class="uploadMode === 'link' ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-slate-700'" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        🔗 Link
+                                    </button>
+                                    <button type="button" @click="uploadMode = 'write'" :class="uploadMode === 'write' ? 'bg-white shadow-sm text-primary' : 'text-slate-500 hover:text-slate-700'" class="flex-1 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2">
+                                        ✍️ Write
+                                    </button>
+                                </div>
+
                                 {{-- Option A: File Upload --}}
-                                <div class="relative group flex justify-center px-10 pt-10 pb-12 border-2 border-slate-200 border-dashed rounded-3xl hover:border-primary/50 transition-all bg-white/30"
-                                     :class="driveLink ? 'opacity-40 grayscale pointer-events-none' : ''">
+                                <div x-show="uploadMode === 'file'" class="relative group flex justify-center px-10 pt-10 pb-12 border-2 border-slate-200 border-dashed rounded-3xl hover:border-primary/50 transition-all bg-white/30">
                                     <div class="space-y-4 text-center">
                                         <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                                             <svg class="h-10 w-10 text-primary" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -406,7 +418,7 @@
                                         </div>
                                         <div class="flex flex-col text-sm text-slate-600">
                                             <label for="file-upload" class="relative cursor-pointer font-black text-primary text-lg hover:underline">
-                                                <span x-text="fileName ? fileName : 'Click to Select Node File'"></span>
+                                                <span x-text="fileName ? fileName : 'Select Node File'"></span>
                                                 <input id="file-upload" name="file" type="file" class="sr-only" @change="fileName = $el.files[0].name">
                                             </label>
                                             <p class="mt-2 text-xs text-slate-400 font-bold uppercase italic tracking-tighter">PDF/Doc up to 10MB</p>
@@ -414,29 +426,32 @@
                                     </div>
                                 </div>
 
-                                {{-- OR Divider --}}
-                                <div class="flex items-center gap-4 px-2" :class="(fileName || driveLink) ? 'opacity-30' : ''">
-                                    <div class="h-px flex-1 bg-slate-200"></div>
-                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">OR PASTE LINK</span>
-                                    <div class="h-px flex-1 bg-slate-200"></div>
-                                </div>
-
                                 {{-- Option B: Drive Link --}}
-                                <div class="space-y-3" :class="fileName ? 'opacity-40 grayscale pointer-events-none' : ''">
+                                <div x-show="uploadMode === 'link'" class="space-y-3">
                                     <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-2">
-                                        <span class="text-lg">🔗</span> External Drive / Cloud Link
+                                        🔗 External Cloud Link
                                     </label>
                                     <input type="url" name="drive_link" x-model="driveLink" placeholder="https://drive.google.com/file/d/..."
                                            class="w-full h-14 bg-white/60 border border-slate-100 rounded-2xl px-6 text-sm font-bold text-slate-700 focus:ring-primary/20 focus:border-primary transition-all">
-                                    <p class="text-[9px] text-slate-400 font-medium px-2 italic leading-relaxed">Recommended for large assets or Google Docs. Ensure the link is set to "Anyone with the link can view".</p>
+                                    <p class="text-[9px] text-slate-400 font-medium px-2 italic leading-relaxed">Ensure the link is set to "Public" so everyone can access the knowledge node.</p>
+                                </div>
+
+                                {{-- Option C: Write Digital Manuscript ✍️ --}}
+                                <div x-show="uploadMode === 'write'" class="space-y-3">
+                                    <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest px-1 flex items-center gap-2">
+                                        ✍️ Digital Manuscript (HTML/Text)
+                                    </label>
+                                    <textarea name="raw_content" x-model="rawContent" rows="8" placeholder="Paste your high-fidelity HTML code or write notes here..."
+                                              class="w-full bg-white/60 border border-slate-100 rounded-2xl p-6 text-xs font-mono text-slate-700 focus:ring-primary/20 focus:border-primary transition-all"></textarea>
+                                    <p class="text-[9px] text-slate-400 font-medium px-2 italic leading-relaxed">You can paste full HTML/CSS for premium formatting or simple text for quick notes.</p>
                                 </div>
 
                                 <div class="flex gap-4">
                                     <button type="button" @click="uploadStep = 1" class="flex-1 h-16 bg-slate-100 text-slate-500 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Back</button>
                                     <button type="submit" 
-                                            :disabled="!fileName && !driveLink"
+                                            :disabled="uploadMode === 'file' ? !fileName : (uploadMode === 'link' ? !driveLink : !rawContent)"
                                             class="flex-[2] h-16 bg-primary text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all outline-none disabled:opacity-30">
-                                        Share with the Verse
+                                        Manifest in the Verse
                                     </button>
                                 </div>
                             </div>

@@ -205,10 +205,11 @@ class NoteController extends Controller
             'subject_id' => 'required',
             'exam_name' => 'required_if:note_type,competitive|nullable|string|max:100',
             'custom_subject' => 'required_if:subject_id,other|nullable|string|max:100',
-            'file' => 'nullable|required_without:drive_link|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
-            'drive_link' => 'nullable|required_without:file|url|max:500',
+            'file' => 'nullable|required_without_all:drive_link,raw_content|mimes:pdf,doc,docx,ppt,pptx,zip,jpg,png|max:10240', // 10MB
+            'drive_link' => 'nullable|required_without_all:file,raw_content|url|max:1000',
+            'raw_content' => 'nullable|required_without_all:file,drive_link|string',
         ], [
-            'file.required_without' => 'Please upload a file OR provide a Drive link.',
+            'file.required_without_all' => 'Bhai, ya to file upload karo, ya link do, ya fir likh lo!',
             'drive_link.required_without' => 'Please provide a Drive link OR upload a file.',
             'exam_name.required_if' => 'Bhai, exam ka naam to batado (e.g. AAI ATC)!',
             'pyq_year.required_if' => 'Kis saal ka paper hai ye? Year select kijiye.',
@@ -314,6 +315,7 @@ class NoteController extends Controller
                 'note_type' => $request->note_type,
                 'exam_name' => $request->note_type === 'competitive' ? $request->exam_name : null,
                 'file_path' => $filePath,
+                'ai_content' => $request->raw_content, // Re-purposing ai_content as unified raw_content
                 'user_id' => $userId,
                 'college_id' => $college_id,
                 'subject_id' => $request->subject_id === 'other' ? null : $request->subject_id,
@@ -333,8 +335,8 @@ class NoteController extends Controller
     {
         $note = Note::findOrFail($id);
 
-        // 🛡️ Handle AI Notes (Print to PDF)
-        if ($note->note_type === 'ai') {
+        // 🛡️ Handle Digital Notes (Print to PDF)
+        if ($note->isDigital()) {
             return redirect()->route('notes.print', $note->slug);
         }
 

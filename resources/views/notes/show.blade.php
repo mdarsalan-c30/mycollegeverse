@@ -26,149 +26,75 @@
 
             <!-- Note Viewer -->
             <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
-                @if($note->isAiGenerated())
-                {{-- AI Content Renderer --}}
-                <div class="p-8 md:p-12 bg-white/60">
-                    <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
-                        <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
-                            🤖 AI Generated
+                @if($note->isDigital())
+                    @if($note->hasFullHtml())
+                        {{-- Isolated High-Fidelity Render --}}
+                        <div class="h-[900px] bg-white relative">
+                            <iframe id="manuscript-frame" 
+                                    srcdoc="{{ $note->ai_content }}" 
+                                    class="w-full h-full border-none" 
+                                    sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
+                            
+                            <!-- Fullscreen Command Node -->
+                            <div class="absolute bottom-6 right-6">
+                                <button onclick="toggleManuscriptFullscreen()" class="bg-primary/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:scale-105 transition-all">
+                                    <span>📺</span> Fullscreen Mode
+                                </button>
+                            </div>
                         </div>
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Powered by Gemini</span>
-                    </div>
-                    <article class="prose prose-lg prose-slate max-w-none ai-notes-display">
-                        <style>
-                            .ai-notes-display {
-                                font-family: 'Inter', sans-serif;
-                                line-height: 1.8;
-                                color: #334155;
+                        <script>
+                            function toggleManuscriptFullscreen() {
+                                const frame = document.getElementById('manuscript-frame');
+                                if (frame.requestFullscreen) {
+                                    frame.requestFullscreen();
+                                } else if (frame.webkitRequestFullscreen) {
+                                    frame.webkitRequestFullscreen();
+                                } else if (frame.msRequestFullscreen) {
+                                    frame.msRequestFullscreen();
+                                }
                             }
-                            .ai-notes-display h2 {
-                                color: #1e293b !important;
-                                font-weight: 900 !important;
-                                font-size: 1.875rem !important;
-                                border-left: 6px solid #6366f1;
-                                padding-left: 1.25rem;
-                                margin-top: 3.5rem !important;
-                                margin-bottom: 1.5rem !important;
-                                background: linear-gradient(to right, #f8fafc, transparent);
-                                padding-top: 0.5rem;
-                                padding-bottom: 0.5rem;
-                            }
-                            .ai-notes-display h3 {
-                                color: #475569 !important;
-                                font-weight: 800 !important;
-                                font-size: 1.5rem !important;
-                                margin-top: 2.5rem !important;
-                                margin-bottom: 1.25rem !important;
-                            }
-                            .ai-notes-display .info-box {
-                                background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%);
-                                border: 1px solid #bae6fd;
-                                border-radius: 2rem;
-                                padding: 2.5rem;
-                                margin: 3rem 0;
-                                position: relative;
-                            }
-                            .ai-notes-display .info-box::before {
-                                content: '📖 DEFINITION';
-                                position: absolute;
-                                top: -0.75rem;
-                                left: 2rem;
-                                background: #0369a1;
-                                color: white;
-                                padding: 0.25rem 1.25rem;
-                                border-radius: 1rem;
-                                font-size: 0.65rem;
-                                font-weight: 900;
-                            }
-                            .ai-notes-display .exam-tip {
-                                background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
-                                border: 2px dashed #f59e0b;
-                                border-radius: 2rem;
-                                padding: 2.5rem;
-                                margin: 3rem 0;
-                                color: #92400e;
-                                position: relative;
-                            }
-                            .ai-notes-display .exam-tip::before {
-                                content: '🎓 EXAM FOCUS';
-                                position: absolute;
-                                top: -0.75rem;
-                                left: 2rem;
-                                background: #d97706;
-                                color: white;
-                                padding: 0.25rem 1.25rem;
-                                border-radius: 1rem;
-                                font-size: 0.65rem;
-                                font-weight: 900;
-                            }
-                            .ai-notes-display .diagram-box {
-                                background: #f8fafc;
-                                border: 2px solid #e2e8f0;
-                                border-radius: 2.5rem;
-                                padding: 4rem 2rem;
-                                margin: 4rem 0;
-                                text-align: center;
-                                font-style: italic;
-                                color: #64748b;
-                                position: relative;
-                                border-style: dashed;
-                            }
-                            .ai-notes-display .diagram-box::after {
-                                content: '📸 CONCEPTUAL ILLUSTRATION';
-                                position: absolute;
-                                bottom: 1.5rem;
-                                left: 50%;
-                                transform: translateX(-50%);
-                                font-size: 0.6rem;
-                                font-weight: 800;
-                                letter-spacing: 0.2em;
-                                opacity: 0.4;
-                            }
-                            .ai-notes-display table {
-                                border-radius: 1.5rem;
-                                overflow: hidden;
-                                border: 1px solid #e2e8f0;
-                                background: white;
-                            }
-                            .ai-notes-display th {
-                                background: #f1f5f9;
-                                color: #475569 !important;
-                                font-weight: 900 !important;
-                                text-transform: uppercase;
-                                letter-spacing: 0.05em;
-                            }
-                            .ai-notes-display td {
-                                border-bottom: 1px solid #f1f5f9;
-                            }
-                            /* Mermaid Diagram Styling */
-                            .ai-notes-display .mermaid {
-                                background: white;
-                                padding: 2rem;
-                                border-radius: 2.5rem;
-                                border: 1px solid #e2e8f0;
-                                margin: 3rem 0;
-                                display: flex;
-                                justify-content: center;
-                                overflow-x: auto;
-                            }
-                        </style>
+                        </script>
+                    @else
+                        {{-- Standard High-Performance Prose Render --}}
+                        <div class="p-8 md:p-12 bg-white/60">
+                            <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                                @if($note->isAiGenerated())
+                                    <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                        🤖 AI Manifest
+                                    </div>
+                                @else
+                                    <div class="bg-emerald-100 text-emerald-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
+                                        ✍️ Digital Manuscript
+                                    </div>
+                                @endif
+                                <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Optimized for Verse Readers</span>
+                            </div>
+                            <article class="prose prose-lg prose-slate max-w-none ai-notes-display">
+                                <style>
+                                    .ai-notes-display { font-family: 'Inter', sans-serif; line-height: 1.8; color: #334155; }
+                                    .ai-notes-display h2 { color: #1e293b !important; font-weight: 900 !important; font-size: 1.875rem !important; border-left: 6px solid #6366f1; padding-left: 1.25rem; margin-top: 3.5rem !important; margin-bottom: 1.5rem !important; background: linear-gradient(to right, #f8fafc, transparent); padding-top: 0.5rem; padding-bottom: 0.5rem; }
+                                    .ai-notes-display h3 { color: #475569 !important; font-weight: 800 !important; font-size: 1.5rem !important; margin-top: 2.5rem !important; margin-bottom: 1.25rem !important; }
+                                    .ai-notes-display .info-box { background: linear-gradient(135deg, #f0f7ff 0%, #e0effe 100%); border: 1px solid #bae6fd; border-radius: 2rem; padding: 2.5rem; margin: 3rem 0; position: relative; }
+                                    .ai-notes-display .info-box::before { content: '📖 DEFINITION'; position: absolute; top: -0.75rem; left: 2rem; background: #0369a1; color: white; padding: 0.25rem 1.25rem; border-radius: 1rem; font-size: 0.65rem; font-weight: 900; }
+                                    .ai-notes-display .exam-tip { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 2px dashed #f59e0b; border-radius: 2rem; padding: 2.5rem; margin: 3rem 0; color: #92400e; position: relative; }
+                                    .ai-notes-display .exam-tip::before { content: '🎓 EXAM FOCUS'; position: absolute; top: -0.75rem; left: 2rem; background: #d97706; color: white; padding: 0.25rem 1.25rem; border-radius: 1rem; font-size: 0.65rem; font-weight: 900; }
+                                    .ai-notes-display table { border-radius: 1.5rem; overflow: hidden; border: 1px solid #e2e8f0; background: white; }
+                                    .ai-notes-display th { background: #f1f5f9; color: #475569 !important; font-weight: 900 !important; text-transform: uppercase; letter-spacing: 0.05em; }
+                                    .ai-notes-display .mermaid { background: white; padding: 2rem; border-radius: 2.5rem; border: 1px solid #e2e8f0; margin: 3rem 0; display: flex; justify-content: center; overflow-x: auto; }
+                                </style>
 
-                        {!! $note->ai_content !!}
+                                {!! $note->ai_content !!}
 
-                        @if($note->note_type === 'ai')
-                            <script type="module">
-                                import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-                                mermaid.initialize({ 
-                                    startOnLoad: true,
-                                    theme: 'neutral',
-                                    fontFamily: 'Inter',
-                                    securityLevel: 'loose'
-                                });
-                            </script>
-                        @endif
-                    </article>
-                </div>
+                                @if($note->note_type === 'ai')
+                                    <script type="module">
+                                        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+                                        mermaid.initialize({ startOnLoad: true, theme: 'neutral', fontFamily: 'Inter', securityLevel: 'loose' });
+                                    </script>
+                                @endif
+                            </article>
+                        </div>
+                    @endif
+        </div>
                 @else
                 {{-- Knowledge Asset Viewer 🛰️ --}}
                 <div class="aspect-[3/4] bg-slate-100 relative">

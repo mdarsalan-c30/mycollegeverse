@@ -30,6 +30,18 @@ class Note extends Model
         return $this->note_type === 'ai';
     }
 
+    public function isDigital()
+    {
+        return !empty($this->ai_content);
+    }
+
+    public function hasFullHtml()
+    {
+        if (!$this->isDigital()) return false;
+        $content = strtolower($this->ai_content);
+        return str_contains($content, '<html') || str_contains($content, '<head') || str_contains($content, '<body');
+    }
+
     protected static function boot()
     {
         parent::boot();

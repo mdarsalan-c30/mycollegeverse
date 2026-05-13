@@ -1,3 +1,11 @@
+@if($note->hasFullHtml())
+    {!! $note->ai_content !!}
+    <div class="no-print fixed bottom-8 right-8 z-50">
+        <button onclick="window.print()" class="bg-indigo-600 text-white px-8 py-3 rounded-full font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-indigo-700 transition-all">
+            🖨️ Save as PDF
+        </button>
+    </div>
+@else
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,25 +35,9 @@
             margin-top: 2.5rem;
             margin-bottom: 1.25rem;
         }
-        .info-box {
-            background: #f0f7ff;
-            border: 1px solid #bae6fd;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        .exam-tip {
-            background: #fffbeb;
-            border: 2px dashed #f59e0b;
-            border-radius: 1rem;
-            padding: 2rem;
-            margin: 2rem 0;
-        }
-        .mermaid {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-        }
+        .info-box { background: #f0f7ff; border: 1px solid #bae6fd; border-radius: 1rem; padding: 2rem; margin: 2rem 0; }
+        .exam-tip { background: #fffbeb; border: 2px dashed #f59e0b; border-radius: 1rem; padding: 2rem; margin: 2rem 0; }
+        .mermaid { display: flex; justify-content: center; margin: 2rem 0; }
         table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
         th, td { border: 1px solid #e2e8f0; padding: 1rem; text-align: left; }
         th { background: #f1f5f9; }
@@ -68,7 +60,7 @@
                 </div>
                 <div class="text-right">
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Authorized By</p>
-                    <p class="font-black text-slate-800 uppercase tracking-tighter">MyCollegeVerse AI</p>
+                    <p class="font-black text-slate-800 uppercase tracking-tighter">{{ $note->user->name }}</p>
                 </div>
             </div>
         </header>
@@ -88,3 +80,4 @@
     </script>
 </body>
 </html>
+@endif
