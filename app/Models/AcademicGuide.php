@@ -82,4 +82,12 @@ class AcademicGuide extends Model
         
         return strlen($this->content) > 1000 && stripos($this->content, '<div') !== false;
     }
+
+    /**
+     * Scope a query to only include published guides 🛰️
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
 }
