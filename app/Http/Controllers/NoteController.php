@@ -340,7 +340,8 @@ class NoteController extends Controller
             return redirect()->route('notes.print', $note->slug);
         }
 
-        if (str_contains($note->file_path, 'cloudinary.com')) {
+        // 🛡️ Handle External URLs (Cloudinary, Drive, etc.)
+        if (filter_var($note->file_path, FILTER_VALIDATE_URL)) {
             return redirect()->away($note->file_path);
         }
 
