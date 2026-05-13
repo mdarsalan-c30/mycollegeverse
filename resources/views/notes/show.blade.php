@@ -182,10 +182,67 @@
                          </div>
 
                          @auth
-                         <a href="{{ route('notes.download', $note->id) }}" class="bg-primary text-white px-8 py-4 rounded-3xl font-black shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-105 transition-all">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
-                            Download PDF
-                         </a>
+                             @if($note->isDigital())
+                                <button onclick="downloadDigitalManuscript()" id="download-btn" class="bg-primary text-white px-8 py-4 rounded-3xl font-black shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-105 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                                    Download PDF
+                                </button>
+                                
+                                <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+                                <script>
+                                    async function downloadDigitalManuscript() {
+                                        const btn = document.getElementById('download-btn');
+                                        const originalText = btn.innerHTML;
+                                        btn.innerHTML = '<span class="animate-pulse">⚡ Manifesting...</span>';
+                                        btn.disabled = true;
+
+                                        try {
+                                            let element;
+                                            @if($note->hasFullHtml())
+                                                const frame = document.getElementById('manuscript-frame');
+                                                element = frame.contentDocument.body.cloneNode(true);
+                                            @else
+                                                element = document.querySelector('.ai-notes-display').cloneNode(true);
+                                            @endif
+
+                                            const watermark = document.createElement('div');
+                                            watermark.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 60px; color: rgba(0,0,0,0.05); font-weight: 900; z-index: -1; pointer-events: none; white-space: nowrap; font-family: 'Inter', sans-serif; letter-spacing: 0.1em;";
+                                            watermark.innerText = 'MYCOLLEGEVERSE • ACADEMIC OS';
+                                            
+                                            const pdfContainer = document.createElement('div');
+                                            pdfContainer.style.padding = '40px';
+                                            pdfContainer.style.background = 'white';
+                                            pdfContainer.appendChild(watermark);
+                                            pdfContainer.appendChild(element);
+
+                                            const opt = {
+                                                margin: [10, 10],
+                                                filename: '{{ $note->slug }}_verse_notes.pdf',
+                                                image: { type: 'jpeg', quality: 0.98 },
+                                                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                                                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                                            };
+
+                                            await html2pdf().set(opt).from(pdfContainer).save();
+                                            
+                                            btn.innerHTML = '✅ Downloaded';
+                                            setTimeout(() => {
+                                                btn.innerHTML = originalText;
+                                                btn.disabled = false;
+                                            }, 2000);
+                                        } catch (e) {
+                                            console.error('Manifestation Failed:', e);
+                                            window.location.href = "{{ route('notes.download', $note->id) }}";
+                                        }
+                                    }
+                                </script>
+                             @else
+                                <a href="{{ route('notes.download', $note->id) }}" class="bg-primary text-white px-8 py-4 rounded-3xl font-black shadow-xl shadow-primary/20 flex items-center justify-center gap-3 hover:scale-105 transition-all">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                                    Download PDF
+                                </a>
+                             @endif
+                             */ @endphp
                          @else
                          <a href="{{ route('login') }}" class="bg-slate-900 text-white px-8 py-4 rounded-3xl font-black flex items-center justify-center gap-3 hover:bg-primary transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
