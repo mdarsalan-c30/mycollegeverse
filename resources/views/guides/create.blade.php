@@ -65,7 +65,7 @@
                             <div class="space-y-3">
                                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Sector (Category)</label>
                                 <select name="category" required class="w-full h-16 bg-white border border-slate-100 rounded-[1.5rem] px-8 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm">
-                                    @foreach(['Syllabus', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
+                                    @foreach(['Syllabus', 'Notes', 'Practical', 'Project', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
                                         <option value="{{ $cat }}" {{ old('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                                     @endforeach
                                 </select>
@@ -260,7 +260,10 @@
                 const htmlEditor = document.getElementById('html-editor');
                 let finalContent = '';
                 
-                if (htmlEditor && htmlEditor.offsetParent !== null) {
+                // Detection logic: Alpine might use display: none
+                const isHtmlActive = (htmlEditor && (htmlEditor.offsetParent !== null || htmlEditor.style.display === 'block'));
+                
+                if (isHtmlActive) {
                     finalContent = htmlEditor.value;
                     if (finalContent.trim().length < 10) {
                         alert('Bhai, HTML code toh dalo!');
@@ -268,13 +271,23 @@
                     }
                 } else {
                     finalContent = quill.root.innerHTML;
+                    // Fallback for empty quill
                     if (quill.getText().trim().length === 0 && finalContent.indexOf('<img') === -1) {
                         alert('Please enter some content before broadcasting.');
                         e.preventDefault(); return false;
                     }
                 }
 
-                document.getElementById('content-input').value = finalContent;
+                // Force sync to hidden input 🛰️
+                const contentInput = document.getElementById('content-input');
+                contentInput.value = finalContent;
+                
+                // Final validation check
+                if (!contentInput.value || contentInput.value.trim() === '') {
+                    alert('Critical: Manifestation content lost. Please retry.');
+                    e.preventDefault(); return false;
+                }
+
                 document.getElementById('submit-btn').innerHTML = 'Broadcasting Node... 🛰️';
                 document.getElementById('submit-btn').disabled = true;
             });
