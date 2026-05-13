@@ -145,9 +145,42 @@
             </div>
             @endif
 
-            <!-- Content Area -->
-            <div class="px-8 md:px-20 py-16 guide-content">
-                {!! $guide->content !!}
+            <!-- Content Area / Digital Manuscript Manifestation ⚡ -->
+            <div class="px-8 md:px-20 py-16">
+                @if($guide->hasFullHtml())
+                    <!-- Isolated Manuscript Environment 🛰️ -->
+                    <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-2xl relative mb-12">
+                        <div class="bg-slate-900 px-8 py-4 flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                            </div>
+                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Isolated Academic Node • Manifest v1.0</span>
+                        </div>
+                        <iframe id="manuscript-frame" class="w-full h-[800px] border-none" srcdoc="{{ $guide->content }}"></iframe>
+                    </div>
+                @else
+                    <div class="guide-content">
+                        {!! $guide->content !!}
+                    </div>
+                @endif
+
+                <!-- Direct Manifestation Hub 🛰️ -->
+                <div class="mt-16 p-10 bg-slate-50 rounded-[3.5rem] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div class="flex items-center gap-6">
+                        <div class="w-20 h-20 bg-white rounded-3xl flex items-center justify-center text-4xl shadow-sm border border-slate-100">🎓</div>
+                        <div>
+                            <h4 class="text-lg font-black text-slate-900 uppercase tracking-tight mb-1">Manifest Guide to PDF</h4>
+                            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Generate a branded academic manuscript with institutional watermarking.</p>
+                        </div>
+                    </div>
+                    
+                    <button id="manifest-btn" onclick="manifestGuide()" class="w-full md:w-auto px-12 py-5 bg-slate-900 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-xl hover:bg-primary hover:scale-105 transition-all flex items-center justify-center gap-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" /></svg>
+                        Manifest PDF ⬇️
+                    </button>
+                </div>
             </div>
 
             <!-- Author Actions -->
@@ -169,4 +202,62 @@
             <a href="{{ route('guides.create') }}" class="inline-flex items-center px-12 py-4 bg-primary text-white font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl shadow-2xl shadow-primary/30 hover:scale-105 transition-all">Manifest New Node 🌌</a>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        async function manifestGuide() {
+            const btn = document.getElementById('manifest-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="animate-pulse italic">🛰️ Syncing Multiverse...</span>';
+            btn.disabled = true;
+
+            try {
+                let element;
+                @if($guide->hasFullHtml())
+                    const frame = document.getElementById('manuscript-frame');
+                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
+                    element = frameDoc.body.cloneNode(true);
+                    const styles = frameDoc.querySelectorAll('style, link[rel="stylesheet"]');
+                    styles.forEach(s => element.prepend(s.cloneNode(true)));
+                @else
+                    element = document.querySelector('.guide-content').cloneNode(true);
+                @endif
+
+                // Branded Watermark Manifestation 🏛️
+                const watermark = document.createElement('div');
+                watermark.style.cssText = "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 50px; color: rgba(0,0,0,0.08); font-weight: 900; z-index: 1000; pointer-events: none; white-space: nowrap; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.2em; width: 100%; text-align: center;";
+                watermark.innerText = 'MYCOLLEGEVERSE.IN • ACADEMIC HUB';
+                
+                const pdfContainer = document.createElement('div');
+                pdfContainer.style.padding = '40px';
+                pdfContainer.style.background = 'white';
+                pdfContainer.style.position = 'relative';
+                pdfContainer.appendChild(watermark);
+                pdfContainer.appendChild(element);
+
+                const opt = {
+                    margin: [15, 15],
+                    filename: '{{ $guide->slug }}_academic_intel.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+
+                await html2pdf().set(opt).from(pdfContainer).save();
+                
+                btn.innerHTML = '✅ Manifested';
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 2000);
+            } catch (e) {
+                console.error('Manifestation Failed:', e);
+                alert('Bhai, manifestation failed. Check console for intel.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+    @endpush
 @endsection

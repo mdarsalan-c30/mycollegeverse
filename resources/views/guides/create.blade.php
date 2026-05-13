@@ -79,17 +79,41 @@
                 </div>
 
                 <!-- Content Matrix -->
-                <div class="space-y-8">
-                    <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 bg-indigo-500/10 text-indigo-500 rounded-xl flex items-center justify-center font-black">02</div>
-                        <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-900">Knowledge Manifestation</h3>
+                <div class="space-y-8" x-data="{ manifestMode: 'standard' }">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-indigo-500/10 text-indigo-500 rounded-xl flex items-center justify-center font-black">02</div>
+                            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-900">Knowledge Manifestation</h3>
+                        </div>
+
+                        <!-- Mode Switcher 🛰️ -->
+                        <div class="bg-slate-100 p-1 rounded-2xl flex gap-1 border border-slate-200 w-fit">
+                            <button type="button" @click="manifestMode = 'standard'" :class="manifestMode === 'standard' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
+                                Standard Prose
+                            </button>
+                            <button type="button" @click="manifestMode = 'html'" :class="manifestMode === 'html' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'" class="px-6 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all flex items-center gap-2">
+                                ⚡ Smart HTML
+                            </button>
+                        </div>
                     </div>
 
                     <div class="space-y-4">
-                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Description / Guide Content</label>
-                        <div id="editor-wrapper" class="rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm">
+                        <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">
+                            <span x-show="manifestMode === 'standard'">Description / Guide Content</span>
+                            <span x-show="manifestMode === 'html'" class="text-indigo-500">Raw Manuscript Code (HTML/CSS)</span>
+                        </label>
+
+                        <!-- Standard Editor (Quill) -->
+                        <div x-show="manifestMode === 'standard'" id="editor-wrapper" class="rounded-[2rem] border border-slate-100 overflow-hidden shadow-sm transition-all" x-transition>
                             <div id="editor" class="h-96 bg-white font-sans text-base"></div>
                         </div>
+
+                        <!-- Smart HTML Editor -->
+                        <div x-show="manifestMode === 'html'" x-transition class="transition-all">
+                            <textarea id="html-editor" placeholder="Paste your high-fidelity HTML/CSS code here... (e.g. PPS Smart Prep Node)" 
+                                      class="w-full h-96 bg-slate-900 text-indigo-300 font-mono text-sm p-8 rounded-[2rem] border border-slate-800 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-2xl resize-none placeholder:text-slate-700"></textarea>
+                        </div>
+
                         <input type="hidden" name="content" id="content-input" value="{{ old('content') }}">
                     </div>
 
@@ -169,8 +193,21 @@
                 const title = document.querySelector('input[name="title"]').value;
                 const metaTitle = document.querySelector('input[name="meta_title"]').value;
                 const metaDesc = document.querySelector('textarea[name="meta_description"]').value;
-                const content = quill.getText();
                 const keywords = document.querySelector('input[name="meta_keywords"]').value;
+                
+                // Content extraction based on active mode 🛰️
+                const htmlEditor = document.getElementById('html-editor');
+                let content = '';
+                let rawHtml = '';
+                
+                if (htmlEditor && htmlEditor.offsetParent !== null) {
+                    rawHtml = htmlEditor.value;
+                    // Strip tags for SEO word count
+                    content = rawHtml.replace(/<[^>]*>?/gm, ' ');
+                } else {
+                    content = quill.getText();
+                    rawHtml = quill.root.innerHTML;
+                }
 
                 let score = 0;
                 let rules = { title: false, meta: false, depth: false, keywords: false };
@@ -184,12 +221,12 @@
 
                 // 3. Content Depth
                 const words = content.trim().split(/\s+/).length;
-                if (words >= 300) { score += 25; rules.depth = true; }
+                if (words >= 300 || (rawHtml.length > 1000 && htmlEditor.offsetParent !== null)) { score += 25; rules.depth = true; }
 
                 // 4. Keyword presence
                 if (keywords.length > 3) {
                     const firstKeyword = keywords.split(',')[0].trim().toLowerCase();
-                    if (content.toLowerCase().includes(firstKeyword)) { score += 25; rules.keywords = true; }
+                    if (content.toLowerCase().includes(firstKeyword) || rawHtml.toLowerCase().includes(firstKeyword)) { score += 25; rules.keywords = true; }
                 }
 
                 // UI Update
@@ -214,17 +251,30 @@
 
             // Real-time Pulse
             quill.on('text-change', updateSeo);
+            document.getElementById('html-editor').addEventListener('input', updateSeo);
             document.querySelectorAll('input, textarea').forEach(el => el.addEventListener('input', updateSeo));
             updateSeo(); // Init
 
             var form = document.getElementById('manifest-form');
             form.addEventListener('submit', function(e) {
-                var html = quill.root.innerHTML;
-                if (quill.getText().trim().length === 0 && html.indexOf('<img') === -1) {
-                    alert('Please enter some content before broadcasting.');
-                    e.preventDefault(); return false;
+                const htmlEditor = document.getElementById('html-editor');
+                let finalContent = '';
+                
+                if (htmlEditor && htmlEditor.offsetParent !== null) {
+                    finalContent = htmlEditor.value;
+                    if (finalContent.trim().length < 10) {
+                        alert('Bhai, HTML code toh dalo!');
+                        e.preventDefault(); return false;
+                    }
+                } else {
+                    finalContent = quill.root.innerHTML;
+                    if (quill.getText().trim().length === 0 && finalContent.indexOf('<img') === -1) {
+                        alert('Please enter some content before broadcasting.');
+                        e.preventDefault(); return false;
+                    }
                 }
-                document.getElementById('content-input').value = html;
+
+                document.getElementById('content-input').value = finalContent;
                 document.getElementById('submit-btn').innerHTML = 'Broadcasting Node... 🛰️';
                 document.getElementById('submit-btn').disabled = true;
             });

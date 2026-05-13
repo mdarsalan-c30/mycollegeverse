@@ -61,10 +61,25 @@ class AcademicGuide extends Model
     }
 
     /**
-     * Scope for published guides
+     * Determine if the guide is a digital manuscript 🛰️
      */
-    public function scopePublished($query)
+    public function isDigital()
     {
-        return $query->where('is_published', true);
+        return !empty($this->content);
+    }
+
+    /**
+     * Determine if the guide contains a full high-fidelity HTML node ⚡
+     */
+    public function hasFullHtml()
+    {
+        if (empty($this->content)) return false;
+        
+        $indicators = ['<!DOCTYPE html>', '<html', '<head>', '<style', 'smart-prep', 'manuscript-frame'];
+        foreach ($indicators as $indicator) {
+            if (stripos($this->content, $indicator) !== false) return true;
+        }
+        
+        return strlen($this->content) > 1000 && stripos($this->content, '<div') !== false;
     }
 }
