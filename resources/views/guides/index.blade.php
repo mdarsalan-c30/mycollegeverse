@@ -75,7 +75,7 @@
                     </h3>
 
                     <p class="text-slate-500 text-sm font-medium leading-relaxed mb-8 line-clamp-2">
-                        {{ Str::limit(strip_tags($guide->content), 100) }}
+                        {{ \Illuminate\Support\Str::limit(strip_tags($guide->content), 100) }}
                     </p>
 
                     <div class="flex items-center justify-between pt-8 border-t border-slate-50">

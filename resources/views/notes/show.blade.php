@@ -145,7 +145,7 @@
                          <div class="mt-6 pt-6 border-t border-slate-200">
                              <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Detailed Insight</h5>
                              <div class="text-xs text-slate-500 italic line-clamp-3">
-                                 {{ Str::limit(strip_tags($note->ai_content), 300) }}
+                                 {{ \Illuminate\Support\Str::limit(strip_tags($note->ai_content), 300) }}
                              </div>
                          </div>
                     @endif
