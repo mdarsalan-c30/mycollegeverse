@@ -564,3 +564,13 @@ Route::get('/storage/academic-guides/{file}', function ($file) {
 });
 
 Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+
+// Mock Interview AI 🎙️
+Route::middleware(['auth'])->prefix('assess/mock-interview')->name('interview.')->group(function() {
+    Route::get('/', [App\Http\Controllers\MockInterviewController::class, 'index'])->name('index');
+    Route::post('/start', [App\Http\Controllers\MockInterviewController::class, 'start'])->name('start');
+    Route::post('/transcribe', [App\Http\Controllers\MockInterviewController::class, 'transcribe'])->name('transcribe');
+    Route::post('/think', [App\Http\Controllers\MockInterviewController::class, 'think'])->name('think');
+    Route::post('/speak', [App\Http\Controllers\MockInterviewController::class, 'speak'])->name('speak');
+});
+
