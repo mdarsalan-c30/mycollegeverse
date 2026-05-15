@@ -255,6 +255,12 @@
                         });
                         
                         const data = await res.json();
+                        if (data.status === 'error') {
+                            alert(data.message);
+                            this.statusMessage = "STT Error. Please try typing.";
+                            return;
+                        }
+                        
                         const userText = data.transcript || data.text;
                         
                         if (userText) {
@@ -270,18 +276,26 @@
                     this.isThinking = true;
                     this.statusMessage = "Analyzing response...";
                     
-                    const res = await fetch('{{ route("interview.think") }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ session_id: this.currentSessionId, message: userText })
-                    });
-                    
-                    const data = await res.json();
-                    this.isThinking = false;
-                    
-                    if (data.status === 'success') {
-                        this.transcript.push({ role: 'Assistant', text: data.message });
-                        this.speak(data.message);
+                    try {
+                        const res = await fetch('{{ route("interview.think") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ session_id: this.currentSessionId, message: userText })
+                        });
+                        
+                        const data = await res.json();
+                        this.isThinking = false;
+                        
+                        if (data.status === 'success') {
+                            this.transcript.push({ role: 'Assistant', text: data.message });
+                            this.speak(data.message);
+                        } else {
+                            alert(data.message || "Unknown Brain Error");
+                            this.statusMessage = "Brain Module Error.";
+                        }
+                    } catch (e) {
+                        this.isThinking = false;
+                        alert("Connection Error: " + e.message);
                     }
                 },
 
@@ -289,23 +303,35 @@
                     this.isSpeaking = true;
                     this.statusMessage = "AI is speaking...";
                     
-                    const res = await fetch('{{ route("interview.speak") }}', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ text })
-                    });
-                    
-                    const data = await res.json();
-                    if (data.audio_base64) {
-                        const audio = new Audio("data:audio/wav;base64," + data.audio_base64);
-                        audio.onended = () => {
+                    try {
+                        const res = await fetch('{{ route("interview.speak") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ text })
+                        });
+                        
+                        const data = await res.json();
+                        if (data.status === 'error') {
+                            console.error(data.message);
+                            this.statusMessage = "Audio failed (Voice Module Error).";
                             this.isSpeaking = false;
-                            this.statusMessage = "Awaiting your response. Hold the mic button to speak.";
-                        };
-                        audio.play();
-                    } else {
+                            return;
+                        }
+
+                        if (data.audio_base64) {
+                            const audio = new Audio("data:audio/wav;base64," + data.audio_base64);
+                            audio.onended = () => {
+                                this.isSpeaking = false;
+                                this.statusMessage = "Awaiting your response. Hold the mic button to speak.";
+                            };
+                            audio.play();
+                        } else {
+                            this.isSpeaking = false;
+                            this.statusMessage = "AI response ready (Audio missing). Please respond.";
+                        }
+                    } catch (e) {
                         this.isSpeaking = false;
-                        this.statusMessage = "AI response ready (Audio failed). Please respond.";
+                        console.error("Voice Connection Error:", e);
                     }
                 },
 
