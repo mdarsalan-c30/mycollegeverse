@@ -25,13 +25,22 @@ foreach ($paths as $name => $path) {
 echo "<h2>Checking Database Connection...</h2>";
 try {
     $env = file_get_contents(__DIR__.'/../.env');
-    preg_match('/DB_HOST=(.*)/', $env, $host);
-    preg_match('/DB_DATABASE=(.*)/', $env, $db);
-    preg_match('/DB_USERNAME=(.*)/', $env, $user);
-    preg_match('/DB_PASSWORD=(.*)/', $env, $pass);
+    // High-Precision Credential Parsing 🛰️
+    function getEnvValue($key, $content) {
+        if (preg_match('/^' . $key . '=(.*)$/m', $content, $matches)) {
+            $value = trim($matches[1]);
+            return trim($value, '"\' ');
+        }
+        return null;
+    }
+
+    $host = getEnvValue('DB_HOST', $env);
+    $dbName = getEnvValue('DB_DATABASE', $env);
+    $dbUser = getEnvValue('DB_USERNAME', $env);
+    $dbPass = getEnvValue('DB_PASSWORD', $env);
     
-    $dsn = "mysql:host=".trim($host[1]).";dbname=".trim($db[1]).";charset=utf8mb4";
-    $pdo = new PDO($dsn, trim($user[1]), trim($pass[1]));
+    $dsn = "mysql:host=$host;dbname=$dbName;charset=utf8mb4";
+    $pdo = new PDO($dsn, $dbUser, $dbPass);
     echo "✅ Database Connection Successful!<br>";
 } catch (Exception $e) {
     echo "❌ Database Error: " . $e->getMessage() . "<br>";
