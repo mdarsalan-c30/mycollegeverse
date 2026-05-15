@@ -5,14 +5,6 @@ use App\Http\Controllers\SitemapController;
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
-use App\Http\Controllers\DeployController;
-
-/*
-|--------------------------------------------------------------------------
-| Multiverse Deployment Gateway 🛰️
-|--------------------------------------------------------------------------
-*/
-Route::get('/multiverse-sync/{token}', [DeployController::class, 'deploy'])->name('deploy.sync');
 
 /*
 |--------------------------------------------------------------------------
