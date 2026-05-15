@@ -8,9 +8,23 @@
     <!-- SEO Optimization 🚀 -->
     <meta name="description" content="Validate talent with {{ $assignment->title }}. Use MyCollegeVerse Assess (TaskFlow) to manage candidate assignments, reviews, and evaluations for free. Ideal for startups and fast-growing teams.">
     <meta name="keywords" content="Free Assessment Tool, Candidate Task Management, Startup Hiring, Skill Validation, MyCollegeVerse, TaskFlow, {{ $assignment->role }}, {{ $assignment->task_type }} Test">
+    <link rel="canonical" href="{{ url()->current() }}" />
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="{{ $assignment->title }} | Talent Validation Node">
     <meta property="og:description" content="Complete the assessment for {{ $assignment->recruiter->company_name ?? 'MyCollegeVerse' }} and showcase your skills.">
-    <meta name="robots" content="index, follow">
+    <meta property="og:image" content="{{ asset('images/og-assess.jpg') }}">
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="{{ $assignment->title }} | Talent Validation Node">
+    <meta property="twitter:description" content="Complete the assessment for {{ $assignment->recruiter->company_name ?? 'MyCollegeVerse' }} and showcase your skills.">
+    <meta property="twitter:image" content="{{ asset('images/og-assess.jpg') }}">
+
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">

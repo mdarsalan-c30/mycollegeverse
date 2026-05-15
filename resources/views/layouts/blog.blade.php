@@ -8,6 +8,22 @@
         <title>@yield('title', 'Editorial Hub | MyCollegeVerse')</title>
         <meta name="description" content="@yield('meta_description', 'Deep academic insights and campus strategy from the MyCollegeVerse editorial team.')">
         <link rel="canonical" href="{{ url()->current() }}" />
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="@yield('title', 'Editorial Hub | MyCollegeVerse')">
+        <meta property="og:description" content="@yield('meta_description', 'Deep academic insights and campus strategy from the MyCollegeVerse editorial team.')">
+        <meta property="og:image" content="{{ asset('assets/mcv/og-blog.jpg') }}">
+
+        <!-- Twitter Card -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="@yield('title', 'Editorial Hub | MyCollegeVerse')">
+        <meta property="twitter:description" content="@yield('meta_description', 'Deep academic insights and campus strategy from the MyCollegeVerse editorial team.')">
+        <meta property="twitter:image" content="{{ asset('assets/mcv/og-blog.jpg') }}">
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

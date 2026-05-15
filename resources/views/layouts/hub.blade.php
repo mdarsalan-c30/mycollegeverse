@@ -6,6 +6,27 @@
         <title>@yield('title', 'Academic Hub | MyCollegeVerse')</title>
         <meta name="description" content="@yield('meta_description', 'The ultimate repository for syllabi, college guides, and academic notices.')">
         <meta name="keywords" content="@yield('meta_keywords', 'syllabus, university guide, academic notice, college resources')">
+        <meta name="author" content="MyCollegeVerse Team">
+        <meta name="robots" content="index, follow">
+        <link rel="canonical" href="{{ url()->current() }}" />
+
+        <!-- Google Search Console Verification 🔎 -->
+        <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="@yield('title', 'Academic Hub | MyCollegeVerse')">
+        <meta property="og:description" content="@yield('meta_description', 'The ultimate repository for syllabi, college guides, and academic notices.')">
+        <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+
+        <!-- Twitter Card -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="@yield('title', 'Academic Hub | MyCollegeVerse')">
+        <meta property="twitter:description" content="@yield('meta_description', 'The ultimate repository for syllabi, college guides, and academic notices.')">
+        <meta property="twitter:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
