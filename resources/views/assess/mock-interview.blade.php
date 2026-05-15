@@ -60,24 +60,39 @@
                     </div>
 
                     <!-- Audio Controls / Status Bar -->
-                    <div class="p-8 bg-white/40 border-t border-white/60 flex items-center justify-between">
-                        <div class="flex items-center gap-4">
-                            <div class="w-3 h-3 rounded-full" :class="isListening ? 'bg-green-500 animate-pulse' : 'bg-slate-300'"></div>
-                            <span class="text-[10px] font-black uppercase tracking-widest text-slate-400" x-text="isListening ? 'Mic Active' : 'Mic Off'"></span>
-                        </div>
-                        
-                        <div class="flex gap-4">
-                            <button x-show="isInterviewing && !isThinking && !isSpeaking" 
-                                    @mousedown="startListening()" 
-                                    @mouseup="stopListening()"
-                                    class="group flex items-center gap-3 px-8 py-4 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                                <span x-text="isListening ? 'Release to Send' : 'Hold to Speak'"></span>
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
-                            </button>
+                    <div class="p-8 bg-white/40 border-t border-white/60 flex flex-col gap-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-3 h-3 rounded-full" :class="isListening ? 'bg-green-500 animate-pulse' : 'bg-slate-300'"></div>
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400" x-text="isListening ? 'Mic Active' : 'Mic Off'"></span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Powered by Verse Intelligence</span>
+                            </div>
                         </div>
 
-                        <div class="flex items-center gap-2">
-                            <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Powered by Verse Intelligence</span>
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <!-- Text Input Fallback -->
+                            <div class="flex-1 relative group" x-show="isInterviewing">
+                                <input type="text" 
+                                       x-model="manualInput" 
+                                       @keyup.enter="sendManualInput()"
+                                       placeholder="Type your response here if mic is unavailable..." 
+                                       class="w-full bg-white/50 border-white/60 rounded-2xl px-6 py-4 text-xs font-bold text-slate-700 placeholder:text-slate-300 focus:ring-2 focus:ring-primary/20 transition-all outline-none">
+                                <button @click="sendManualInput()" class="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-primary hover:scale-110 transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+                                </button>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <button x-show="isInterviewing && !isThinking && !isSpeaking" 
+                                        @mousedown="startListening()" 
+                                        @mouseup="stopListening()"
+                                        class="flex-shrink-0 group flex items-center gap-3 px-8 py-4 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                                    <span x-text="isListening ? 'Release to Send' : 'Hold to Speak'"></span>
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -164,6 +179,7 @@
                 showRoleModal: false,
                 currentSessionId: null,
                 statusMessage: 'Ready to benchmark your intelligence. Select a role to begin.',
+                manualInput: '',
                 roles: ['Frontend Developer', 'Backend Architect', 'Marketing Head', 'UI/UX Designer', 'Product Manager', 'Data Scientist'],
                 transcript: [],
                 mediaRecorder: null,
@@ -187,8 +203,19 @@
                     if (data.status === 'success') {
                         this.currentSessionId = data.session_id;
                         this.isInterviewing = true;
-                        this.triggerAIGreeting("Hello! Welcome to the interview. I am your AI assistant. Can you start by introducing yourself?");
+                        
+                        // Professional Initiation
+                        const introText = `Hello! I am your lead interviewer for the ${role} position. Today, I'll be assessing your technical skills and cultural fit. To start, could you please introduce yourself and tell me about your most significant project?`;
+                        this.triggerAIGreeting(introText);
                     }
+                },
+
+                async sendManualInput() {
+                    if (!this.manualInput.trim() || this.isThinking || this.isSpeaking) return;
+                    const text = this.manualInput.trim();
+                    this.manualInput = '';
+                    this.transcript.push({ role: 'You', text });
+                    this.processThinking(text);
                 },
 
                 async triggerAIGreeting(text) {
