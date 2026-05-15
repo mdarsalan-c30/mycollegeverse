@@ -3,6 +3,7 @@ Allow: /
 Allow: /colleges
 Allow: /notes
 Allow: /jobs
+Allow: /academic-hub
 Allow: /sitemap.xml
 
 # Restricted Zones
