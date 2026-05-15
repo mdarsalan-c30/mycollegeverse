@@ -15,7 +15,6 @@
         @stack('structured-data')
 
         <!-- Scripts -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
             tailwind.config = {
@@ -50,7 +49,6 @@
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
             }
-            [x-cloak] { display: none !important; }
         </style>
         @stack('head')
     </head>

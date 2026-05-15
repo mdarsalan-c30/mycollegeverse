@@ -11,16 +11,6 @@
 
         <form action="{{ route('guides.store') }}" method="POST" id="manifest-form" enctype="multipart/form-data" class="space-y-10 pb-32">
             @csrf
-
-            @if(session('error'))
-            <div class="bg-red-50 border border-red-100 p-8 rounded-[2.5rem] mb-10 flex items-center gap-6 animate-pulse">
-                <div class="text-3xl">⚠️</div>
-                <div>
-                    <h4 class="text-xs font-black text-red-900 uppercase tracking-widest mb-1">Manifestation Error</h4>
-                    <p class="text-[10px] font-bold text-red-400 uppercase tracking-widest">{{ session('error') }}</p>
-                </div>
-            </div>
-            @endif
             
             <div class="glass p-10 md:p-16 rounded-[4rem] border border-slate-100 shadow-2xl space-y-12">
                 <!-- SEO Status Node (Mirroring Blog Engine) -->
@@ -75,7 +65,7 @@
                             <div class="space-y-3">
                                 <label class="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-4">Sector (Category)</label>
                                 <select name="category" required class="w-full h-16 bg-white border border-slate-100 rounded-[1.5rem] px-8 text-sm font-bold text-slate-600 focus:ring-4 focus:ring-primary/5 transition-all shadow-sm">
-                                    @foreach(['Syllabus', 'Notes', 'Practical', 'Project', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
+                                    @foreach(['Syllabus', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
                                         <option value="{{ $cat }}" {{ old('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                                     @endforeach
                                 </select>
@@ -119,7 +109,7 @@
                         </div>
 
                         <!-- Smart HTML Editor -->
-                        <div x-show="manifestMode === 'html'" x-cloak x-transition class="transition-all" style="display: none;" :style="manifestMode === 'html' ? 'display: block' : 'display: none'">
+                        <div x-show="manifestMode === 'html'" x-transition class="transition-all">
                             <textarea id="html-editor" placeholder="Paste your high-fidelity HTML/CSS code here... (e.g. PPS Smart Prep Node)" 
                                       class="w-full h-96 bg-slate-900 text-indigo-300 font-mono text-sm p-8 rounded-[2rem] border border-slate-800 focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-2xl resize-none placeholder:text-slate-700"></textarea>
                         </div>
@@ -270,10 +260,7 @@
                 const htmlEditor = document.getElementById('html-editor');
                 let finalContent = '';
                 
-                // Detection logic: Alpine might use display: none
-                const isHtmlActive = (htmlEditor && (htmlEditor.offsetParent !== null || htmlEditor.style.display === 'block'));
-                
-                if (isHtmlActive) {
+                if (htmlEditor && htmlEditor.offsetParent !== null) {
                     finalContent = htmlEditor.value;
                     if (finalContent.trim().length < 10) {
                         alert('Bhai, HTML code toh dalo!');
@@ -281,23 +268,13 @@
                     }
                 } else {
                     finalContent = quill.root.innerHTML;
-                    // Fallback for empty quill
                     if (quill.getText().trim().length === 0 && finalContent.indexOf('<img') === -1) {
                         alert('Please enter some content before broadcasting.');
                         e.preventDefault(); return false;
                     }
                 }
 
-                // Force sync to hidden input 🛰️
-                const contentInput = document.getElementById('content-input');
-                contentInput.value = finalContent;
-                
-                // Final validation check
-                if (!contentInput.value || contentInput.value.trim() === '') {
-                    alert('Critical: Manifestation content lost. Please retry.');
-                    e.preventDefault(); return false;
-                }
-
+                document.getElementById('content-input').value = finalContent;
                 document.getElementById('submit-btn').innerHTML = 'Broadcasting Node... 🛰️';
                 document.getElementById('submit-btn').disabled = true;
             });
