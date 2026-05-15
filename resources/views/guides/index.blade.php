@@ -35,7 +35,7 @@
                 <div class="flex gap-2 p-1">
                     <select name="category" class="h-14 bg-white border border-slate-100 rounded-[1.5rem] px-6 text-[10px] font-black uppercase tracking-widest text-slate-500 focus:ring-4 focus:ring-primary/5 transition-all">
                         <option value="">All Categories</option>
-                        @foreach(['Syllabus', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
+                        @foreach(['Syllabus', 'Notes', 'Practical', 'Project', 'College Guide', 'Admission', 'Career', 'Notice'] as $cat)
                             <option value="{{ $cat }}" {{ request('category') == $cat ? 'selected' : '' }}>{{ $cat }}</option>
                         @endforeach
                     </select>
@@ -57,6 +57,9 @@
                     <div class="flex justify-between items-start mb-8">
                         <div class="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center text-2xl group-hover:bg-primary/10 transition-colors">
                             @if($guide->category == 'Syllabus') 📑
+                            @elseif($guide->category == 'Notes') 📄
+                            @elseif($guide->category == 'Practical') 🔬
+                            @elseif($guide->category == 'Project') 🏗️
                             @elseif($guide->category == 'College Guide') 🏫
                             @elseif($guide->category == 'Notice') 🔔
                             @else 💡

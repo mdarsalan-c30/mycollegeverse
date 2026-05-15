@@ -130,6 +130,26 @@
                         </div>
                     </div>
                 @endif
+
+                <!-- Knowledge Graph Context Node (SEO Booster) 🛰️ -->
+                <div class="p-8 bg-slate-50 border-t border-slate-100">
+                    <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Academic Asset Summary</h5>
+                    <div class="text-sm text-slate-600 font-medium leading-relaxed">
+                        This academic resource titled <strong class="text-secondary">"{{ $note->title }}"</strong> is a verified student manuscript shared within the MyCollegeVerse multiverse. 
+                        It covers essential concepts of <span class="text-primary font-bold">{{ $note->subject->name ?? 'Academic Studies' }}</span> for students at 
+                        <span class="text-secondary font-bold">{{ $note->college->name }}</span>. 
+                        @if($note->is_pyq) This asset is a Previous Year Question (PYQ) paper from the year {{ $note->pyq_year }}. @endif
+                        The material has been peer-reviewed and validated by the student community for exam readiness.
+                    </div>
+                    @if($note->ai_content && !$note->isDigital())
+                         <div class="mt-6 pt-6 border-t border-slate-200">
+                             <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Detailed Insight</h5>
+                             <div class="text-xs text-slate-500 italic line-clamp-3">
+                                 {{ Str::limit(strip_tags($note->ai_content), 300) }}
+                             </div>
+                         </div>
+                    @endif
+                </div>
             </div>
 
             <!-- Notes Meta & Discussion -->
