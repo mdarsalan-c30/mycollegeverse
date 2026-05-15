@@ -227,6 +227,11 @@ class User extends Authenticatable
         return $this->hasMany(ChatMessage::class, 'receiver_id');
     }
 
+    public function sentMessages()
+    {
+        return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
     public function getUnreadMessagesCountAttribute()
     {
         return $this->receivedMessages()->where('is_read', false)->count();

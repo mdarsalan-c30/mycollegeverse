@@ -11,14 +11,47 @@ class ChatController extends Controller
 {
     public function index(User $user = null)
     {
+        // 1. Identify the receiver first
+        if (!$user || !$user->id) {
+            $firstUser = User::where('id', '!=', Auth::id())
+                ->addSelect(['latest_message_at' => ChatMessage::select('created_at')
+                    ->where(function($q) {
+                        $q->whereColumn('sender_id', 'users.id')->where('receiver_id', Auth::id());
+                    })->orWhere(function($q) {
+                        $q->whereColumn('receiver_id', 'users.id')->where('sender_id', Auth::id());
+                    })->latest()->take(1)
+                ])
+                ->orderByDesc('latest_message_at')
+                ->first();
+            $receiver = $firstUser;
+        } else {
+            $receiver = $user;
+        }
+
+        // 2. Mark as read immediately if we have a receiver
+        if ($receiver) {
+            ChatMessage::where('sender_id', $receiver->id)
+                      ->where('receiver_id', Auth::id())
+                      ->where('is_read', false)
+                      ->update(['is_read' => true]);
+        }
+
+        // 3. Fetch users with updated unread counts
         $users = User::where('id', '!=', Auth::id())
-            ->withCount(['receivedMessages as unread_count' => function($query) {
+            ->withCount(['sentMessages as unread_count' => function($query) {
                 $query->where('receiver_id', Auth::id())->where('is_read', false);
             }])
+            ->addSelect(['latest_message_at' => ChatMessage::select('created_at')
+                ->where(function($q) {
+                    $q->whereColumn('sender_id', 'users.id')->where('receiver_id', Auth::id());
+                })->orWhere(function($q) {
+                    $q->whereColumn('receiver_id', 'users.id')->where('sender_id', Auth::id());
+                })->latest()->take(1)
+            ])
+            ->orderByDesc('unread_count')
+            ->orderByDesc('latest_message_at')
             ->get();
-        // If no user is provided, default to the first available contact
-        $receiver = $user && $user->id ? $user : $users->first();
-        
+
         $messages = [];
         if ($receiver) {
             $messages = ChatMessage::where(function($q) use ($receiver) {
@@ -26,12 +59,6 @@ class ChatController extends Controller
             })->orWhere(function($q) use ($receiver) {
                 $q->where('sender_id', $receiver->id)->where('receiver_id', Auth::id());
             })->orderBy('created_at', 'asc')->get();
-
-            // Mark as read
-            ChatMessage::where('sender_id', $receiver->id)
-                      ->where('receiver_id', Auth::id())
-                      ->where('is_read', false)
-                      ->update(['is_read' => true]);
         }
 
         return view('chat.index', compact('users', 'receiver', 'messages'));
