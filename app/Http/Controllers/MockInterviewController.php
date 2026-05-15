@@ -15,7 +15,6 @@ class MockInterviewController extends Controller
 
     public function index()
     {
-        dd('Hit');
         $sessions = InterviewSession::where('user_id', Auth::id())->latest()->get();
 
         return view('assess.mock-interview', compact('sessions'));
