@@ -98,23 +98,35 @@
                             <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Secure Submission Protocol</p>
                         </div>
 
+                        <!-- Error Feedback Node 🛡️ -->
+                        @if($errors->any())
+                        <div class="bg-rose-50 border border-rose-100 rounded-2xl p-4 animate-pulse">
+                            @foreach($errors->all() as $error)
+                                <p class="text-[10px] font-black text-rose-600 uppercase tracking-tight flex items-center gap-2">
+                                    <span class="text-xs">⚠️</span> {{ $error }}
+                                </p>
+                            @endforeach
+                        </div>
+                        @endif
+
                         <div class="space-y-4">
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
                                 <input type="text" name="candidate_name" required placeholder="Your full name"
-                                       value="{{ auth()->user()->name ?? '' }}"
-                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
+                                       value="{{ old('candidate_name', auth()->user()->name ?? '') }}"
+                                       class="w-full h-12 bg-white border @error('candidate_name') border-rose-500 @else border-slate-300 @enderror rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Email Address</label>
                                 <input type="email" name="candidate_email" required placeholder="you@example.com"
-                                       value="{{ auth()->user()->email ?? '' }}"
-                                       class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
+                                       value="{{ old('candidate_email', auth()->user()->email ?? '') }}"
+                                       class="w-full h-12 bg-white border @error('candidate_email') border-rose-500 @else border-slate-300 @enderror rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Phone Number (WhatsApp Preferred)</label>
                                 <input type="text" name="candidate_phone" placeholder="+91 00000 00000"
+                                       value="{{ old('candidate_phone') }}"
                                        class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                         </div>
@@ -124,6 +136,7 @@
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Work Link (Drive/Portfolio)</label>
                                 <input type="url" name="submission_link" placeholder="https://drive.google.com/..."
+                                       value="{{ old('submission_link') }}"
                                        class="w-full h-12 bg-white border border-slate-300 rounded-xl px-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">
                             </div>
                             @endif
@@ -132,13 +145,25 @@
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Upload Asset</label>
                                 <div class="relative group">
-                                    <input type="file" name="file" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                    <input type="file" name="file" onchange="updateFileName(this)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                     <div class="h-24 bg-slate-50 border-2 border-dashed border-slate-300 rounded-2xl flex flex-col items-center justify-center group-hover:border-blue-400 group-hover:bg-blue-50/30 transition-all">
-                                        <span class="text-2xl">📁</span>
-                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">Select submission file</span>
+                                        <span class="text-2xl" id="file-icon">📁</span>
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2" id="file-text">Select submission file</span>
                                     </div>
                                 </div>
                                 <p class="text-[9px] text-slate-400 text-center font-medium mt-2">Max 20MB. Nodes purged after 10 days.</p>
+                                <script>
+                                    function updateFileName(input) {
+                                        const text = document.getElementById('file-text');
+                                        const icon = document.getElementById('file-icon');
+                                        if(input.files && input.files[0]) {
+                                            text.innerText = input.files[0].name;
+                                            text.classList.remove('text-slate-400');
+                                            text.classList.add('text-blue-600');
+                                            icon.innerText = '✅';
+                                        }
+                                    }
+                                </script>
                             </div>
                             @endif
 
@@ -146,14 +171,15 @@
                             <div class="space-y-1">
                                 <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Written Deliverable / Notes</label>
                                 <textarea name="submission_text" rows="5" placeholder="Paste your article or notes here..."
-                                          class="w-full bg-white border border-slate-300 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300"></textarea>
+                                          class="w-full bg-white border border-slate-300 rounded-2xl p-4 text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all shadow-sm placeholder:text-slate-300">{{ old('submission_text') }}</textarea>
                             </div>
                             @endif
                         </div>
 
-                        <button type="submit" class="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95">
+                        <button type="submit" onclick="this.innerHTML='🛰️ Beaming...'; this.disabled=true; this.form.submit();" class="w-full h-16 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-slate-900 transition-all shadow-xl shadow-blue-100 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
                             Beam Submission 🚀
                         </button>
+
                     </form>
                 </div>
             </div>

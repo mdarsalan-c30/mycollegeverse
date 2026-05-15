@@ -28,36 +28,25 @@
             <!-- Note Viewer -->
             <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
                 @if($note->isDigital())
-                    @if($note->hasFullHtml())
-                        {{-- Isolated High-Fidelity Render via Base64 Pipeline 🛰️ --}}
-                        <div class="h-[900px] bg-white relative">
-                            <iframe id="manuscript-frame" 
-                                    src="data:text/html;base64,{{ base64_encode($note->ai_content) }}" 
-                                    class="w-full h-full border-none" 
-                                    sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
-                            
-                            <!-- Fullscreen Command Node -->
-                            <div class="absolute bottom-6 right-6">
-                                <button onclick="toggleManuscriptFullscreen()" class="bg-primary/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:scale-105 transition-all">
-                                    <span>📺</span> Fullscreen Mode
+                    <div x-data="{ viewMode: '{{ $note->hasFullHtml() ? 'html' : 'prose' }}' }" class="space-y-6">
+                        <!-- View Mode Switcher 🛰️ -->
+                        <div class="px-8 pt-8">
+                            <div class="bg-slate-100/50 p-1 rounded-2xl flex gap-1 border border-slate-200 w-fit">
+                                <button @click="viewMode = 'prose'" 
+                                        :class="viewMode === 'prose' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'" 
+                                        class="px-6 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all">
+                                    Standard Prose
+                                </button>
+                                <button @click="viewMode = 'html'" 
+                                        :class="viewMode === 'html' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'" 
+                                        class="px-6 py-2 rounded-xl font-black text-[9px] uppercase tracking-widest transition-all flex items-center gap-2">
+                                    ⚡ Smart HTML
                                 </button>
                             </div>
                         </div>
-                        <script>
-                            function toggleManuscriptFullscreen() {
-                                const frame = document.getElementById('manuscript-frame');
-                                if (frame.requestFullscreen) {
-                                    frame.requestFullscreen();
-                                } else if (frame.webkitRequestFullscreen) {
-                                    frame.webkitRequestFullscreen();
-                                } else if (frame.msRequestFullscreen) {
-                                    frame.msRequestFullscreen();
-                                }
-                            }
-                        </script>
-                    @else
-                        {{-- Standard High-Performance Prose Render --}}
-                        <div class="p-8 md:p-12 bg-white/60">
+
+                        <!-- Standard Prose View -->
+                        <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="p-8 md:p-12 bg-white/60">
                             <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
                                 @if($note->isAiGenerated())
                                     <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
@@ -98,7 +87,25 @@
                                 @endif
                             </article>
                         </div>
-                    @endif
+
+                        <!-- Smart HTML View -->
+                        <div x-show="viewMode === 'html'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                            <div class="h-[900px] bg-white relative">
+                                <iframe id="manuscript-frame" 
+                                        src="data:text/html;base64,{{ base64_encode($note->ai_content) }}" 
+                                        class="w-full h-full border-none" 
+                                        sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
+                                
+                                <!-- Fullscreen Command Node -->
+                                <div class="absolute bottom-6 right-6">
+                                    <button onclick="toggleManuscriptFullscreen()" class="bg-primary/90 backdrop-blur-md text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-2xl flex items-center gap-2 hover:scale-105 transition-all">
+                                        <span>📺</span> Fullscreen Mode
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 @else
                     {{-- Knowledge Asset Viewer 🛰️ --}}
                     <div class="aspect-[3/4] bg-slate-100 relative">

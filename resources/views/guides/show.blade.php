@@ -146,25 +146,49 @@
             @endif
 
             <!-- Content Area / Digital Manuscript Manifestation ⚡ -->
-            <div class="px-8 md:px-20 py-16">
-                @if($guide->hasFullHtml())
-                    <!-- Isolated Manuscript Environment 🛰️ -->
-                    <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-2xl relative mb-12">
-                        <div class="bg-slate-900 px-8 py-4 flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-red-500"></div>
-                                <div class="w-2 h-2 rounded-full bg-amber-500"></div>
-                                <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
-                            </div>
-                            <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Isolated Academic Node • Manifest v1.0</span>
+            <div class="px-8 md:px-20 py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
+                
+                <!-- View Mode Switcher Node 🛰️ -->
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl w-fit mb-12 border border-slate-200">
+                    <button @click="viewMode = 'prose'" 
+                            :class="viewMode === 'prose' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'" 
+                            class="px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
+                        Standard Prose
+                    </button>
+                    <button @click="viewMode = 'html'" 
+                            :class="viewMode === 'html' ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-400 hover:text-slate-600'" 
+                            class="px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2">
+                        ⚡ Smart HTML
+                    </button>
+                </div>
+
+                <div class="relative">
+                    <!-- Standard Prose View -->
+                    <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                        <div class="guide-content">
+                            {!! $guide->content !!}
                         </div>
-                        <iframe id="manuscript-frame" class="w-full h-[800px] border-none" srcdoc="{{ $guide->content }}"></iframe>
                     </div>
-                @else
-                    <div class="guide-content">
-                        {!! $guide->content !!}
+
+                    <!-- Smart HTML View (Isolated) -->
+                    <div x-show="viewMode === 'html'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
+                        <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-2xl relative">
+                            <div class="bg-slate-900 px-8 py-4 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-amber-500"></div>
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                </div>
+                                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest italic">Isolated Academic Node • Smart HTML Manifest</span>
+                            </div>
+                            <iframe id="manuscript-frame" 
+                                    class="w-full h-[800px] border-none" 
+                                    src="data:text/html;base64,{{ base64_encode($guide->content) }}"
+                                    sandbox="allow-scripts allow-popups allow-forms allow-same-origin"></iframe>
+                        </div>
                     </div>
-                @endif
+                </div>
+
 
                 <!-- Direct Manifestation Hub 🛰️ -->
                 <div class="mt-16 p-10 bg-slate-50 rounded-[3.5rem] border border-slate-100 flex flex-col md:flex-row items-center justify-between gap-8">
