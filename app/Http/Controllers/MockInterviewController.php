@@ -1,9 +1,11 @@
 <?php
+namespace App\Http\Controllers;
 
 use App\Models\InterviewSession;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Auth;
+
 
 class MockInterviewController extends Controller
 {
