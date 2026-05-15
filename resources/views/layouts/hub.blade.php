@@ -6,14 +6,6 @@
         <title>@yield('title', 'Academic Hub | MyCollegeVerse')</title>
         <meta name="description" content="@yield('meta_description', 'The ultimate repository for syllabi, college guides, and academic notices.')">
         <meta name="keywords" content="@yield('meta_keywords', 'syllabus, university guide, academic notice, college resources')">
-        <link rel="canonical" href="{{ url()->current() }}">
-
-        <!-- Open Graph / Multiverse Social Protocol -->
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="@yield('title', 'Academic Hub | MyCollegeVerse')">
-        <meta property="og:description" content="@yield('meta_description', 'The ultimate repository for syllabi, college guides, and academic notices.')">
-        <meta property="og:image" content="{{ asset('mcv-seo-banner.jpg') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">

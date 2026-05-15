@@ -71,38 +71,18 @@ class BlogController extends Controller
             
             $schema = [
                 "@context" => "https://schema.org",
-                "@graph" => [
-                    [
-                        "@type" => "BlogPosting",
-                        "@id" => url()->current() . "#article",
-                        "mainEntityOfPage" => ["@type" => "WebPage", "@id" => url()->current()],
-                        "headline" => $blog->title,
-                        "description" => $seoDescription,
-                        "image" => $blog->featured_image ? $blog->featured_image_url : asset('mcv-seo-banner.jpg'),
-                        "author" => [
-                            "@type" => "Person",
-                            "name" => $blog->author->name ?? "MyCollegeVerse Editorial",
-                            "url" => url('/')
-                        ],
-                        "publisher" => [
-                            "@type" => "Organization",
-                            "name" => "MyCollegeVerse",
-                            "logo" => [
-                                "@type" => "ImageObject",
-                                "url" => asset('assets/mcv/mycollegeverse.png')
-                            ]
-                        ],
-                        "datePublished" => $blog->created_at->toIso8601String(),
-                        "dateModified" => $blog->updated_at->toIso8601String()
-                    ],
-                    [
-                        "@type" => "BreadcrumbList",
-                        "itemListElement" => [
-                            ["@type" => "ListItem", "position" => 1, "name" => "Editorial Hub", "item" => route('blog.index')],
-                            ["@type" => "ListItem", "position" => 2, "name" => $blog->category->name ?? 'News', "item" => route('blog.index', ['category' => $blog->category->slug ?? 'all'])],
-                            ["@type" => "ListItem", "position" => 3, "name" => $blog->title, "item" => url()->current()]
-                        ]
-                    ]
+                "@type" => "BlogPosting",
+                "headline" => $blog->title,
+                "description" => $seoDescription,
+                "author" => [
+                    "@type" => "Person",
+                    "name" => $blog->author->name ?? "MyCollegeVerse Editorial"
+                ],
+                "datePublished" => $blog->created_at->toIso8601String(),
+                "publisher" => [
+                    "@type" => "Organization",
+                    "name" => "MyCollegeVerse",
+                    "logo" => asset('images/logo.png')
                 ]
             ];
 

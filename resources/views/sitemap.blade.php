@@ -25,10 +25,6 @@
         <loc>{{ url('/jobs') }}</loc>
         <priority>0.8</priority>
     </url>
-    <url>
-        <loc>{{ url('/academic-hub') }}</loc>
-        <priority>0.9</priority>
-    </url>
 
     <!-- Faculty Nodes -->
     @foreach ($professors as $professor)
@@ -67,36 +63,6 @@
         <lastmod>{{ $blog->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
-    </url>
-    @endforeach
-
-    <!-- Academic Hub Manifests -->
-    @foreach ($guides as $guide)
-    <url>
-        <loc>{{ route('guides.show', $guide->slug) }}</loc>
-        <lastmod>{{ $guide->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.8</priority>
-    </url>
-    @endforeach
-
-    <!-- Career Nodes (Jobs) -->
-    @foreach ($jobs as $job)
-    <url>
-        <loc>{{ route('jobs.show', $job->id) }}</loc>
-        <lastmod>{{ $job->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-        <changefreq>daily</changefreq>
-        <priority>0.8</priority>
-    </url>
-    @endforeach
-
-    <!-- Static Identity Nodes (Pages) -->
-    @foreach ($pages as $page)
-    <url>
-        <loc>{{ route('pages.show', $page->slug) }}</loc>
-        <lastmod>{{ $page->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
     </url>
     @endforeach
 </urlset>

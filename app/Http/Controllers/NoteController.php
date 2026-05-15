@@ -121,25 +121,19 @@ class NoteController extends Controller
             "@context" => "https://schema.org",
             "@graph" => [
                 [
-                    "@type" => "Article",
-                    "@id" => url()->current() . "#article",
-                    "mainEntityOfPage" => ["@type" => "WebPage", "@id" => url()->current()],
+                    "@type" => "CreativeWork",
                     "educationalLevel" => "College",
                     "name" => $note->title,
-                    "headline" => $note->title,
                     "description" => $seoDescription,
-                    "image" => asset('mcv-seo-banner.jpg'),
-                    "author" => ["@type" => "Person", "name" => $note->user->name ?? "Verified Scholar"],
+                    "author" => ["@type" => "Person", "name" => $note->user->name],
                     "publisher" => [
                         "@type" => "Organization",
                         "name" => "MyCollegeVerse",
-                        "logo" => [
-                            "@type" => "ImageObject",
-                            "url" => asset('assets/mcv/mycollegeverse.png')
-                        ]
+                        "logo" => asset('images/logo.png')
                     ],
                     "datePublished" => $note->created_at->toIso8601String(),
                     "genre" => "Educational Notes",
+                    "interactivityType" => "informational",
                     "learningResourceType" => "Lecture Notes"
                 ],
                 [

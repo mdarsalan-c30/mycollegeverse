@@ -12,13 +12,6 @@
         <!-- Google Search Console Verification 🔎 -->
         <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
 
-        <!-- Open Graph / Auth Protocol -->
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="@yield('title', 'Join MyCollegeVerse | The Academic Multiverse')">
-        <meta property="og:description" content="@yield('meta_description', 'Enter the ultimate academic multiverse. Share notes, review professors, and join your campus verse.')">
-        <meta property="og:image" content="{{ asset('mcv-seo-banner.jpg') }}">
-
         <!-- Analytics Infrastructure 📡 -->
         <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':

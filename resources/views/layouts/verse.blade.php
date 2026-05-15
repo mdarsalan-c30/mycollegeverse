@@ -6,15 +6,6 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title', $title ?? config('app.name'))</title>
         <meta name="description" content="@yield('meta_description', 'Explore college campuses, verified notes, and faculty reviews in the MyCollegeVerse academic multiverse.')">
-        <link rel="canonical" href="{{ url()->current() }}" />
-        <meta name="google-site-verification" content="aAhlYLCkOzDk3VELTlux0gNO8eRUbas3N8I4sEayXaU" />
-
-        <!-- Open Graph / Campus Protocol -->
-        <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:title" content="@yield('title', $title ?? 'Campus Verse | MyCollegeVerse')">
-        <meta property="og:description" content="@yield('meta_description', 'Explore college campuses and academic resources.')">
-        <meta property="og:image" content="{{ asset('mcv-seo-banner.jpg') }}">
         @yield('meta')
         
         <!-- Analytics Infrastructure 📡 -->
