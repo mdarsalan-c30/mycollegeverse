@@ -45,6 +45,10 @@ class MockInterviewController extends Controller
             'model' => $request->model ?? 'saaras_v3',
         ]);
 
+        if ($response->failed()) {
+            return response()->json(['status' => 'error', 'message' => 'Sarvam STT Error: ' . $response->body()]);
+        }
+
         return $response->json();
     }
 
@@ -66,13 +70,13 @@ class MockInterviewController extends Controller
         If they answer well, acknowledge it briefly and move to a slightly harder question.
         If they answer poorly, guide them or ask a clarifying question.";
 
-        $messages = [
-            ['role' => 'system', 'content' => $systemPrompt]
-        ];
+        $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
         foreach($history as $h) {
-            $messages[] = ['role' => 'user', 'content' => $h['user']];
-            $messages[] = ['role' => 'assistant', 'content' => $h['ai']];
+            if (isset($h['user']) && isset($h['ai'])) {
+                $messages[] = ['role' => 'user', 'content' => $h['user']];
+                $messages[] = ['role' => 'assistant', 'content' => $h['ai']];
+            }
         }
 
         $messages[] = ['role' => 'user', 'content' => $request->message];
@@ -86,7 +90,11 @@ class MockInterviewController extends Controller
             'temperature' => 0.7
         ]);
 
-        $aiMessage = $response->json()['choices'][0]['message']['content'] ?? "Error in brain module.";
+        if ($response->failed()) {
+            return response()->json(['status' => 'error', 'message' => 'Groq API Error: ' . $response->body()]);
+        }
+
+        $aiMessage = $response->json()['choices'][0]['message']['content'] ?? "Error in brain module logic.";
 
         // Update history
         $history[] = ['user' => $request->message, 'ai' => $aiMessage, 'timestamp' => now()];
@@ -104,15 +112,19 @@ class MockInterviewController extends Controller
             'Content-Type' => 'application/json'
         ])->post($this->sarvamTtsUrl, [
             'inputs' => [$request->text],
-            'target_language_code' => 'hi-IN', // Defaulting to high-fidelity Hinglish/Hindi-English
-            'speaker' => 'meera', // Professional voice
+            'target_language_code' => 'hi-IN',
+            'speaker' => 'meera',
             'pitch' => 0,
-            'pace' => 1.1,
+            'pace' => 1.0,
             'loudness' => 1.5,
             'speech_sample_rate' => 22050,
             'enable_preprocessing' => true,
-            'model' => 'bulbul_v1'
+            'model' => 'bulbul_v3' // Upgraded to v3
         ]);
+
+        if ($response->failed()) {
+            return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
+        }
 
         return $response->json();
     }
