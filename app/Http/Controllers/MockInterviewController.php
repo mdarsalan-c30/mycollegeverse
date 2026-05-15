@@ -38,7 +38,7 @@ class MockInterviewController extends Controller
         $request->validate(['audio' => 'required|file', 'model' => 'nullable|string']);
 
         $response = Http::withHeaders([
-            'api-subscription-key' => env('SARVAM_API_KEY')
+            'api-subscription-key' => trim(config('services.sarvam.key'))
         ])->attach(
             'file', file_get_contents($request->file('audio')), 'audio.wav'
         )->post($this->sarvamSttUrl, [
@@ -82,7 +82,7 @@ class MockInterviewController extends Controller
         $messages[] = ['role' => 'user', 'content' => $request->message];
 
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . env('GROQ_API_KEY'),
+            'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
             'Content-Type' => 'application/json'
         ])->post($this->groqUrl, [
             'model' => 'llama3-70b-8192',
@@ -108,7 +108,7 @@ class MockInterviewController extends Controller
         $request->validate(['text' => 'required|string']);
 
         $response = Http::withHeaders([
-            'api-subscription-key' => env('SARVAM_API_KEY'),
+            'api-subscription-key' => trim(config('services.sarvam.key')),
             'Content-Type' => 'application/json'
         ])->post($this->sarvamTtsUrl, [
             'inputs' => [$request->text],
@@ -119,7 +119,7 @@ class MockInterviewController extends Controller
             'loudness' => 1.5,
             'speech_sample_rate' => 22050,
             'enable_preprocessing' => true,
-            'model' => 'bulbul_v3' // Upgraded to v3
+            'model' => 'bulbul_v3'
         ]);
 
         if ($response->failed()) {
