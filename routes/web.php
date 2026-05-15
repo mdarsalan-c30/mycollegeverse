@@ -44,6 +44,10 @@ Route::middleware('auth')->group(function() {
     Route::post('/api/notifications/mark-all-read', [App\Http\Controllers\NotificationController::class, 'markAllRead'])->name('notifications.mark-all-read');
 });
 
+// Production Deployment Node 🛰️
+Route::get('/deploy/sync/{secret}', [App\Http\Controllers\DeployController::class, 'sync']);
+Route::get('/deploy/clear/{secret}', [App\Http\Controllers\DeployController::class, 'clearCache']);
+
 Route::get('/multiverse-note-slug-sync', function() {
     try {
         $notes = \App\Models\Note::whereNull('slug')->get();

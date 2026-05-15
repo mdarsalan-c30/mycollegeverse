@@ -13,7 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // Path Alignment for Hostinger Shared Hosting 🛰️
+        $this->app->bind('path.public', function() {
+            return base_path('public_html');
+        });
     }
 
     /**

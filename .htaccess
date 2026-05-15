@@ -2,5 +2,5 @@
     RewriteEngine On
     
     # Bridge Traffic to Public Node 🛰️
-    RewriteRule ^(.*)$ public/$1 [L]
+    RewriteRule ^(.*)$ public_html/$1 [L]
 </IfModule>
