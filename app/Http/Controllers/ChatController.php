@@ -11,7 +11,11 @@ class ChatController extends Controller
 {
     public function index(User $user = null)
     {
-        $users = User::where('id', '!=', Auth::id())->get();
+        $users = User::where('id', '!=', Auth::id())
+            ->withCount(['receivedMessages as unread_count' => function($query) {
+                $query->where('receiver_id', Auth::id())->where('is_read', false);
+            }])
+            ->get();
         // If no user is provided, default to the first available contact
         $receiver = $user && $user->id ? $user : $users->first();
         

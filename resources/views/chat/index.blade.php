@@ -43,7 +43,14 @@
                             <span class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></span>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-xs font-extrabold text-slate-800 truncate">{{ $user->name }}</p>
+                            <div class="flex justify-between items-center">
+                                <p class="text-xs font-extrabold text-slate-800 truncate">{{ $user->name }}</p>
+                                @if($user->unread_count > 0)
+                                    <span class="bg-rose-500 text-white text-[8px] font-black px-1.5 py-0.5 rounded-full animate-bounce shadow-sm">
+                                        {{ $user->unread_count }}
+                                    </span>
+                                @endif
+                            </div>
                             <div class="flex items-center gap-1.5 mt-1">
                                 <span class="px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-tighter {{ $user->role === 'recruiter' ? 'bg-slate-900 text-white' : 'bg-primary/10 text-primary' }}">
                                     {{ $user->role === 'recruiter' ? 'Recruiter' : 'Student' }}
@@ -94,9 +101,12 @@
                 @foreach($messages as $msg)
                     <div class="flex gap-3 items-end {{ $msg->sender_id == Auth::id() ? 'justify-end' : '' }}">
                         @if($msg->sender_id != Auth::id())
-                        <a href="{{ route('profile.show', $receiver->username) }}" class="flex-shrink-0">
-                            <img src="https://ui-avatars.com/api/?name={{ urlencode($receiver->name) }}&background=random" class="w-6 h-6 rounded-lg hover:ring-2 ring-primary/20 transition-all"/>
-                        </a>
+                        <div class="flex flex-col items-center gap-1">
+                            <a href="{{ route('profile.show', $receiver->username) }}" class="flex-shrink-0">
+                                <img src="https://ui-avatars.com/api/?name={{ urlencode($receiver->name) }}&background=random" class="w-6 h-6 rounded-lg hover:ring-2 ring-primary/20 transition-all"/>
+                            </a>
+                            <span class="text-[7px] font-black text-slate-400 uppercase tracking-tighter">{{ explode(' ', $receiver->name)[0] }}</span>
+                        </div>
                         @endif
                         <div class="max-w-[75%] md:max-w-md {{ $msg->sender_id == Auth::id() ? 'bg-primary text-white rounded-br-none' : 'bg-white text-slate-700 rounded-bl-none' }} px-4 py-3 rounded-2xl shadow-sm text-xs font-medium leading-relaxed">
                             {!! \App\Helpers\ChatFormatter::format($msg->message) !!}
@@ -216,12 +226,18 @@
                 const res = await fetch(`/chat/fetch/{{ $receiver->username ?? '' }}`);
                 const data = await res.json();
                 
+                const receiverName = '{{ $receiver->name ?? 'Contact' }}';
+                const receiverAvatar = 'https://ui-avatars.com/api/?name={{ urlencode($receiver->name ?? '') }}&background=random';
+
                 chatMessages.innerHTML = data.map(msg => {
                     const isMine = msg.sender_id == {{ Auth::id() }};
                     const hasImage = msg.type === 'image' && msg.image_path;
 
                     const avatarHtml = !isMine
-                        ? `<a href="/profile/{{ $receiver->username ?? '' }}"><img src="{{ $receiver->profile_photo_url }}" class="w-6 h-6 rounded-lg shadow-sm border border-white flex-shrink-0"/></a>`
+                        ? `<div class="flex flex-col items-center gap-1">
+                                <a href="/profile/{{ $receiver->username ?? '' }}"><img src="${receiverAvatar}" class="w-6 h-6 rounded-lg shadow-sm border border-white flex-shrink-0"/></a>
+                                <span class="text-[7px] font-black text-slate-400 uppercase tracking-tighter">${receiverName.split(' ')[0]}</span>
+                           </div>`
                         : '';
 
                     const imageHtml = hasImage
