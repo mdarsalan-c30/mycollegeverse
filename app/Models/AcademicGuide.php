@@ -61,6 +61,14 @@ class AcademicGuide extends Model
     }
 
     /**
+     * Scope for published guides
+     */
+    public function scopePublished($query)
+    {
+        return $query->where('is_published', true);
+    }
+
+    /**
      * Determine if the guide is a digital manuscript 🛰️
      */
     public function isDigital()
