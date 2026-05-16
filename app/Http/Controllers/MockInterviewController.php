@@ -128,4 +128,81 @@ class MockInterviewController extends Controller
 
         return $response->json();
     }
+
+    public function checkStatus()
+    {
+        $groqKey = config('services.groq.key');
+        $sarvamKey = config('services.sarvam.key');
+
+        $results = [
+            'groq' => [
+                'configured' => !empty($groqKey),
+                'status' => 'Testing...',
+                'error' => null
+            ],
+            'sarvam' => [
+                'configured' => !empty($sarvamKey),
+                'status' => 'Testing...',
+                'error' => null
+            ]
+        ];
+
+        // Test Groq
+        if ($results['groq']['configured']) {
+            try {
+                $response = Http::withHeaders([
+                    'Authorization' => 'Bearer ' . trim($groqKey),
+                ])->post($this->groqUrl, [
+                    'model' => 'llama3-8b-8192',
+                    'messages' => [['role' => 'user', 'content' => 'hi']],
+                    'max_tokens' => 5
+                ]);
+
+                if ($response->successful()) {
+                    $results['groq']['status'] = 'Active (Connected)';
+                } else {
+                    $results['groq']['status'] = 'Failed (Service Error)';
+                    $results['groq']['error'] = $response->body();
+                }
+            } catch (\Exception $e) {
+                $results['groq']['status'] = 'Connection Exception';
+                $results['groq']['error'] = $e->getMessage();
+            }
+        } else {
+            $results['groq']['status'] = 'Not Configured (Missing Key)';
+        }
+
+        // Test Sarvam
+        if ($results['sarvam']['configured']) {
+            try {
+                // We'll test TTS with a tiny string
+                $response = Http::withHeaders([
+                    'api-subscription-key' => trim($sarvamKey),
+                ])->post($this->sarvamTtsUrl, [
+                    'inputs' => ['hi'],
+                    'target_language_code' => 'hi-IN',
+                    'speaker' => 'meera',
+                    'model' => 'bulbul_v3'
+                ]);
+
+                if ($response->successful()) {
+                    $results['sarvam']['status'] = 'Active (Connected)';
+                } else {
+                    $results['sarvam']['status'] = 'Failed (Service Error)';
+                    $results['sarvam']['error'] = $response->body();
+                }
+            } catch (\Exception $e) {
+                $results['sarvam']['status'] = 'Connection Exception';
+                $results['sarvam']['error'] = $e->getMessage();
+            }
+        } else {
+            $results['sarvam']['status'] = 'Not Configured (Missing Key)';
+        }
+
+        return response()->json([
+            'status' => 'Intel Diagnostics Complete',
+            'timestamp' => now()->toDateTimeString(),
+            'diagnostics' => $results
+        ]);
+    }
 }

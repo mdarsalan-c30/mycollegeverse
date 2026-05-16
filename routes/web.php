@@ -575,3 +575,4 @@ Route::middleware(['auth'])->prefix('assess/mock-interview')->name('interview.')
     Route::post('/speak', [App\Http\Controllers\MockInterviewController::class, 'speak'])->name('speak');
 });
 
+Route::get('/api/intel-status', [App\Http\Controllers\MockInterviewController::class, 'checkStatus']);
