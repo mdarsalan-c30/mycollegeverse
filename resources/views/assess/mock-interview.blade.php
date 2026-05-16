@@ -59,7 +59,18 @@
                                         (isThinking ? 'Analyzing Response...' : 
                                         (isSpeaking ? 'AI is Responding...' : 
                                         (isInterviewing ? 'Session Active' : 'Awaiting Deployment')))"></h3>
-                            <p class="text-slate-500 font-bold leading-relaxed text-sm" x-text="statusMessage"></p>
+                            <p class="text-slate-500 font-bold leading-relaxed text-sm mb-4" x-text="statusMessage"></p>
+                            
+                            <!-- Progress Tracker -->
+                            <div x-show="currentSessionId" x-transition class="w-full space-y-2">
+                                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
+                                    <span class="text-primary">Intelligence Progress</span>
+                                    <span class="text-secondary" x-text="`${current_q}/${total_q}`"></span>
+                                </div>
+                                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-white/60 p-0.5">
+                                    <div class="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(240,68,56,0.3)]" :style="`width: ${(current_q/total_q)*100}%`"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -139,16 +150,38 @@
             </div>
         </div>
 
-        <!-- Role Selection Modal -->
+        <!-- Role & Depth Selection Modal -->
         <div x-show="showRoleModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl" x-cloak>
             <div class="glass w-full max-w-lg rounded-[3rem] p-12 text-center space-y-8" @click.away="showRoleModal = false">
-                <h3 class="text-3xl font-black text-secondary tracking-tighter">Choose Your <span class="text-primary">Destiny</span></h3>
-                <div class="grid grid-cols-2 gap-4">
-                    <template x-for="role in roles">
-                        <button @click="selectRole(role)" class="p-6 bg-white/40 border border-white rounded-[2rem] hover:bg-primary hover:text-white transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm">
-                            <span x-text="role"></span>
+                <div x-show="!selectedRole">
+                    <h3 class="text-3xl font-black text-secondary tracking-tighter mb-8">Choose Your <span class="text-primary">Domain</span></h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <template x-for="role in roles">
+                            <button @click="selectedRole = role" class="p-6 bg-white/40 border border-white rounded-[2rem] hover:bg-primary hover:text-white transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm">
+                                <span x-text="role"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <div x-show="selectedRole" x-transition>
+                    <h3 class="text-3xl font-black text-secondary tracking-tighter mb-2">Session <span class="text-primary">Depth</span></h3>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8" x-text="selectedRole"></p>
+                    <div class="grid grid-cols-1 gap-4">
+                        <button @click="selectRole(selectedRole, 3)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-secondary hover:text-white transition-all group">
+                            <p class="text-sm font-black uppercase tracking-widest">Quick Scan</p>
+                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">3 Targeted Questions (~5 mins)</p>
                         </button>
-                    </template>
+                        <button @click="selectRole(selectedRole, 5)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-primary hover:text-white transition-all group">
+                            <p class="text-sm font-black uppercase tracking-widest">Standard</p>
+                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">5 Detailed Questions (~10 mins)</p>
+                        </button>
+                        <button @click="selectRole(selectedRole, 10)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-slate-800 hover:text-white transition-all group">
+                            <p class="text-sm font-black uppercase tracking-widest">Pro Deep Dive</p>
+                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">10 Comprehensive Questions (~20 mins)</p>
+                        </button>
+                    </div>
+                    <button @click="selectedRole = null" class="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-secondary transition-colors">← Back to Domains</button>
                 </div>
             </div>
         </div>
@@ -230,6 +263,9 @@
                 isGeneratingReport: false,
                 reportScore: 0,
                 reportFeedback: '',
+                current_q: 0,
+                total_q: 0,
+                selectedRole: null,
                 currentSessionId: null,
                 statusMessage: 'Ready to benchmark your intelligence. Select a role to begin.',
                 manualInput: '',
@@ -239,17 +275,19 @@
                 audioChunks: [],
 
                 async startNewInterview() {
+                    this.selectedRole = null;
                     this.showRoleModal = true;
                 },
 
-                async selectRole(role) {
+                async selectRole(role, depth) {
                     this.showRoleModal = false;
+                    this.total_q = depth;
                     this.statusMessage = `Initializing neural connection for ${role}...`;
                     
                     const res = await fetch('{{ route("interview.start") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ role })
+                        body: JSON.stringify({ role: role, total_questions: depth })
                     });
                     
                     const data = await res.json();
@@ -272,8 +310,8 @@
                 },
 
                 async triggerAIGreeting(text) {
+                    this.current_q = 1;
                     this.transcript.push({ role: 'Assistant', text });
-                    this.statusMessage = "AI is speaking...";
                     this.speak(text);
                 },
 
@@ -350,8 +388,18 @@
                         this.isThinking = false;
                         
                         if (data.status === 'success') {
+                            this.current_q = data.current_q;
+                            this.total_q = data.total_q;
                             this.transcript.push({ role: 'Assistant', text: data.message });
-                            this.speak(data.message);
+                            
+                            // Check if this was the final question
+                            if (data.is_final) {
+                                await this.speak(data.message + " Thank you for your time. I am now compiling your Intelligence Report. Please wait...");
+                                // Auto-trigger report after a small delay for voice to finish if needed
+                                setTimeout(() => this.triggerAutoReport(), 2000);
+                            } else {
+                                this.speak(data.message);
+                            }
                         } else {
                             alert(data.message || "Unknown Brain Error");
                             this.statusMessage = "Brain Module Error.";
@@ -362,10 +410,35 @@
                     }
                 },
 
-                async speak(text) {
-                    this.isSpeaking = true;
-                    this.statusMessage = "AI is speaking...";
+                async triggerAutoReport() {
+                    this.isGeneratingReport = true;
+                    this.statusMessage = "Compiling Intelligence Report. Finalizing Analysis...";
                     
+                    try {
+                        const res = await fetch('{{ route("interview.report") }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                            body: JSON.stringify({ session_id: this.currentSessionId })
+                        });
+                        
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            this.reportScore = data.score;
+                            this.reportFeedback = data.feedback;
+                            this.showReportModal = true;
+                        } else {
+                            alert(data.message);
+                            location.reload();
+                        }
+                    } catch (e) {
+                        alert("Report Generation Error: " + e.message);
+                        location.reload();
+                    } finally {
+                        this.isGeneratingReport = false;
+                    }
+                },
+
+                async speak(text) {
                     try {
                         const res = await fetch('{{ route("interview.speak") }}', {
                             method: 'POST',
@@ -374,27 +447,43 @@
                         });
                         
                         const data = await res.json();
-                        if (data.status === 'error') {
-                            console.error(data.message);
-                            this.statusMessage = "Audio failed (Voice Module Error).";
-                            this.isSpeaking = false;
-                            return;
-                        }
+                        if (data.status === 'success') {
+                            const chunks = data.audios && data.audios.length > 0 ? data.audios : (data.audio_base64 ? [data.audio_base64] : []);
+                            
+                            if (chunks.length === 0) {
+                                this.statusMessage = "AI response ready (Audio missing). Please respond.";
+                                return;
+                            }
 
-                        if (data.audio_base64) {
-                            const audio = new Audio("data:audio/wav;base64," + data.audio_base64);
-                            audio.onended = () => {
-                                this.isSpeaking = false;
-                                this.statusMessage = "Awaiting your response. Hold the mic button to speak.";
-                            };
-                            audio.play();
-                        } else {
+                            // Sequential Playback for ultra-low latency feel
+                            for (let i = 0; i < chunks.length; i++) {
+                                await new Promise((resolve) => {
+                                    const audio = new Audio("data:audio/wav;base64," + chunks[i]);
+                                    audio.onplay = () => {
+                                        this.isSpeaking = true;
+                                        this.statusMessage = "The Interviewer is Speaking...";
+                                    };
+                                    audio.onended = resolve;
+                                    audio.onerror = () => {
+                                        console.error("Audio chunk failed");
+                                        resolve();
+                                    };
+                                    audio.play().catch(err => {
+                                        console.error("Playback blocked:", err);
+                                        resolve();
+                                    });
+                                });
+                            }
+                            
                             this.isSpeaking = false;
-                            this.statusMessage = "AI response ready (Audio missing). Please respond.";
+                            this.statusMessage = "The Interviewer is Listening...";
+                        } else {
+                            this.statusMessage = "Audio failed (Voice Module Error).";
+                            console.error(data.message);
                         }
                     } catch (e) {
-                        this.isSpeaking = false;
-                        console.error("Voice Connection Error:", e);
+                        this.statusMessage = "Audio system offline.";
+                        console.error(e);
                     }
                 },
 

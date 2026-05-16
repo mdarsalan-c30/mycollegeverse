@@ -22,12 +22,16 @@ class MockInterviewController extends Controller
 
     public function start(Request $request)
     {
-        $request->validate(['role' => 'required|string']);
+        $request->validate([
+            'role' => 'required|string',
+            'total_questions' => 'nullable|integer|min:3|max:20'
+        ]);
 
         $session = InterviewSession::create([
             'user_id' => Auth::id(),
             'role' => $request->role,
             'transcript' => [],
+            'total_questions' => $request->total_questions ?? 5,
             'status' => 'active'
         ]);
 
@@ -106,9 +110,21 @@ class MockInterviewController extends Controller
 
         // Update history
         $history[] = ['user' => $request->message, 'ai' => $aiMessage, 'timestamp' => now()];
-        $session->update(['transcript' => $history]);
+        
+        $session->update([
+            'transcript' => $history,
+            'current_question_count' => $session->current_question_count + 1
+        ]);
 
-        return response()->json(['status' => 'success', 'message' => $aiMessage]);
+        $isFinal = ($session->current_question_count >= $session->total_questions);
+
+        return response()->json([
+            'status' => 'success', 
+            'message' => $aiMessage,
+            'is_final' => $isFinal,
+            'current_q' => $session->current_question_count,
+            'total_q' => $session->total_questions
+        ]);
     }
 
     public function speak(Request $request)
@@ -130,13 +146,11 @@ class MockInterviewController extends Controller
         }
 
         $data = $response->json();
-        // Sarvam bulbul:v3 often returns 'audios' array
-        $audio = $data['audio_base64'] ?? ($data['audios'][0] ?? null);
-
+        
         return response()->json([
             'status' => 'success',
-            'audio_base64' => $audio,
-            'raw_debug' => $data // Temporary debug node
+            'audio_base64' => $data['audio_base64'] ?? null,
+            'audios' => $data['audios'] ?? []
         ]);
     }
 

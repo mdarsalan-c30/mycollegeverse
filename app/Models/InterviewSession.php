@@ -9,7 +9,7 @@ class InterviewSession extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'role', 'transcript', 'score', 'feedback', 'status'];
+    protected $fillable = ['user_id', 'role', 'transcript', 'score', 'feedback', 'status', 'total_questions', 'current_question_count'];
 
     protected $casts = [
         'transcript' => 'array',
