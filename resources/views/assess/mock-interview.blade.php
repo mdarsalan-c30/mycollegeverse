@@ -156,38 +156,16 @@
             </div>
         </div>
 
-        <!-- Role & Depth Selection Modal -->
+        <!-- Role Selection Modal -->
         <div x-show="showRoleModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl" x-cloak>
             <div class="glass w-full max-w-lg rounded-[3rem] p-12 text-center space-y-8" @click.away="showRoleModal = false">
-                <div x-show="!selectedRole">
-                    <h3 class="text-3xl font-black text-secondary tracking-tighter mb-8">Choose Your <span class="text-primary">Domain</span></h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <template x-for="role in roles">
-                            <button @click="selectedRole = role" class="p-6 bg-white/40 border border-white rounded-[2rem] hover:bg-primary hover:text-white transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm">
-                                <span x-text="role"></span>
-                            </button>
-                        </template>
-                    </div>
-                </div>
-
-                <div x-show="selectedRole" x-transition>
-                    <h3 class="text-3xl font-black text-secondary tracking-tighter mb-2">Session <span class="text-primary">Depth</span></h3>
-                    <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-8" x-text="selectedRole"></p>
-                    <div class="grid grid-cols-1 gap-4">
-                        <button @click="selectRole(selectedRole, 3)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-secondary hover:text-white transition-all group">
-                            <p class="text-sm font-black uppercase tracking-widest">Quick Scan</p>
-                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">3 Targeted Questions (~5 mins)</p>
+                <h3 class="text-3xl font-black text-secondary tracking-tighter mb-8">Choose Your <span class="text-primary">Domain</span></h3>
+                <div class="grid grid-cols-2 gap-4">
+                    <template x-for="role in roles">
+                        <button @click="selectRole(role)" class="p-6 bg-white/40 border border-white rounded-[2rem] hover:bg-primary hover:text-white transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm">
+                            <span x-text="role"></span>
                         </button>
-                        <button @click="selectRole(selectedRole, 5)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-primary hover:text-white transition-all group">
-                            <p class="text-sm font-black uppercase tracking-widest">Standard</p>
-                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">5 Detailed Questions (~10 mins)</p>
-                        </button>
-                        <button @click="selectRole(selectedRole, 10)" class="p-6 bg-white/40 border border-white rounded-3xl hover:bg-slate-800 hover:text-white transition-all group">
-                            <p class="text-sm font-black uppercase tracking-widest">Pro Deep Dive</p>
-                            <p class="text-[10px] font-bold text-slate-500 group-hover:text-white/70">10 Comprehensive Questions (~20 mins)</p>
-                        </button>
-                    </div>
-                    <button @click="selectedRole = null" class="mt-6 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-secondary transition-colors">← Back to Domains</button>
+                    </template>
                 </div>
             </div>
         </div>

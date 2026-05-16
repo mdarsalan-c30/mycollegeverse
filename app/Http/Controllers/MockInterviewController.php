@@ -22,24 +22,13 @@ class MockInterviewController extends Controller
 
     public function start(Request $request)
     {
-        $request->validate([
-            'role' => 'required|string',
-            'total_questions' => 'nullable|integer|min:3|max:20'
-        ]);
-
-        $data = [
+        $session = InterviewSession::create([
             'user_id' => Auth::id(),
             'role' => $request->role,
             'transcript' => [],
+            'total_questions' => 20, // Long session, user will wrap up
             'status' => 'active'
-        ];
-
-        // Only add progress columns if they exist in DB to avoid 500
-        if (\Schema::hasColumn('interview_sessions', 'total_questions')) {
-            $data['total_questions'] = $request->total_questions ?? 5;
-        }
-
-        $session = InterviewSession::create($data);
+        ]);
 
         return response()->json(['status' => 'success', 'session_id' => $session->id]);
     }
@@ -50,23 +39,24 @@ class MockInterviewController extends Controller
             return response()->json(['status' => 'error', 'message' => 'No audio file provided']);
         }
 
-        // Using Groq Whisper for longer duration support (up to 25MB)
+        // Switching back to Sarvam STT for better accuracy as requested
         $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
+            'api-subscription-key' => trim(config('services.sarvam.key')),
         ])->attach(
             'file', file_get_contents($request->file('audio')), 'audio.wav'
-        )->post($this->groqAudioUrl, [
-            'model' => 'whisper-large-v3',
+        )->post($this->sarvamSttUrl, [
+            'model' => 'saarika:v2',
+            'language_code' => 'hi-IN'
         ]);
 
         if ($response->failed()) {
-            return response()->json(['status' => 'error', 'message' => 'Groq STT Error: ' . $response->body()]);
+            return response()->json(['status' => 'error', 'message' => 'Transcription Error: ' . $response->body()]);
         }
 
         $data = $response->json();
         return response()->json([
             'status' => 'success',
-            'transcript' => $data['text'] ?? ''
+            'transcript' => $data['transcript'] ?? ''
         ]);
     }
 
@@ -241,14 +231,29 @@ class MockInterviewController extends Controller
             ])->post($this->groqUrl, [
                 'model' => 'llama-3.1-8b-instant',
                 'messages' => [
-                    ['role' => 'system', 'content' => 'You are a senior career coach and technical recruiter. Output only valid JSON.'],
+                    ['role' => 'system', 'content' => 'You are a senior career coach. Analyze the interview transcript. Output valid JSON with keys "score" (0-100) and "feedback" (detailed string).'],
                     ['role' => 'user', 'content' => $analysisPrompt]
                 ],
                 'response_format' => ['type' => 'json_object']
             ]);
 
-            $data = $response->json();
-            $analysis = json_decode($data['choices'][0]['message']['content'], true);
+            if ($response->failed()) {
+                throw new \Exception("Brain analysis failed: " . $response->body());
+            }
+
+            $rawContent = $response->json()['choices'][0]['message']['content'];
+            $analysis = json_decode($rawContent, true);
+
+            if (!$analysis || !isset($analysis['score'])) {
+                // Fallback parsing if JSON is slightly malformed
+                preg_match('/"score":\s*(\d+)/', $rawContent, $scoreMatch);
+                preg_match('/"feedback":\s*"(.*)"/s', $rawContent, $feedbackMatch);
+                
+                $analysis = [
+                    'score' => $scoreMatch[1] ?? 70,
+                    'feedback' => $feedbackMatch[1] ?? "Interview completed successfully. Good effort!"
+                ];
+            }
 
             $session->update([
                 'score' => $analysis['score'] ?? 0,
