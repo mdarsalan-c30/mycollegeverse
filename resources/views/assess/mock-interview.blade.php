@@ -298,7 +298,10 @@
                     this.statusMessage = "Recording your response...";
                     
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    const options = { mimeType: 'audio/webm;codecs=opus' };
+                    const options = { 
+                        mimeType: 'audio/webm;codecs=opus',
+                        audioBitsPerSecond: 128000 
+                    };
                     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
                         console.warn('Opus not supported, falling back to default');
                         delete options.mimeType;
@@ -320,8 +323,10 @@
                     this.mediaRecorder.onstop = async () => {
                         this.statusMessage = "Transcribing speech...";
                         const audioBlob = new Blob(this.audioChunks, { type: this.mediaRecorder.mimeType });
+                        const lastAiMsg = this.transcript.filter(e => e.role === 'Assistant').pop()?.text || "";
                         const formData = new FormData();
                         formData.append('audio', audioBlob);
+                        formData.append('context', lastAiMsg);
                         formData.append('_token', '{{ csrf_token() }}');
 
                         const res = await fetch('{{ route("interview.transcribe") }}', {

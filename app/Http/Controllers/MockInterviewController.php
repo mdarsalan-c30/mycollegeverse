@@ -41,12 +41,16 @@ class MockInterviewController extends Controller
         }
 
         // Using Groq Whisper for longer duration support (up to 25MB)
+        // Adding a technical prompt to help recognize tech jargon better
         $response = Http::withHeaders([
             'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
         ])->attach(
-            'file', file_get_contents($request->file('audio')), 'audio.wav'
+            'file', file_get_contents($request->file('audio')->getRealPath()), 'interview.webm'
         )->post($this->groqAudioUrl, [
             'model' => 'whisper-large-v3',
+            'response_format' => 'json',
+            'language' => 'en', // Biasing towards English for professional context
+            'prompt' => 'Technical job interview. Context: ' . ($request->context ?? 'Interview about web development, PHP, Laravel, UI/UX.')
         ]);
 
         if ($response->failed()) {
