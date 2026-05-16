@@ -273,15 +273,16 @@
                     }
                 },
 
-                async selectRole(role, depth) {
+                async selectRole(role) {
                     this.showRoleModal = false;
-                    this.total_q = depth;
+                    this.total_q = 20; // Default long session
+                    this.current_q = 0;
                     this.statusMessage = `Initializing neural connection for ${role}...`;
                     
                     const res = await fetch('{{ route("interview.start") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ role: role, total_questions: depth })
+                        body: JSON.stringify({ role: role })
                     });
                     
                     const data = await res.json();
