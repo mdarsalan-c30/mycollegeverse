@@ -35,7 +35,7 @@
                     <div class="flex-1 flex flex-col items-center justify-center p-12 text-center">
                         <div class="relative mb-12">
                             <!-- Outer Pulse -->
-                            <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150 opacity-20" :class="isThinking || isSpeaking ? 'opacity-40' : 'hidden'"></div>
+                            <div class="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-150 opacity-20" :class="isThinking || isSpeaking || isListening ? 'opacity-40' : 'hidden'"></div>
                             
                             <!-- Main Core -->
                             <div class="w-48 h-48 bg-gradient-to-br from-primary via-indigo-600 to-purple-600 rounded-full flex items-center justify-center shadow-2xl relative z-10 overflow-hidden group">
@@ -54,7 +54,11 @@
                         </div>
 
                         <div class="space-y-6 max-w-md">
-                            <h3 class="text-2xl font-black text-secondary uppercase tracking-tight" x-text="isInterviewing ? 'The Interviewer is Listening...' : 'Awaiting Deployment'"></h3>
+                            <h3 class="text-2xl font-black text-secondary uppercase tracking-tight" 
+                                x-text="isListening ? 'Interviewer is Listening...' : 
+                                        (isThinking ? 'Analyzing Response...' : 
+                                        (isSpeaking ? 'AI is Responding...' : 
+                                        (isInterviewing ? 'Session Active' : 'Awaiting Deployment')))"></h3>
                             <p class="text-slate-500 font-bold leading-relaxed text-sm" x-text="statusMessage"></p>
                         </div>
                     </div>
@@ -86,11 +90,11 @@
 
                             <div class="flex gap-4">
                                 <button x-show="isInterviewing && !isThinking && !isSpeaking" 
-                                        @mousedown="startListening()" 
-                                        @mouseup="stopListening()"
-                                        class="flex-shrink-0 group flex items-center gap-3 px-8 py-4 bg-primary text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                                    <span x-text="isListening ? 'Release to Send' : 'Hold to Speak'"></span>
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
+                                        @click="toggleMic()"
+                                        :class="isListening ? 'bg-rose-500 shadow-rose-500/20' : 'bg-primary shadow-primary/20'"
+                                        class="flex-shrink-0 group flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">
+                                    <span x-text="isListening ? 'Stop & Send' : 'Start Speaking'"></span>
+                                    <svg class="w-4 h-4" :class="isListening ? 'animate-pulse' : ''" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
                                 </button>
                             </div>
                         </div>
@@ -222,6 +226,14 @@
                     this.transcript.push({ role: 'Assistant', text });
                     this.statusMessage = "AI is speaking...";
                     this.speak(text);
+                },
+
+                toggleMic() {
+                    if (this.isListening) {
+                        this.stopListening();
+                    } else {
+                        this.startListening();
+                    }
                 },
 
                 async startListening() {
