@@ -434,7 +434,7 @@
                 </header>
 
                 <!-- Page Content -->
-                <main class="flex-1 overflow-y-auto px-8 py-8 md:pb-8 pb-32 page-fade-in">
+                <main class="flex-1 overflow-y-auto px-4 md:px-8 py-8 md:pb-8 pb-32 page-fade-in">
                     @if(session('success'))
                     <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" class="fixed top-28 right-8 z-[100] glass px-6 py-4 rounded-2xl border-green-500/30 shadow-xl flex items-center gap-4 animate-bounce-subtle">
                         <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">

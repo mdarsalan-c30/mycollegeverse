@@ -54,8 +54,8 @@
             <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-[10rem] -mr-32 -mt-32"></div>
 
             <!-- Hero Header -->
-            <div class="px-8 md:px-20 pt-20 pb-16 relative">
-                <div class="flex items-center gap-4 mb-8">
+            <div class="px-5 md:px-20 pt-16 md:pt-20 pb-12 md:pb-16 relative">
+                <div class="flex items-center gap-4 mb-6 md:mb-8">
                     <span class="px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-full ring-1 ring-primary/20">
                         {{ $guide->category }}
                     </span>
@@ -105,9 +105,9 @@
 
             <!-- PDF Interactive Hub (If exists) -->
             @if($guide->file_path)
-            <div class="mx-8 md:mx-20 mb-12 space-y-6">
+            <div class="mx-5 md:mx-20 mb-12 space-y-6">
                 <!-- PDF Viewer Node -->
-                <div class="glass rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
+                <div class="glass rounded-[2rem] md:rounded-[3rem] overflow-hidden border border-slate-100 shadow-xl aspect-[4/5] md:aspect-video relative group">
                     @php
                         $pdfUrl = $guide->file_path;
                         if (\Illuminate\Support\Str::contains($pdfUrl, 'http')) {
@@ -146,10 +146,10 @@
             @endif
 
             <!-- Content Area / Digital Manuscript Manifestation ⚡ -->
-            <div class="px-8 md:px-20 py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
+            <div class="px-5 md:px-20 py-12 md:py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
                 
                 <!-- View Mode Switcher Node 🛰️ -->
-                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl w-fit mb-12 border border-slate-200">
+                <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl w-fit mb-8 md:mb-12 border border-slate-200">
                     <button @click="viewMode = 'prose'" 
                             :class="viewMode === 'prose' ? 'bg-white shadow-sm text-primary' : 'text-slate-400 hover:text-slate-600'" 
                             class="px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
@@ -239,11 +239,10 @@
             try {
                 let element;
                 @if($guide->hasFullHtml())
-                    const frame = document.getElementById('manuscript-frame');
-                    const frameDoc = frame.contentDocument || frame.contentWindow.document;
-                    element = frameDoc.body.cloneNode(true);
-                    const styles = frameDoc.querySelectorAll('style, link[rel="stylesheet"]');
-                    styles.forEach(s => element.prepend(s.cloneNode(true)));
+                    // Fix: Avoid cross-origin iframe document access error 🛰️
+                    const contentDiv = document.createElement('div');
+                    contentDiv.innerHTML = `{!! addslashes($guide->content) !!}`;
+                    element = contentDiv;
                 @else
                     element = document.querySelector('.guide-content').cloneNode(true);
                 @endif

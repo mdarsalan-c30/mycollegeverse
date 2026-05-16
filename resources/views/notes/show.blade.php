@@ -46,8 +46,8 @@
                         </div>
 
                         <!-- Standard Prose View -->
-                        <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="p-8 md:p-12 bg-white/60">
-                            <div class="flex items-center gap-3 mb-8 pb-6 border-b border-slate-100">
+                        <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="p-5 md:p-12 bg-white/60">
+                            <div class="flex items-center gap-3 mb-6 md:mb-8 pb-6 border-b border-slate-100">
                                 @if($note->isAiGenerated())
                                     <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
                                         🤖 AI Manifest
@@ -206,14 +206,10 @@
                                         try {
                                             let element;
                                             @if($note->hasFullHtml())
-                                                // High-Fidelity Iframe Content Extraction
-                                                const frame = document.getElementById('manuscript-frame');
-                                                const frameDoc = frame.contentDocument || frame.contentWindow.document;
-                                                element = frameDoc.body.cloneNode(true);
-                                                
-                                                // Resolve Internal Styles 🛰️
-                                                const styles = frameDoc.querySelectorAll('style, link[rel="stylesheet"]');
-                                                styles.forEach(s => element.prepend(s.cloneNode(true)));
+                                                // Fix: Avoid cross-origin iframe document access error 🛰️
+                                                const contentDiv = document.createElement('div');
+                                                contentDiv.innerHTML = `{!! addslashes($note->ai_content) !!}`;
+                                                element = contentDiv;
                                             @else
                                                 // Standard Prose Container
                                                 element = document.querySelector('.ai-notes-display').cloneNode(true);
