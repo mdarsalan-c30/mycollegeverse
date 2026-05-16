@@ -151,27 +151,52 @@ class MockInterviewController extends Controller
     public function speak(Request $request)
     {
         $request->validate(['text' => 'required|string']);
+        $text = $request->text;
 
-        $response = Http::withHeaders([
-            'api-subscription-key' => trim(config('services.sarvam.key')),
-            'Content-Type' => 'application/json'
-        ])->post($this->sarvamTtsUrl, [
-            'inputs' => [$request->text],
-            'target_language_code' => 'hi-IN',
-            'speaker' => 'ritu',
-            'model' => 'bulbul:v3'
-        ]);
+        // Sarvam Bulbul:v3 has a 500 char limit. We must split by sentence.
+        $sentences = preg_split('/(?<=[.?!])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $chunks = [];
+        $currentChunk = "";
 
-        if ($response->failed()) {
-            return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
+        foreach ($sentences as $sentence) {
+            if (strlen($currentChunk . " " . $sentence) < 450) {
+                $currentChunk .= ($currentChunk ? " " : "") . $sentence;
+            } else {
+                if ($currentChunk) $chunks[] = $currentChunk;
+                $currentChunk = $sentence;
+                
+                // If a single sentence is still > 450, force split it
+                while (strlen($currentChunk) > 450) {
+                    $chunks[] = substr($currentChunk, 0, 450);
+                    $currentChunk = substr($currentChunk, 450);
+                }
+            }
+        }
+        if ($currentChunk) $chunks[] = $currentChunk;
+
+        $audios = [];
+
+        foreach ($chunks as $chunk) {
+            $response = Http::withHeaders([
+                'api-subscription-key' => trim(config('services.sarvam.key')),
+                'Content-Type' => 'application/json'
+            ])->post($this->sarvamTtsUrl, [
+                'inputs' => [$chunk],
+                'target_language_code' => 'hi-IN',
+                'speaker' => 'hi-IN-aditya', // Using compatible speaker
+                'model' => 'bulbul:v3',
+                'speech_sample_rate' => 16000,
+                'enable_preprocessing' => true
+            ]);
+
+            if ($response->successful()) {
+                $audios[] = $response->json()['audios'][0] ?? null;
+            }
         }
 
-        $data = $response->json();
-        
         return response()->json([
             'status' => 'success',
-            'audio_base64' => $data['audio_base64'] ?? null,
-            'audios' => $data['audios'] ?? []
+            'audios' => array_filter($audios)
         ]);
     }
 
