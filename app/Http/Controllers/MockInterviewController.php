@@ -118,56 +118,79 @@ class MockInterviewController extends Controller
     {
         $request->validate(['text' => 'required|string']);
 
-        $response = Http::withHeaders([
-            'api-subscription-key' => trim(config('services.sarvam.key')),
-            'Content-Type' => 'application/json'
-        ])->post($this->sarvamTtsUrl, [
-            'inputs' => [$request->text],
-            'target_language_code' => 'hi-IN',
-            'speaker' => 'ritu',
-            'model' => 'bulbul:v3'
-        ]);
-
-        if ($response->failed()) {
-            return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
+        // Split text into sentences or chunks < 500 chars to avoid Sarvam limit
+        $text = $request->text;
+        $chunks = preg_split('/(?<=[.!?])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        
+        // Ensure no single chunk is > 500 chars (defensive)
+        $finalChunks = [];
+        foreach($chunks as $chunk) {
+            if (strlen($chunk) > 450) {
+                $subChunks = str_split($chunk, 450);
+                foreach($subChunks as $sc) $finalChunks[] = $sc;
+            } else {
+                $finalChunks[] = $chunk;
+            }
         }
 
-        $data = $response->json();
-        
-        return response()->json([
-            'status' => 'success',
-            'audio_base64' => $data['audio_base64'] ?? null,
-            'audios' => $data['audios'] ?? []
-        ]);
+        try {
+            $response = Http::withHeaders([
+                'api-subscription-key' => trim(config('services.sarvam.key')),
+                'Content-Type' => 'application/json'
+            ])->post($this->sarvamTtsUrl, [
+                'inputs' => $finalChunks,
+                'target_language_code' => 'en-IN',
+                'speaker' => 'ritu',
+                'model' => 'bulbul:v3'
+            ]);
+
+            if ($response->failed()) {
+                return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
+            }
+
+            $data = $response->json();
+            
+            return response()->json([
+                'status' => 'success',
+                'audio_base64' => $data['audio_base64'] ?? null,
+                'audios' => $data['audios'] ?? []
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Voice Engine Exception: ' . $e->getMessage()]);
+        }
     }
 
     public function generateReport(Request $request)
     {
-        $request->validate(['session_id' => 'required|exists:interview_sessions,id']);
-        $session = InterviewSession::where('id', $request->session_id)
-                                    ->where('user_id', Auth::id())
-                                    ->firstOrFail();
-
-        if (!$session->transcript || count($session->transcript) < 2) {
-            return response()->json(['status' => 'error', 'message' => 'Interview too short for meaningful analysis.']);
-        }
-
-        $transcriptText = "";
-        foreach($session->transcript as $entry) {
-            $transcriptText .= $entry['role'] . ": " . $entry['text'] . "\n";
-        }
-
-        $analysisPrompt = "Analyze this mock interview transcript for a " . $session->role . " role. 
-        Provide a JSON response with exactly two keys:
-        1. 'score': A number between 0 and 100 based on the quality of the candidate's answers.
-        2. 'feedback': A detailed professional summary including Strengths, Weaknesses, and Advice for improvement. 
-        Keep the feedback in plain text or simple markdown.
-        
-        Transcript:
-        " . $transcriptText;
-
         try {
-            $response = Http::withHeaders([
+            $request->validate(['session_id' => 'required|exists:interview_sessions,id']);
+            $session = InterviewSession::where('id', $request->session_id)
+                                        ->where('user_id', Auth::id())
+                                        ->firstOrFail();
+
+            if (!$session->transcript || count($session->transcript) < 2) {
+                return response()->json(['status' => 'error', 'message' => 'Interview too short for meaningful analysis.']);
+            }
+
+            // Truncate transcript if too long (keep last 15 messages)
+            $transcript = array_slice($session->transcript, -15);
+            $transcriptText = "";
+            foreach($transcript as $entry) {
+                $role = isset($entry['user']) ? 'Candidate' : 'Interviewer';
+                $text = $entry['user'] ?? ($entry['ai'] ?? ($entry['text'] ?? ''));
+                $transcriptText .= "$role: $text\n";
+            }
+
+            $analysisPrompt = "Analyze this mock interview transcript for a " . $session->role . " role. 
+            Provide a JSON response with exactly two keys:
+            1. 'score': A number between 0 and 100 based on the quality of the candidate's answers.
+            2. 'feedback': A detailed professional summary including Strengths, Weaknesses, and Advice for improvement. 
+            Keep the feedback in plain text or simple markdown.
+            
+            Transcript:
+            " . $transcriptText;
+
+            $response = Http::timeout(60)->withHeaders([
                 'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
                 'Content-Type' => 'application/json'
             ])->post($this->groqUrl, [
@@ -179,6 +202,10 @@ class MockInterviewController extends Controller
                 'response_format' => ['type' => 'json_object'],
                 'max_tokens' => 1024
             ]);
+
+            if ($response->failed()) {
+                throw new \Exception("Brain Module Timed Out or Errored: " . $response->body());
+            }
 
             $data = $response->json();
             $analysis = json_decode($data['choices'][0]['message']['content'], true);
@@ -196,6 +223,7 @@ class MockInterviewController extends Controller
             ]);
 
         } catch (\Exception $e) {
+            \Log::error("Interview Report Error: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Intelligence Analysis Failed: ' . $e->getMessage()]);
         }
     }
