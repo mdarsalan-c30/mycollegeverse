@@ -238,10 +238,12 @@
                 },
 
                 async stopListening() {
-                    if (!this.isListening) return;
+                    if (!this.isListening || !this.mediaRecorder) return;
                     this.isListening = false;
                     
-                    this.mediaRecorder.stop();
+                    if (this.mediaRecorder.state !== 'inactive') {
+                        this.mediaRecorder.stop();
+                    }
                     this.mediaRecorder.onstop = async () => {
                         this.statusMessage = "Transcribing speech...";
                         const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });

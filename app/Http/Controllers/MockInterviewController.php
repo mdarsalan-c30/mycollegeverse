@@ -42,7 +42,7 @@ class MockInterviewController extends Controller
         ])->attach(
             'file', file_get_contents($request->file('audio')), 'audio.wav'
         )->post($this->sarvamSttUrl, [
-            'model' => $request->model ?? 'saaras_v3',
+            'model' => 'saaras:v3',
         ]);
 
         if ($response->failed()) {
