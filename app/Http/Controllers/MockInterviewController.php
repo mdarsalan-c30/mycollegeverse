@@ -176,7 +176,8 @@ class MockInterviewController extends Controller
                     ['role' => 'system', 'content' => 'You are a senior career coach and technical recruiter. Output only valid JSON.'],
                     ['role' => 'user', 'content' => $analysisPrompt]
                 ],
-                'response_format' => ['type' => 'json_object']
+                'response_format' => ['type' => 'json_object'],
+                'max_tokens' => 1024
             ]);
 
             $data = $response->json();

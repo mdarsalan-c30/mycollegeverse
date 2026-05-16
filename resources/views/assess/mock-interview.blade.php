@@ -298,7 +298,12 @@
                     this.statusMessage = "Recording your response...";
                     
                     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                    this.mediaRecorder = new MediaRecorder(stream);
+                    const options = { mimeType: 'audio/webm;codecs=opus' };
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                        console.warn('Opus not supported, falling back to default');
+                        delete options.mimeType;
+                    }
+                    this.mediaRecorder = new MediaRecorder(stream, options);
                     this.audioChunks = [];
                     
                     this.mediaRecorder.ondataavailable = (e) => this.audioChunks.push(e.data);
@@ -314,7 +319,7 @@
                     }
                     this.mediaRecorder.onstop = async () => {
                         this.statusMessage = "Transcribing speech...";
-                        const audioBlob = new Blob(this.audioChunks, { type: 'audio/wav' });
+                        const audioBlob = new Blob(this.audioChunks, { type: this.mediaRecorder.mimeType });
                         const formData = new FormData();
                         formData.append('audio', audioBlob);
                         formData.append('_token', '{{ csrf_token() }}');
@@ -396,7 +401,7 @@
 
                 async generateReportAutomated() {
                     this.isGeneratingReport = true;
-                    this.statusMessage = "Auto-Generating Intelligence Report...";
+                    this.statusMessage = "Compiling Neuro-Assessment Report...";
                     try {
                         const res = await fetch('{{ route("interview.report") }}', {
                             method: 'POST',
@@ -408,9 +413,15 @@
                             this.reportScore = data.score;
                             this.reportFeedback = data.feedback;
                             this.showReportModal = true;
+                            this.statusMessage = "Analysis Complete.";
+                        } else {
+                            this.statusMessage = "Report Gen Failed: " + data.message;
+                            alert("Intelligence Report Error: " + data.message);
                         }
                     } catch (e) {
                         console.error("Auto-report failed", e);
+                        this.statusMessage = "Neural Analytics Offline.";
+                        alert("Network Error during analysis. Please check your connection.");
                     } finally {
                         this.isGeneratingReport = false;
                     }
