@@ -123,7 +123,7 @@ class MockInterviewController extends Controller
             'Content-Type' => 'application/json'
         ])->post($this->sarvamTtsUrl, [
             'inputs' => [$request->text],
-            'target_language_code' => 'en-IN',
+            'target_language_code' => 'hi-IN',
             'speaker' => 'ritu',
             'model' => 'bulbul:v3'
         ]);
@@ -143,35 +143,40 @@ class MockInterviewController extends Controller
 
     public function generateReport(Request $request)
     {
+        $request->validate(['session_id' => 'required|exists:interview_sessions,id']);
+        $session = InterviewSession::where('id', $request->session_id)
+                                    ->where('user_id', Auth::id())
+                                    ->firstOrFail();
+
+        if (!$session->transcript || count($session->transcript) < 2) {
+            return response()->json(['status' => 'error', 'message' => 'Interview too short for meaningful analysis.']);
+        }
+
+        $transcriptText = "";
+        foreach($session->transcript as $entry) {
+            if (isset($entry['user'])) {
+                $transcriptText .= "Candidate: " . $entry['user'] . "\n";
+            }
+            if (isset($entry['ai'])) {
+                $transcriptText .= "Interviewer: " . $entry['ai'] . "\n";
+            }
+            // Fallback for older format if any
+            if (isset($entry['role']) && isset($entry['text'])) {
+                $transcriptText .= $entry['role'] . ": " . $entry['text'] . "\n";
+            }
+        }
+
+        $analysisPrompt = "Analyze this mock interview transcript for a " . $session->role . " role. 
+        Provide a JSON response with exactly two keys:
+        1. 'score': A number between 0 and 100 based on the quality of the candidate's answers.
+        2. 'feedback': A detailed professional summary including Strengths, Weaknesses, and Advice for improvement. 
+        Keep the feedback in plain text or simple markdown.
+        
+        Transcript:
+        " . $transcriptText;
+
         try {
-            $request->validate(['session_id' => 'required|exists:interview_sessions,id']);
-            $session = InterviewSession::where('id', $request->session_id)
-                                        ->where('user_id', Auth::id())
-                                        ->firstOrFail();
-
-            if (!$session->transcript || count($session->transcript) < 2) {
-                return response()->json(['status' => 'error', 'message' => 'Interview too short for meaningful analysis.']);
-            }
-
-            // Truncate transcript if too long (keep last 15 messages)
-            $transcript = array_slice($session->transcript, -15);
-            $transcriptText = "";
-            foreach($transcript as $entry) {
-                $role = isset($entry['user']) ? 'Candidate' : 'Interviewer';
-                $text = $entry['user'] ?? ($entry['ai'] ?? ($entry['text'] ?? ''));
-                $transcriptText .= "$role: $text\n";
-            }
-
-            $analysisPrompt = "Analyze this mock interview transcript for a " . $session->role . " role. 
-            Provide a JSON response with exactly two keys:
-            1. 'score': A number between 0 and 100 based on the quality of the candidate's answers.
-            2. 'feedback': A detailed professional summary including Strengths, Weaknesses, and Advice for improvement. 
-            Keep the feedback in plain text or simple markdown.
-            
-            Transcript:
-            " . $transcriptText;
-
-            $response = Http::timeout(60)->withHeaders([
+            $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
                 'Content-Type' => 'application/json'
             ])->post($this->groqUrl, [
@@ -183,10 +188,6 @@ class MockInterviewController extends Controller
                 'response_format' => ['type' => 'json_object'],
                 'max_tokens' => 1024
             ]);
-
-            if ($response->failed()) {
-                throw new \Exception("Brain Module Timed Out or Errored: " . $response->body());
-            }
 
             $data = $response->json();
             $analysis = json_decode($data['choices'][0]['message']['content'], true);
@@ -204,7 +205,6 @@ class MockInterviewController extends Controller
             ]);
 
         } catch (\Exception $e) {
-            \Log::error("Interview Report Error: " . $e->getMessage());
             return response()->json(['status' => 'error', 'message' => 'Intelligence Analysis Failed: ' . $e->getMessage()]);
         }
     }
