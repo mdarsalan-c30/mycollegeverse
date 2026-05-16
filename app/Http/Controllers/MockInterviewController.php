@@ -183,7 +183,7 @@ class MockInterviewController extends Controller
             ])->post($this->sarvamTtsUrl, [
                 'inputs' => [$chunk],
                 'target_language_code' => 'hi-IN',
-                'speaker' => 'hi-IN-aditya', // Using compatible speaker
+                'speaker' => 'aditya', // Corrected name based on error message
                 'model' => 'bulbul:v3',
                 'speech_sample_rate' => 16000,
                 'enable_preprocessing' => true
@@ -191,7 +191,16 @@ class MockInterviewController extends Controller
 
             if ($response->successful()) {
                 $audios[] = $response->json()['audios'][0] ?? null;
+            } else {
+                \Log::error("Sarvam TTS Chunk Error: " . $response->body());
             }
+        }
+
+        if (empty($audios)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to generate any audio chunks.'
+            ]);
         }
 
         return response()->json([
