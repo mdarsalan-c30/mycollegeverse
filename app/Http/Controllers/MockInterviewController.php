@@ -22,11 +22,12 @@ class MockInterviewController extends Controller
 
     public function start(Request $request)
     {
+        $request->validate(['role' => 'required|string']);
+
         $session = InterviewSession::create([
             'user_id' => Auth::id(),
             'role' => $request->role,
             'transcript' => [],
-            'total_questions' => 20, // Long session, user will wrap up
             'status' => 'active'
         ]);
 
@@ -39,24 +40,23 @@ class MockInterviewController extends Controller
             return response()->json(['status' => 'error', 'message' => 'No audio file provided']);
         }
 
-        // Switching back to Sarvam STT for better accuracy as requested
+        // Using Groq Whisper for longer duration support (up to 25MB)
         $response = Http::withHeaders([
-            'api-subscription-key' => trim(config('services.sarvam.key')),
+            'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
         ])->attach(
             'file', file_get_contents($request->file('audio')), 'audio.wav'
-        )->post($this->sarvamSttUrl, [
-            'model' => 'saarika:v2',
-            'language_code' => 'hi-IN'
+        )->post($this->groqAudioUrl, [
+            'model' => 'whisper-large-v3',
         ]);
 
         if ($response->failed()) {
-            return response()->json(['status' => 'error', 'message' => 'Transcription Error: ' . $response->body()]);
+            return response()->json(['status' => 'error', 'message' => 'Groq STT Error: ' . $response->body()]);
         }
 
         $data = $response->json();
         return response()->json([
             'status' => 'success',
-            'transcript' => $data['transcript'] ?? ''
+            'transcript' => $data['text'] ?? ''
         ]);
     }
 
@@ -64,25 +64,22 @@ class MockInterviewController extends Controller
     {
         $request->validate([
             'session_id' => 'required|exists:interview_sessions,id',
-            'message' => 'required|string'
+            'message' => 'required|string',
+            'wrap_up' => 'boolean'
         ]);
 
         $session = InterviewSession::findOrFail($request->session_id);
         $history = $session->transcript ?? [];
 
-        $total = $session->total_questions ?? 5;
-        $current = ($session->current_question_count ?? 0) + 1;
+        // Build prompt
+        $wrapUpInst = $request->wrap_up ? " IMPORTANT: The candidate wants to wrap up. Ask one final concluding question (e.g., 'Do you have any questions for us?' or 'Why should we hire you?') and then prepare to end the conversation." : "";
 
-        // Build prompt with awareness of progress
         $systemPrompt = "You are an expert technical interviewer for a " . $session->role . " role. 
-        PROGRESS: This is question " . $current . " out of " . $total . ".
-        
-        Guidelines:
-        1. Ask one question at a time. Keep responses concise.
-        2. If this is the final question ( " . $current . " == " . $total . " ), acknowledge the answer and formally conclude the interview.
-        3. If the user indicates they are in a hurry (wrap up), conclude the interview gracefully in this turn.
-        
-        Wait for user input before proceeding. If they answer well, acknowledge briefly and move to a harder question.";
+        Your goal is to conduct a high-fidelity, professional interview. 
+        Ask one question at a time. Keep responses concise and natural. 
+        Wait for user input before proceeding. 
+        If they answer well, acknowledge it briefly and move to a slightly harder question.
+        If they answer poorly, guide them or ask a clarifying question." . $wrapUpInst;
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
@@ -112,90 +109,35 @@ class MockInterviewController extends Controller
 
         // Update history
         $history[] = ['user' => $request->message, 'ai' => $aiMessage, 'timestamp' => now()];
-        
-        $updateData = ['transcript' => $history];
-        
-        // Defensive progress tracking
-        $hasProgressCols = \Schema::hasColumn('interview_sessions', 'current_question_count');
-        if ($hasProgressCols) {
-            $updateData['current_question_count'] = $session->current_question_count + 1;
-        }
-        
-        $session->update($updateData);
+        $session->update(['transcript' => $history]);
 
-        $isFinal = false;
-        // Check if limit reached OR if wrap up signal was sent in this turn
-        if ($hasProgressCols && \Schema::hasColumn('interview_sessions', 'total_questions')) {
-            $isFinal = ($session->current_question_count >= $session->total_questions) || (strpos($request->message, '[SYSTEM: User is in a hurry]') !== false);
-        }
-
-        return response()->json([
-            'status' => 'success', 
-            'message' => $aiMessage,
-            'is_final' => $isFinal,
-            'current_q' => $session->current_question_count ?? 0,
-            'total_q' => $session->total_questions ?? 0
-        ]);
+        return response()->json(['status' => 'success', 'message' => $aiMessage]);
     }
 
     public function speak(Request $request)
     {
         $request->validate(['text' => 'required|string']);
-        $text = $request->text;
 
-        // Sarvam Bulbul:v3 has a 500 char limit. We must split by sentence.
-        $sentences = preg_split('/(?<=[.?!])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
-        $chunks = [];
-        $currentChunk = "";
+        $response = Http::withHeaders([
+            'api-subscription-key' => trim(config('services.sarvam.key')),
+            'Content-Type' => 'application/json'
+        ])->post($this->sarvamTtsUrl, [
+            'inputs' => [$request->text],
+            'target_language_code' => 'hi-IN',
+            'speaker' => 'ritu',
+            'model' => 'bulbul:v3'
+        ]);
 
-        foreach ($sentences as $sentence) {
-            if (strlen($currentChunk . " " . $sentence) < 450) {
-                $currentChunk .= ($currentChunk ? " " : "") . $sentence;
-            } else {
-                if ($currentChunk) $chunks[] = $currentChunk;
-                $currentChunk = $sentence;
-                
-                // If a single sentence is still > 450, force split it
-                while (strlen($currentChunk) > 450) {
-                    $chunks[] = substr($currentChunk, 0, 450);
-                    $currentChunk = substr($currentChunk, 450);
-                }
-            }
-        }
-        if ($currentChunk) $chunks[] = $currentChunk;
-
-        $audios = [];
-
-        foreach ($chunks as $chunk) {
-            $response = Http::withHeaders([
-                'api-subscription-key' => trim(config('services.sarvam.key')),
-                'Content-Type' => 'application/json'
-            ])->post($this->sarvamTtsUrl, [
-                'inputs' => [$chunk],
-                'target_language_code' => 'hi-IN',
-                'speaker' => 'aditya', // Corrected name based on error message
-                'model' => 'bulbul:v3',
-                'speech_sample_rate' => 16000,
-                'enable_preprocessing' => true
-            ]);
-
-            if ($response->successful()) {
-                $audios[] = $response->json()['audios'][0] ?? null;
-            } else {
-                \Log::error("Sarvam TTS Chunk Error: " . $response->body());
-            }
+        if ($response->failed()) {
+            return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
         }
 
-        if (empty($audios)) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to generate any audio chunks.'
-            ]);
-        }
-
+        $data = $response->json();
+        
         return response()->json([
             'status' => 'success',
-            'audios' => array_filter($audios)
+            'audio_base64' => $data['audio_base64'] ?? null,
+            'audios' => $data['audios'] ?? []
         ]);
     }
 
@@ -231,29 +173,14 @@ class MockInterviewController extends Controller
             ])->post($this->groqUrl, [
                 'model' => 'llama-3.1-8b-instant',
                 'messages' => [
-                    ['role' => 'system', 'content' => 'You are a senior career coach. Analyze the interview transcript. Output valid JSON with keys "score" (0-100) and "feedback" (detailed string).'],
+                    ['role' => 'system', 'content' => 'You are a senior career coach and technical recruiter. Output only valid JSON.'],
                     ['role' => 'user', 'content' => $analysisPrompt]
                 ],
                 'response_format' => ['type' => 'json_object']
             ]);
 
-            if ($response->failed()) {
-                throw new \Exception("Brain analysis failed: " . $response->body());
-            }
-
-            $rawContent = $response->json()['choices'][0]['message']['content'];
-            $analysis = json_decode($rawContent, true);
-
-            if (!$analysis || !isset($analysis['score'])) {
-                // Fallback parsing if JSON is slightly malformed
-                preg_match('/"score":\s*(\d+)/', $rawContent, $scoreMatch);
-                preg_match('/"feedback":\s*"(.*)"/s', $rawContent, $feedbackMatch);
-                
-                $analysis = [
-                    'score' => $scoreMatch[1] ?? 70,
-                    'feedback' => $feedbackMatch[1] ?? "Interview completed successfully. Good effort!"
-                ];
-            }
+            $data = $response->json();
+            $analysis = json_decode($data['choices'][0]['message']['content'], true);
 
             $session->update([
                 'score' => $analysis['score'] ?? 0,

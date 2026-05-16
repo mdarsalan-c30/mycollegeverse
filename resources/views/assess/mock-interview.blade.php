@@ -20,9 +20,14 @@
                     </button>
                 </template>
                 <template x-if="isInterviewing">
-                    <button @click="endInterview()" class="bg-rose-500 text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-rose-500/20 hover:scale-105 active:scale-95 transition-all">
-                        Terminate Session
-                    </button>
+                    <div class="flex gap-4">
+                        <button x-show="!isWrappingUp" @click="startWrapUp()" class="bg-amber-500 text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-amber-500/20 hover:scale-105 active:scale-95 transition-all">
+                            Wrap Up
+                        </button>
+                        <button @click="endInterview()" class="bg-rose-500 text-white px-10 py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-rose-500/20 hover:scale-105 active:scale-95 transition-all">
+                            Terminate Session
+                        </button>
+                    </div>
                 </template>
             </div>
         </div>
@@ -59,18 +64,7 @@
                                         (isThinking ? 'Analyzing Response...' : 
                                         (isSpeaking ? 'AI is Responding...' : 
                                         (isInterviewing ? 'Session Active' : 'Awaiting Deployment')))"></h3>
-                            <p class="text-slate-500 font-bold leading-relaxed text-sm mb-4" x-text="statusMessage"></p>
-                            
-                            <!-- Progress Tracker -->
-                            <div x-show="currentSessionId" x-transition class="w-full space-y-2">
-                                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-widest">
-                                    <span class="text-primary">Intelligence Progress</span>
-                                    <span class="text-secondary" x-text="`${current_q}/${total_q}`"></span>
-                                </div>
-                                <div class="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-white/60 p-0.5">
-                                    <div class="h-full bg-primary rounded-full transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(240,68,56,0.3)]" :style="`width: ${(current_q/total_q)*100}%`"></div>
-                                </div>
-                            </div>
+                            <p class="text-slate-500 font-bold leading-relaxed text-sm" x-text="statusMessage"></p>
                         </div>
                     </div>
 
@@ -106,12 +100,6 @@
                                         class="flex-shrink-0 group flex items-center gap-3 px-8 py-4 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">
                                     <span x-text="isListening ? 'Stop & Send' : 'Start Speaking'"></span>
                                     <svg class="w-4 h-4" :class="isListening ? 'animate-pulse' : ''" fill="currentColor" viewBox="0 0 20 20"><path d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8a1 1 0 10-2 0A5 5 0 015 8a1 1 0 00-2 0 7.001 7.001 0 006 6.93V17H6a1 1 0 100 2h8a1 1 0 100-2h-3v-2.07z"/></svg>
-                                </button>
-
-                                <button x-show="isInterviewing && !isThinking && !isSpeaking && !isWrappingUp" 
-                                        @click="wrapUpSession()"
-                                        class="flex-shrink-0 border-2 border-slate-200 text-slate-400 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:border-secondary hover:text-secondary hover:bg-secondary/5 transition-all">
-                                    Wrap Up
                                 </button>
                             </div>
                         </div>
@@ -159,7 +147,7 @@
         <!-- Role Selection Modal -->
         <div x-show="showRoleModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl" x-cloak>
             <div class="glass w-full max-w-lg rounded-[3rem] p-12 text-center space-y-8" @click.away="showRoleModal = false">
-                <h3 class="text-3xl font-black text-secondary tracking-tighter mb-8">Choose Your <span class="text-primary">Domain</span></h3>
+                <h3 class="text-3xl font-black text-secondary tracking-tighter">Choose Your <span class="text-primary">Destiny</span></h3>
                 <div class="grid grid-cols-2 gap-4">
                     <template x-for="role in roles">
                         <button @click="selectRole(role)" class="p-6 bg-white/40 border border-white rounded-[2rem] hover:bg-primary hover:text-white transition-all text-xs font-black uppercase tracking-widest text-slate-600 shadow-sm">
@@ -242,15 +230,13 @@
                 isListening: false,
                 isThinking: false,
                 isSpeaking: false,
-                isWrappingUp: false,
                 showRoleModal: false,
                 showReportModal: false,
                 isGeneratingReport: false,
+                isWrappingUp: false,
+                wrapUpCounter: 0,
                 reportScore: 0,
                 reportFeedback: '',
-                current_q: 0,
-                total_q: 0,
-                selectedRole: null,
                 currentSessionId: null,
                 statusMessage: 'Ready to benchmark your intelligence. Select a role to begin.',
                 manualInput: '',
@@ -260,29 +246,17 @@
                 audioChunks: [],
 
                 async startNewInterview() {
-                    this.selectedRole = null;
-                    this.isWrappingUp = false;
                     this.showRoleModal = true;
-                },
-
-                async wrapUpSession() {
-                    if (confirm('Do you want to wrap up this interview quickly? The AI will conclude in the next turn.')) {
-                        this.isWrappingUp = true;
-                        this.statusMessage = "Signaling wrap-up to AI...";
-                        this.processThinking("[SYSTEM: User is in a hurry. Please acknowledge and wrap up the interview gracefully now.]");
-                    }
                 },
 
                 async selectRole(role) {
                     this.showRoleModal = false;
-                    this.total_q = 20; // Default long session
-                    this.current_q = 0;
                     this.statusMessage = `Initializing neural connection for ${role}...`;
                     
                     const res = await fetch('{{ route("interview.start") }}', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                        body: JSON.stringify({ role: role })
+                        body: JSON.stringify({ role })
                     });
                     
                     const data = await res.json();
@@ -305,8 +279,8 @@
                 },
 
                 async triggerAIGreeting(text) {
-                    this.current_q = 1;
                     this.transcript.push({ role: 'Assistant', text });
+                    this.statusMessage = "AI is speaking...";
                     this.speak(text);
                 },
 
@@ -368,6 +342,14 @@
                     };
                 },
 
+                startWrapUp() {
+                    this.isWrappingUp = true;
+                    this.wrapUpCounter = 2; // AI will ask 2 more questions
+                    const msg = "I would like to wrap up this interview session.";
+                    this.transcript.push({ role: 'You', text: msg });
+                    this.processThinking(msg);
+                },
+
                 async processThinking(userText) {
                     this.isThinking = true;
                     this.statusMessage = "Analyzing response...";
@@ -376,32 +358,31 @@
                         const res = await fetch('{{ route("interview.think") }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                            body: JSON.stringify({ session_id: this.currentSessionId, message: userText })
+                            body: JSON.stringify({ 
+                                session_id: this.currentSessionId, 
+                                message: userText,
+                                wrap_up: this.isWrappingUp
+                            })
                         });
                         
                         const data = await res.json();
                         this.isThinking = false;
                         
                         if (data.status === 'success') {
-                            this.current_q = data.current_q;
-                            this.total_q = data.total_q;
                             this.transcript.push({ role: 'Assistant', text: data.message });
                             
-                            // Check if this was the final question
-                            if (data.is_final) {
-                                this.isWrappingUp = true; // Block further input
-                                this.statusMessage = "Session concluding. Preparing your report...";
-                                
-                                // Speak farewell but don't block report if speak fails
-                                try {
-                                    await this.speak(data.message + " Thank you for your time. I am now compiling your Intelligence Report.");
-                                } catch (e) {
-                                    console.error("Farewell audio failed, proceeding to report.");
+                            // Check if we should end automatically
+                            if (this.isWrappingUp) {
+                                if (this.wrapUpCounter > 0) {
+                                    this.wrapUpCounter--;
+                                    await this.speak(data.message);
+                                } else {
+                                    await this.speak(data.message);
+                                    // Automatic end after last word
+                                    setTimeout(() => this.generateReportAutomated(), 1000);
                                 }
-                                
-                                setTimeout(() => this.triggerAutoReport(), 3000);
                             } else {
-                                this.speak(data.message);
+                                await this.speak(data.message);
                             }
                         } else {
                             alert(data.message || "Unknown Brain Error");
@@ -413,29 +394,23 @@
                     }
                 },
 
-                async triggerAutoReport() {
+                async generateReportAutomated() {
                     this.isGeneratingReport = true;
-                    this.statusMessage = "Compiling Intelligence Report. Finalizing Analysis...";
-                    
+                    this.statusMessage = "Auto-Generating Intelligence Report...";
                     try {
                         const res = await fetch('{{ route("interview.report") }}', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
                             body: JSON.stringify({ session_id: this.currentSessionId })
                         });
-                        
                         const data = await res.json();
                         if (data.status === 'success') {
                             this.reportScore = data.score;
                             this.reportFeedback = data.feedback;
                             this.showReportModal = true;
-                        } else {
-                            alert(data.message);
-                            location.reload();
                         }
                     } catch (e) {
-                        alert("Report Generation Error: " + e.message);
-                        location.reload();
+                        console.error("Auto-report failed", e);
                     } finally {
                         this.isGeneratingReport = false;
                     }
@@ -458,33 +433,21 @@
                                 return;
                             }
 
-                             // Sequential Playback for ultra-low latency feel
+                            // Sequential Playback for ultra-low latency feel
                             for (let i = 0; i < chunks.length; i++) {
                                 await new Promise((resolve) => {
                                     const audio = new Audio("data:audio/wav;base64," + chunks[i]);
-                                    
-                                    // Safety timeout: don't wait forever for one chunk
-                                    const timeout = setTimeout(() => {
-                                        console.warn("Audio chunk playback timeout");
-                                        resolve();
-                                    }, 15000);
-
                                     audio.onplay = () => {
                                         this.isSpeaking = true;
                                         this.statusMessage = "The Interviewer is Speaking...";
                                     };
-                                    audio.onended = () => {
-                                        clearTimeout(timeout);
-                                        resolve();
-                                    };
+                                    audio.onended = resolve;
                                     audio.onerror = () => {
                                         console.error("Audio chunk failed");
-                                        clearTimeout(timeout);
                                         resolve();
                                     };
                                     audio.play().catch(err => {
                                         console.error("Playback blocked:", err);
-                                        clearTimeout(timeout);
                                         resolve();
                                     });
                                 });
