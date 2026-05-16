@@ -80,13 +80,19 @@ class MockInterviewController extends Controller
         $session = InterviewSession::findOrFail($request->session_id);
         $history = $session->transcript ?? [];
 
-        // Build prompt
+        $total = $session->total_questions ?? 5;
+        $current = ($session->current_question_count ?? 0) + 1;
+
+        // Build prompt with awareness of progress
         $systemPrompt = "You are an expert technical interviewer for a " . $session->role . " role. 
-        Your goal is to conduct a high-fidelity, professional interview. 
-        Ask one question at a time. Keep responses concise and natural. 
-        Wait for user input before proceeding. 
-        If they answer well, acknowledge it briefly and move to a slightly harder question.
-        If they answer poorly, guide them or ask a clarifying question.";
+        PROGRESS: This is question " . $current . " out of " . $total . ".
+        
+        Guidelines:
+        1. Ask one question at a time. Keep responses concise.
+        2. If this is the final question ( " . $current . " == " . $total . " ), acknowledge the answer and formally conclude the interview.
+        3. If the user indicates they are in a hurry (wrap up), conclude the interview gracefully in this turn.
+        
+        Wait for user input before proceeding. If they answer well, acknowledge briefly and move to a harder question.";
 
         $messages = [['role' => 'system', 'content' => $systemPrompt]];
 
