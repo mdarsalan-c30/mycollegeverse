@@ -118,46 +118,27 @@ class MockInterviewController extends Controller
     {
         $request->validate(['text' => 'required|string']);
 
-        // Split text into sentences or chunks < 500 chars to avoid Sarvam limit
-        $text = $request->text;
-        $chunks = preg_split('/(?<=[.!?])\s+/', $text, -1, PREG_SPLIT_NO_EMPTY);
+        $response = Http::withHeaders([
+            'api-subscription-key' => trim(config('services.sarvam.key')),
+            'Content-Type' => 'application/json'
+        ])->post($this->sarvamTtsUrl, [
+            'inputs' => [$request->text],
+            'target_language_code' => 'en-IN',
+            'speaker' => 'ritu',
+            'model' => 'bulbul:v3'
+        ]);
+
+        if ($response->failed()) {
+            return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
+        }
+
+        $data = $response->json();
         
-        // Ensure no single chunk is > 500 chars (defensive)
-        $finalChunks = [];
-        foreach($chunks as $chunk) {
-            if (strlen($chunk) > 450) {
-                $subChunks = str_split($chunk, 450);
-                foreach($subChunks as $sc) $finalChunks[] = $sc;
-            } else {
-                $finalChunks[] = $chunk;
-            }
-        }
-
-        try {
-            $response = Http::withHeaders([
-                'api-subscription-key' => trim(config('services.sarvam.key')),
-                'Content-Type' => 'application/json'
-            ])->post($this->sarvamTtsUrl, [
-                'inputs' => $finalChunks,
-                'target_language_code' => 'en-IN',
-                'speaker' => 'ritu',
-                'model' => 'bulbul:v3'
-            ]);
-
-            if ($response->failed()) {
-                return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
-            }
-
-            $data = $response->json();
-            
-            return response()->json([
-                'status' => 'success',
-                'audio_base64' => $data['audio_base64'] ?? null,
-                'audios' => $data['audios'] ?? []
-            ]);
-        } catch (\Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Voice Engine Exception: ' . $e->getMessage()]);
-        }
+        return response()->json([
+            'status' => 'success',
+            'audio_base64' => $data['audio_base64'] ?? null,
+            'audios' => $data['audios'] ?? []
+        ]);
     }
 
     public function generateReport(Request $request)
