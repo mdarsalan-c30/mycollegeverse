@@ -113,10 +113,7 @@ class MockInterviewController extends Controller
         ])->post($this->sarvamTtsUrl, [
             'inputs' => [$request->text],
             'target_language_code' => 'hi-IN',
-            'speaker' => 'shreya',
-            'pitch' => 0,
             'pace' => 1.0,
-            'loudness' => 1.5,
             'speech_sample_rate' => 22050,
             'enable_preprocessing' => true,
             'model' => 'bulbul:v3'
