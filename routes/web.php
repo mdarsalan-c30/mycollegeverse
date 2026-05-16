@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SitemapController;
 
+// Digital Intelligence Node (SEO Sitemap) 🛰️
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 /*
@@ -251,8 +252,8 @@ Route::middleware('guest')->group(function () {
 });
 Route::post('/recruiter/logout', [App\Http\Controllers\Auth\RecruiterLoginController::class, 'destroy'])->name('recruiter.logout');
 
-require __DIR__.'/auth.php';
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+// require __DIR__.'/auth.php';
+// Redundant sitemap nodes removed for signal clarity 🛰️
 
 // Emergency Production Fix for Hostinger
 /*
@@ -563,7 +564,7 @@ Route::get('/storage/academic-guides/{file}', function ($file) {
     ]);
 });
 
-Route::get('/sitemap.xml', [App\Http\Controllers\SitemapController::class, 'index']);
+// Redundant sitemap node removed for signal clarity 🛰️
 
 // Mock Interview AI 🎙️
 Route::middleware(['auth'])->prefix('assess/mock-interview')->name('interview.')->group(function() {

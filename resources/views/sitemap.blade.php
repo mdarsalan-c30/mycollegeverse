@@ -61,8 +61,48 @@
     <url>
         <loc>{{ route('blogs.show', $blog->slug) }}</loc>
         <lastmod>{{ $blog->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-        <changefreq>monthly</changefreq>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    @endforeach
+
+    <!-- Academic Guides (New Nodes) 🛰️ -->
+    @foreach ($guides as $guide)
+    <url>
+        <loc>{{ route('guides.show', $guide->slug) }}</loc>
+        <lastmod>{{ $guide->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
+    @endforeach
+
+    <!-- Career Hub (Job Postings) 💼 -->
+    @foreach ($jobs as $job)
+    <url>
+        <loc>{{ route('jobs.show', $job->slug) }}</loc>
+        <lastmod>{{ $job->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>daily</changefreq>
         <priority>0.7</priority>
+    </url>
+    @endforeach
+
+    <!-- Reward Tokens (Perks Hub) 💎 -->
+    @foreach ($rewards as $reward)
+    <url>
+        <loc>{{ route('rewards.show', $reward->slug) }}</loc>
+        <lastmod>{{ $reward->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+    </url>
+    @endforeach
+
+    <!-- Static Intelligence (Pages) 🏛️ -->
+    @foreach ($pages as $page)
+    <url>
+        <loc>{{ route('pages.show', $page->slug) }}</loc>
+        <lastmod>{{ $page->updated_at->tz('UTC')->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.5</priority>
     </url>
     @endforeach
 </urlset>
