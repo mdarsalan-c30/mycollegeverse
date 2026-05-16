@@ -26,7 +26,7 @@
             </nav>
 
             <!-- Note Viewer -->
-            <div class="glass rounded-[3rem] overflow-hidden border-white/60 shadow-glass relative">
+            <div class="glass md:rounded-[3rem] rounded-none overflow-hidden border-white/60 md:shadow-glass relative">
                 @if($note->isDigital())
                     <div x-data="{ viewMode: '{{ $note->hasFullHtml() ? 'html' : 'prose' }}' }" class="space-y-6">
                         <!-- View Mode Switcher 🛰️ -->
@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- Standard Prose View -->
-                        <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="p-5 md:p-12 bg-white/60">
+                        <div x-show="viewMode === 'prose'" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0" class="p-4 md:p-12 bg-white/60">
                             <div class="flex items-center gap-3 mb-6 md:mb-8 pb-6 border-b border-slate-100">
                                 @if($note->isAiGenerated())
                                     <div class="bg-violet-100 text-violet-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest flex items-center gap-2">
@@ -221,17 +221,25 @@
                                             watermark.innerText = 'MYCOLLEGEVERSE.IN • ACADEMIC OS';
                                             
                                             const pdfContainer = document.createElement('div');
-                                            pdfContainer.style.padding = '40px';
+                                            pdfContainer.style.width = '794px'; // Stabilized A4 width 🛰️
+                                            pdfContainer.style.padding = '60px';
                                             pdfContainer.style.background = 'white';
                                             pdfContainer.style.position = 'relative';
+                                            pdfContainer.style.color = '#334155';
+                                            pdfContainer.style.fontSize = '14pt';
                                             pdfContainer.appendChild(watermark);
                                             pdfContainer.appendChild(element);
 
                                             const opt = {
-                                                margin: [15, 15],
+                                                margin: [10, 10],
                                                 filename: '{{ $note->slug }}_premium_notes.pdf',
                                                 image: { type: 'jpeg', quality: 0.98 },
-                                                html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                                                html2canvas: { 
+                                                    scale: 2, 
+                                                    useCORS: true, 
+                                                    letterRendering: true,
+                                                    width: 794
+                                                },
                                                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                                             };
 

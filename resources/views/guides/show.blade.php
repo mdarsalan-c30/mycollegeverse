@@ -42,7 +42,7 @@
 @endpush
 
 @section('content')
-    <div class="max-w-5xl mx-auto px-6 py-12">
+    <div class="max-w-5xl mx-auto md:px-6 py-6 md:py-12">
         <!-- Breadcrumbs -->
         <nav class="flex items-center text-[10px] font-black uppercase tracking-widest text-slate-400 mb-12 overflow-x-auto whitespace-nowrap pb-2">
             <a href="{{ route('guides.index') }}" class="hover:text-primary transition-colors">Academic Hub</a>
@@ -50,11 +50,11 @@
             <span class="text-slate-300">{{ $guide->category }}</span>
         </nav>
 
-        <article class="bg-white rounded-[4rem] overflow-hidden border border-slate-100 shadow-2xl relative">
-            <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-bl-[10rem] -mr-32 -mt-32"></div>
+        <article class="bg-white md:rounded-[4rem] overflow-hidden md:border border-slate-100 md:shadow-2xl relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 md:rounded-bl-[10rem] -mr-32 -mt-32"></div>
 
             <!-- Hero Header -->
-            <div class="px-5 md:px-20 pt-16 md:pt-20 pb-12 md:pb-16 relative">
+            <div class="px-4 md:px-20 pt-10 md:pt-20 pb-10 md:pb-16 relative">
                 <div class="flex items-center gap-4 mb-6 md:mb-8">
                     <span class="px-4 py-1.5 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest rounded-full ring-1 ring-primary/20">
                         {{ $guide->category }}
@@ -137,7 +137,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3 w-full md:w-auto">
-                        <a href="{{ $downloadUrl }}" download="{{ $guide->title }}.pdf" class="flex-1 md:flex-none px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-[0.2em] rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
+                        <a href="{{ $downloadUrl }}" download="{{ $guide->title }}.pdf" class="flex-1 md:flex-none px-6 md:px-10 py-4 bg-white text-slate-900 font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-primary hover:text-white transition-all text-center">
                             Download Intel PDF ⬇️
                         </a>
                     </div>
@@ -146,7 +146,7 @@
             @endif
 
             <!-- Content Area / Digital Manuscript Manifestation ⚡ -->
-            <div class="px-5 md:px-20 py-12 md:py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
+            <div class="px-4 md:px-20 py-10 md:py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
                 
                 <!-- View Mode Switcher Node 🛰️ -->
                 <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-2xl w-fit mb-8 md:mb-12 border border-slate-200">
@@ -253,17 +253,25 @@
                 watermark.innerText = 'MYCOLLEGEVERSE.IN • ACADEMIC HUB';
                 
                 const pdfContainer = document.createElement('div');
-                pdfContainer.style.padding = '40px';
+                pdfContainer.style.width = '794px'; // Fixed A4 width for consistent manifestation 🛰️
+                pdfContainer.style.padding = '60px';
                 pdfContainer.style.background = 'white';
                 pdfContainer.style.position = 'relative';
+                pdfContainer.style.color = '#334155';
+                pdfContainer.style.fontSize = '14pt';
                 pdfContainer.appendChild(watermark);
                 pdfContainer.appendChild(element);
 
                 const opt = {
-                    margin: [15, 15],
+                    margin: [10, 10],
                     filename: '{{ $guide->slug }}_academic_intel.pdf',
                     image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+                    html2canvas: { 
+                        scale: 2, 
+                        useCORS: true, 
+                        letterRendering: true,
+                        width: 794 // Match the container width
+                    },
                     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
                 };
 
