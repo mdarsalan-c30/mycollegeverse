@@ -410,9 +410,17 @@
                             
                             // Check if this was the final question
                             if (data.is_final) {
-                                await this.speak(data.message + " Thank you for your time. I am now compiling your Intelligence Report. Please wait...");
-                                // Auto-trigger report after a small delay for voice to finish if needed
-                                setTimeout(() => this.triggerAutoReport(), 2000);
+                                this.isWrappingUp = true; // Block further input
+                                this.statusMessage = "Session concluding. Preparing your report...";
+                                
+                                // Speak farewell but don't block report if speak fails
+                                try {
+                                    await this.speak(data.message + " Thank you for your time. I am now compiling your Intelligence Report.");
+                                } catch (e) {
+                                    console.error("Farewell audio failed, proceeding to report.");
+                                }
+                                
+                                setTimeout(() => this.triggerAutoReport(), 3000);
                             } else {
                                 this.speak(data.message);
                             }
@@ -471,21 +479,33 @@
                                 return;
                             }
 
-                            // Sequential Playback for ultra-low latency feel
+                             // Sequential Playback for ultra-low latency feel
                             for (let i = 0; i < chunks.length; i++) {
                                 await new Promise((resolve) => {
                                     const audio = new Audio("data:audio/wav;base64," + chunks[i]);
+                                    
+                                    // Safety timeout: don't wait forever for one chunk
+                                    const timeout = setTimeout(() => {
+                                        console.warn("Audio chunk playback timeout");
+                                        resolve();
+                                    }, 15000);
+
                                     audio.onplay = () => {
                                         this.isSpeaking = true;
                                         this.statusMessage = "The Interviewer is Speaking...";
                                     };
-                                    audio.onended = resolve;
+                                    audio.onended = () => {
+                                        clearTimeout(timeout);
+                                        resolve();
+                                    };
                                     audio.onerror = () => {
                                         console.error("Audio chunk failed");
+                                        clearTimeout(timeout);
                                         resolve();
                                     };
                                     audio.play().catch(err => {
                                         console.error("Playback blocked:", err);
+                                        clearTimeout(timeout);
                                         resolve();
                                     });
                                 });

@@ -134,8 +134,9 @@ class MockInterviewController extends Controller
         $session->update($updateData);
 
         $isFinal = false;
+        // Check if limit reached OR if wrap up signal was sent in this turn
         if ($hasProgressCols && \Schema::hasColumn('interview_sessions', 'total_questions')) {
-            $isFinal = ($session->current_question_count >= $session->total_questions);
+            $isFinal = ($session->current_question_count >= $session->total_questions) || (strpos($request->message, '[SYSTEM: User is in a hurry]') !== false);
         }
 
         return response()->json([
