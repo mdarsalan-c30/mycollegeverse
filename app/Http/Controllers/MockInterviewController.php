@@ -122,11 +122,15 @@ class MockInterviewController extends Controller
     {
         $request->validate(['text' => 'required|string']);
 
+        // Sarvam bulbul:v3 has a character limit per request.
+        // We truncate to a safe 2000 characters to prevent 400 errors.
+        $safeText = mb_substr($request->text, 0, 2000);
+
         $response = Http::withHeaders([
             'api-subscription-key' => trim(config('services.sarvam.key')),
             'Content-Type' => 'application/json'
         ])->post($this->sarvamTtsUrl, [
-            'inputs' => [$request->text],
+            'inputs' => [$safeText],
             'target_language_code' => 'hi-IN',
             'speaker' => 'ritu',
             'model' => 'bulbul:v3'
