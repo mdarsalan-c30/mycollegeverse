@@ -116,6 +116,7 @@ class MockInterviewController extends Controller
             'pace' => 1.0,
             'speech_sample_rate' => 22050,
             'enable_preprocessing' => true,
+            'speaker' => 'anushka',
             'model' => 'bulbul:v3'
         ]);
 
@@ -123,7 +124,15 @@ class MockInterviewController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Sarvam TTS Error: ' . $response->body()]);
         }
 
-        return $response->json();
+        $data = $response->json();
+        // Sarvam bulbul:v3 often returns 'audios' array
+        $audio = $data['audio_base64'] ?? ($data['audios'][0] ?? null);
+
+        return response()->json([
+            'status' => 'success',
+            'audio_base64' => $audio,
+            'raw_debug' => $data // Temporary debug node
+        ]);
     }
 
     public function checkStatus()
