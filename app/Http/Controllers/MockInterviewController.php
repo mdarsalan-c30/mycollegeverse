@@ -140,6 +140,64 @@ class MockInterviewController extends Controller
         ]);
     }
 
+    public function generateReport(Request $request)
+    {
+        $request->validate(['session_id' => 'required|exists:interview_sessions,id']);
+        $session = InterviewSession::where('id', $request->session_id)
+                                    ->where('user_id', Auth::id())
+                                    ->firstOrFail();
+
+        if (!$session->transcript || count($session->transcript) < 2) {
+            return response()->json(['status' => 'error', 'message' => 'Interview too short for meaningful analysis.']);
+        }
+
+        $transcriptText = "";
+        foreach($session->transcript as $entry) {
+            $transcriptText .= $entry['role'] . ": " . $entry['text'] . "\n";
+        }
+
+        $analysisPrompt = "Analyze this mock interview transcript for a " . $session->role . " role. 
+        Provide a JSON response with exactly two keys:
+        1. 'score': A number between 0 and 100 based on the quality of the candidate's answers.
+        2. 'feedback': A detailed professional summary including Strengths, Weaknesses, and Advice for improvement. 
+        Keep the feedback in plain text or simple markdown.
+        
+        Transcript:
+        " . $transcriptText;
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
+                'Content-Type' => 'application/json'
+            ])->post($this->groqUrl, [
+                'model' => 'llama-3.1-8b-instant',
+                'messages' => [
+                    ['role' => 'system', 'content' => 'You are a senior career coach and technical recruiter. Output only valid JSON.'],
+                    ['role' => 'user', 'content' => $analysisPrompt]
+                ],
+                'response_format' => ['type' => 'json_object']
+            ]);
+
+            $data = $response->json();
+            $analysis = json_decode($data['choices'][0]['message']['content'], true);
+
+            $session->update([
+                'score' => $analysis['score'] ?? 0,
+                'feedback' => $analysis['feedback'] ?? 'No feedback generated.',
+                'status' => 'completed'
+            ]);
+
+            return response()->json([
+                'status' => 'success',
+                'score' => $session->score,
+                'feedback' => $session->feedback
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'error', 'message' => 'Intelligence Analysis Failed: ' . $e->getMessage()]);
+        }
+    }
+
     public function checkStatus()
     {
         $groqKey = config('services.groq.key');

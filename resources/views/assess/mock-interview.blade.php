@@ -123,12 +123,13 @@
                     <h4 class="text-sm font-black text-secondary uppercase tracking-widest mb-6">History</h4>
                     <div class="space-y-4">
                         @forelse($sessions as $session)
-                        <div class="p-4 bg-white/30 rounded-2xl border border-white/40 flex items-center justify-between">
+                        <div @click="viewPastReport({{ $session->score ?? 0 }}, `{{ addslashes($session->feedback ?? 'No report generated for this session.') }}`)" 
+                             class="p-4 bg-white/30 rounded-2xl border border-white/40 flex items-center justify-between cursor-pointer hover:bg-primary/5 hover:scale-[1.02] active:scale-95 transition-all group">
                             <div>
-                                <p class="text-xs font-black text-slate-800">{{ $session->role }}</p>
+                                <p class="text-xs font-black text-slate-800 group-hover:text-primary transition-colors">{{ $session->role }}</p>
                                 <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tight">{{ $session->created_at->format('M d, Y') }}</p>
                             </div>
-                            <span class="bg-primary/5 text-primary text-[9px] px-2 py-1 rounded-lg font-black">{{ $session->score ?? 'N/A' }}</span>
+                            <span class="bg-primary/5 text-primary text-[9px] px-2 py-1 rounded-lg font-black group-hover:bg-primary group-hover:text-white transition-all">{{ $session->score ? round($session->score) : 'N/A' }}</span>
                         </div>
                         @empty
                         <p class="text-center text-slate-400 text-xs italic py-4">No previous missions found.</p>
@@ -148,6 +149,50 @@
                             <span x-text="role"></span>
                         </button>
                     </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Performance Report Modal -->
+        <div x-show="showReportModal" class="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-slate-900/60 backdrop-blur-2xl" x-cloak x-transition>
+            <div class="glass w-full max-w-2xl rounded-[3.5rem] border-white/40 overflow-hidden relative" @click.away="!isGeneratingReport && (showReportModal = false)">
+                <div class="p-12 space-y-8">
+                    <div class="text-center space-y-2">
+                        <div class="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
+                            Neural Analysis Complete
+                        </div>
+                        <h3 class="text-4xl font-black text-secondary tracking-tighter">Performance <span class="text-primary">Intel</span></h3>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row items-center gap-12 py-6">
+                        <!-- Score Orb -->
+                        <div class="relative group">
+                            <div class="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+                            <div class="w-40 h-40 rounded-full border-8 border-primary/10 flex items-center justify-center relative bg-white/40 backdrop-blur-xl">
+                                <div class="text-center">
+                                    <span class="text-5xl font-black text-primary" x-text="reportScore"></span>
+                                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Score</p>
+                                </div>
+                                <svg class="absolute inset-0 w-full h-full -rotate-90">
+                                    <circle class="text-slate-100" stroke-width="8" stroke="currentColor" fill="transparent" r="72" cx="80" cy="80"/>
+                                    <circle class="text-primary transition-all duration-1000" stroke-width="8" :stroke-dasharray="2 * Math.PI * 72" :stroke-dashoffset="2 * Math.PI * 72 * (1 - reportScore / 100)" stroke-linecap="round" stroke="currentColor" fill="transparent" r="72" cx="80" cy="80"/>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Text -->
+                        <div class="flex-1 space-y-4">
+                            <div class="bg-white/30 rounded-[2rem] p-8 border border-white/60 max-h-[300px] overflow-y-auto custom-scrollbar">
+                                <p class="text-sm font-medium text-slate-600 leading-relaxed italic" x-text="reportFeedback"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <button @click="showReportModal = false; location.reload();" class="flex-1 py-5 bg-secondary text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-secondary/20 hover:scale-105 transition-all">
+                            Close & Sync
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,6 +226,10 @@
                 isThinking: false,
                 isSpeaking: false,
                 showRoleModal: false,
+                showReportModal: false,
+                isGeneratingReport: false,
+                reportScore: 0,
+                reportFeedback: '',
                 currentSessionId: null,
                 statusMessage: 'Ready to benchmark your intelligence. Select a role to begin.',
                 manualInput: '',
@@ -349,10 +398,40 @@
                     }
                 },
 
-                endInterview() {
-                    if (confirm('Are you sure you want to terminate this high-fidelity session?')) {
-                        location.reload();
+                async endInterview() {
+                    if (confirm('Are you sure you want to terminate this session and generate your Intelligence Report?')) {
+                        this.isGeneratingReport = true;
+                        this.statusMessage = "Compiling Intelligence Report. Please wait...";
+                        
+                        try {
+                            const res = await fetch('{{ route("interview.report") }}', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                                body: JSON.stringify({ session_id: this.currentSessionId })
+                            });
+                            
+                            const data = await res.json();
+                            if (data.status === 'success') {
+                                this.reportScore = data.score;
+                                this.reportFeedback = data.feedback;
+                                this.showReportModal = true;
+                            } else {
+                                alert(data.message);
+                                location.reload();
+                            }
+                        } catch (e) {
+                            alert("Report Generation Error: " + e.message);
+                            location.reload();
+                        } finally {
+                            this.isGeneratingReport = false;
+                        }
                     }
+                },
+
+                viewPastReport(score, feedback) {
+                    this.reportScore = score;
+                    this.reportFeedback = feedback;
+                    this.showReportModal = true;
                 }
             }
         }
