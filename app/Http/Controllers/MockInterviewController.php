@@ -119,7 +119,7 @@ class MockInterviewController extends Controller
             'loudness' => 1.5,
             'speech_sample_rate' => 22050,
             'enable_preprocessing' => true,
-            'model' => 'bulbul_v3'
+            'model' => 'bulbul:v3'
         ]);
 
         if ($response->failed()) {
@@ -182,7 +182,7 @@ class MockInterviewController extends Controller
                     'inputs' => ['hi'],
                     'target_language_code' => 'hi-IN',
                     'speaker' => 'shreya',
-                    'model' => 'bulbul_v3'
+                    'model' => 'bulbul:v3'
                 ]);
 
                 if ($response->successful()) {
