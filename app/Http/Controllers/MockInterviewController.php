@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 class MockInterviewController extends Controller
 {
     private $groqUrl = 'https://api.groq.com/openai/v1/chat/completions';
+    private $groqAudioUrl = 'https://api.groq.com/openai/v1/audio/transcriptions';
     private $sarvamSttUrl = 'https://api.sarvam.ai/speech-to-text';
     private $sarvamTtsUrl = 'https://api.sarvam.ai/text-to-speech';
 
@@ -35,21 +36,28 @@ class MockInterviewController extends Controller
 
     public function transcribe(Request $request)
     {
-        $request->validate(['audio' => 'required|file', 'model' => 'nullable|string']);
+        if (!$request->hasFile('audio')) {
+            return response()->json(['status' => 'error', 'message' => 'No audio file provided']);
+        }
 
+        // Using Groq Whisper for longer duration support (up to 25MB)
         $response = Http::withHeaders([
-            'api-subscription-key' => trim(config('services.sarvam.key'))
+            'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
         ])->attach(
             'file', file_get_contents($request->file('audio')), 'audio.wav'
-        )->post($this->sarvamSttUrl, [
-            'model' => 'saaras:v3',
+        )->post($this->groqAudioUrl, [
+            'model' => 'whisper-large-v3',
         ]);
 
         if ($response->failed()) {
-            return response()->json(['status' => 'error', 'message' => 'Sarvam STT Error: ' . $response->body()]);
+            return response()->json(['status' => 'error', 'message' => 'Groq STT Error: ' . $response->body()]);
         }
 
-        return $response->json();
+        $data = $response->json();
+        return response()->json([
+            'status' => 'success',
+            'transcript' => $data['text'] ?? ''
+        ]);
     }
 
     public function think(Request $request)
