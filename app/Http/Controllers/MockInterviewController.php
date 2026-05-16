@@ -27,13 +27,19 @@ class MockInterviewController extends Controller
             'total_questions' => 'nullable|integer|min:3|max:20'
         ]);
 
-        $session = InterviewSession::create([
+        $data = [
             'user_id' => Auth::id(),
             'role' => $request->role,
             'transcript' => [],
-            'total_questions' => $request->total_questions ?? 5,
             'status' => 'active'
-        ]);
+        ];
+
+        // Only add progress columns if they exist in DB to avoid 500
+        if (\Schema::hasColumn('interview_sessions', 'total_questions')) {
+            $data['total_questions'] = $request->total_questions ?? 5;
+        }
+
+        $session = InterviewSession::create($data);
 
         return response()->json(['status' => 'success', 'session_id' => $session->id]);
     }
@@ -111,19 +117,27 @@ class MockInterviewController extends Controller
         // Update history
         $history[] = ['user' => $request->message, 'ai' => $aiMessage, 'timestamp' => now()];
         
-        $session->update([
-            'transcript' => $history,
-            'current_question_count' => $session->current_question_count + 1
-        ]);
+        $updateData = ['transcript' => $history];
+        
+        // Defensive progress tracking
+        $hasProgressCols = \Schema::hasColumn('interview_sessions', 'current_question_count');
+        if ($hasProgressCols) {
+            $updateData['current_question_count'] = $session->current_question_count + 1;
+        }
+        
+        $session->update($updateData);
 
-        $isFinal = ($session->current_question_count >= $session->total_questions);
+        $isFinal = false;
+        if ($hasProgressCols && \Schema::hasColumn('interview_sessions', 'total_questions')) {
+            $isFinal = ($session->current_question_count >= $session->total_questions);
+        }
 
         return response()->json([
             'status' => 'success', 
             'message' => $aiMessage,
             'is_final' => $isFinal,
-            'current_q' => $session->current_question_count,
-            'total_q' => $session->total_questions
+            'current_q' => $session->current_question_count ?? 0,
+            'total_q' => $session->total_questions ?? 0
         ]);
     }
 
