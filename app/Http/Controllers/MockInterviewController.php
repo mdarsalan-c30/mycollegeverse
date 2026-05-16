@@ -85,7 +85,7 @@ class MockInterviewController extends Controller
             'Authorization' => 'Bearer ' . trim(config('services.groq.key')),
             'Content-Type' => 'application/json'
         ])->post($this->groqUrl, [
-            'model' => 'llama3-70b-8192',
+            'model' => 'llama-3.1-8b-instant',
             'messages' => $messages,
             'temperature' => 0.7
         ]);
@@ -113,7 +113,7 @@ class MockInterviewController extends Controller
         ])->post($this->sarvamTtsUrl, [
             'inputs' => [$request->text],
             'target_language_code' => 'hi-IN',
-            'speaker' => 'meera',
+            'speaker' => 'shreya',
             'pitch' => 0,
             'pace' => 1.0,
             'loudness' => 1.5,
@@ -153,7 +153,7 @@ class MockInterviewController extends Controller
                 $response = Http::withHeaders([
                     'Authorization' => 'Bearer ' . trim($groqKey),
                 ])->post($this->groqUrl, [
-                    'model' => 'llama3-8b-8192',
+                    'model' => 'llama-3.1-8b-instant',
                     'messages' => [['role' => 'user', 'content' => 'hi']],
                     'max_tokens' => 5
                 ]);
@@ -181,7 +181,7 @@ class MockInterviewController extends Controller
                 ])->post($this->sarvamTtsUrl, [
                     'inputs' => ['hi'],
                     'target_language_code' => 'hi-IN',
-                    'speaker' => 'meera',
+                    'speaker' => 'shreya',
                     'model' => 'bulbul_v3'
                 ]);
 
