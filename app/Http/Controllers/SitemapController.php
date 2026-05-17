@@ -18,7 +18,7 @@ class SitemapController extends Controller
         $notes = \App\Models\Note::latest()->get();
         $professors = \App\Models\Professor::all();
         $guides = \App\Models\AcademicGuide::latest()->get();
-        $jobs = \App\Models\JobPosting::where('is_active', true)->latest()->get();
+        $jobs = \App\Models\JobPosting::where('is_approved', true)->latest()->get();
         $pages = \App\Models\Page::all();
 
         return response()->view('sitemap', [
