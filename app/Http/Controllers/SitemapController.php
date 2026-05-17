@@ -20,7 +20,6 @@ class SitemapController extends Controller
         $guides = \App\Models\AcademicGuide::latest()->get();
         $jobs = \App\Models\JobPosting::where('is_active', true)->latest()->get();
         $pages = \App\Models\Page::all();
-        $rewards = \App\Models\Reward::where('is_active', true)->get();
 
         return response()->view('sitemap', [
             'colleges' => $colleges,
@@ -30,7 +29,6 @@ class SitemapController extends Controller
             'guides' => $guides,
             'jobs' => $jobs,
             'pages' => $pages,
-            'rewards' => $rewards,
         ])->header('Content-Type', 'text/xml');
     }
 }

@@ -29,7 +29,7 @@
     <!-- Faculty Nodes -->
     @foreach ($professors as $professor)
     <url>
-        <loc>{{ route('professors.show', $professor->slug) }}</loc>
+        <loc>{{ route('professors.show', $professor->slug ?? $professor->id) }}</loc>
         <lastmod>{{ $professor->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
@@ -49,7 +49,7 @@
     <!-- Institutional Nodes (Colleges) -->
     @foreach ($colleges as $college)
     <url>
-        <loc>{{ route('colleges.show', $college->slug) }}</loc>
+        <loc>{{ route('colleges.show', $college->slug ?? $college->id) }}</loc>
         <lastmod>{{ $college->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -59,7 +59,7 @@
     <!-- Knowledge Artifacts (Blogs) -->
     @foreach ($blogs as $blog)
     <url>
-        <loc>{{ route('blogs.show', $blog->slug) }}</loc>
+        <loc>{{ route('blogs.show', $blog->slug ?? $blog->id) }}</loc>
         <lastmod>{{ $blog->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
@@ -69,7 +69,7 @@
     <!-- Academic Guides (New Nodes) 🛰️ -->
     @foreach ($guides as $guide)
     <url>
-        <loc>{{ route('guides.show', $guide->slug) }}</loc>
+        <loc>{{ route('guides.show', $guide->slug ?? $guide->id) }}</loc>
         <lastmod>{{ $guide->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
@@ -79,27 +79,18 @@
     <!-- Career Hub (Job Postings) 💼 -->
     @foreach ($jobs as $job)
     <url>
-        <loc>{{ route('jobs.show', $job->slug) }}</loc>
+        <loc>{{ route('jobs.show', $job->slug ?? $job->id) }}</loc>
         <lastmod>{{ $job->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
     </url>
     @endforeach
 
-    <!-- Reward Tokens (Perks Hub) 💎 -->
-    @foreach ($rewards as $reward)
-    <url>
-        <loc>{{ route('rewards.show', $reward->slug) }}</loc>
-        <lastmod>{{ $reward->updated_at->tz('UTC')->toAtomString() }}</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-    </url>
-    @endforeach
 
     <!-- Static Intelligence (Pages) 🏛️ -->
     @foreach ($pages as $page)
     <url>
-        <loc>{{ route('pages.show', $page->slug) }}</loc>
+        <loc>{{ route('pages.show', $page->slug ?? $page->id) }}</loc>
         <lastmod>{{ $page->updated_at->tz('UTC')->toAtomString() }}</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.5</priority>
