@@ -258,18 +258,19 @@
             var form = document.getElementById('manifest-form');
             form.addEventListener('submit', function(e) {
                 const htmlEditor = document.getElementById('html-editor');
+                const pdfFile = document.getElementById('pdf_file').files.length > 0;
                 let finalContent = '';
                 
                 if (htmlEditor && htmlEditor.offsetParent !== null) {
                     finalContent = htmlEditor.value;
-                    if (finalContent.trim().length < 10) {
-                        alert('Bhai, HTML code toh dalo!');
+                    if (finalContent.trim().length < 10 && !pdfFile) {
+                        alert('Bhai, HTML code dalo ya fir ek PDF upload karo!');
                         e.preventDefault(); return false;
                     }
                 } else {
                     finalContent = quill.root.innerHTML;
-                    if (quill.getText().trim().length === 0 && finalContent.indexOf('<img') === -1) {
-                        alert('Please enter some content before broadcasting.');
+                    if (quill.getText().trim().length === 0 && finalContent.indexOf('<img') === -1 && !pdfFile) {
+                        alert('Please enter some content or upload a PDF before broadcasting.');
                         e.preventDefault(); return false;
                     }
                 }
