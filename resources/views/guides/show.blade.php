@@ -146,6 +146,7 @@
             @endif
 
             <!-- Content Area / Digital Manuscript Manifestation ⚡ -->
+            @if(!empty($guide->content))
             <div class="px-4 md:px-20 py-10 md:py-16" x-data="{ viewMode: '{{ $guide->hasFullHtml() ? 'html' : 'prose' }}' }">
                 
                 <!-- View Mode Switcher Node 🛰️ -->
@@ -206,6 +207,7 @@
                     </button>
                 </div>
             </div>
+            @endif
 
             <!-- Author Actions -->
             @if(Auth::check() && (Auth::id() === $guide->user_id || Auth::user()->role === 'admin'))

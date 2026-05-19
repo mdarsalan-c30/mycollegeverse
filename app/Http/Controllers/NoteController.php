@@ -237,8 +237,8 @@ class NoteController extends Controller
 
                 // --- High-Quality Premium Imagick Watermarking ---
                 try {
-                    // Check file size (If > 10MB, skip branding to prevent server timeout)
-                    if ($file->getSize() < 10485760) { 
+                    // Check file size (If > 2MB or if it's a competitive exam PYQ/pdf which are usually large, skip branding to prevent server timeout/OOM)
+                    if ($request->note_type !== 'competitive' && $file->getSize() < 2097152) { 
                         $imagick = new \Imagick();
                         // Set 150 DPI for crystal clear text (Standard for readable docs)
                         $imagick->setResolution(150, 150); 
@@ -281,7 +281,7 @@ class NoteController extends Controller
                     } else {
                         $uploadFile = $file->getRealPath();
                     }
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     \Log::warning("Imagick Watermarking failed: " . $e->getMessage());
                     $uploadFile = $file->getRealPath();
                 }

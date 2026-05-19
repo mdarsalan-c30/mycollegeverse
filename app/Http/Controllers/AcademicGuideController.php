@@ -54,9 +54,9 @@ class AcademicGuideController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
             'category' => 'required|string',
-            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
+            'content' => 'nullable|required_without:pdf_file|string',
+            'pdf_file' => 'nullable|required_without:content|file|mimes:pdf|max:10240',
         ]);
 
         $filePath = null;
@@ -241,9 +241,9 @@ class AcademicGuideController extends Controller
 
         $request->validate([
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
             'category' => 'required|string',
-            'pdf_file' => 'nullable|file|mimes:pdf|max:10240',
+            'content' => 'nullable|required_without:pdf_file|string',
+            'pdf_file' => 'nullable|required_without:content|file|mimes:pdf|max:10240',
         ]);
 
         $data = [
